@@ -1,0 +1,134 @@
+
+<div class="pc-container">
+    <div class="pcoded-content pb">
+    <div class="page-header">
+            <div class="page-block">
+                <div class="row align-items-center">
+                    <div class="col-md-6"  style="margin-top: 20px;">
+                        <div class="page-header-title">
+                            <h5 class="m-b-10">Prosecution</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card mt-5">
+            <div class="card-body">
+                <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                    <div class="col-md-12">
+                  <div class="row">
+                    <div class="col-md-10">
+                <div class="row searchbypanel">
+                   <div class="col-md-3  col-12 mb-3">
+                         <label class="form-label"> District  Name</label>
+                          <sup class="text-danger top-0">*</sup>
+                          <select  id="district" formControlName="district" class="form-control form-select" [ngClass]="{ 'is-invalid': isSubmitted && f['district'].errors }" (change)="onDistrictChange($event)" >
+                              <option value="">Select</option>
+                              <option *ngFor="let district of Districts" [value]="district.value">{{ district.text }}</option>
+                          </select>
+                      @if (f['district'].errors && isSubmitted) {
+                              <div class="invalid-feedback">
+                                @if (f['district'].errors['required']) {
+                                  <div>District Name is required</div>
+                                }
+                              </div>
+                              }
+                      </div>
+                        <div class="col-md-3  col-12 mb-3">
+                            <label class="form-label"> Police Station</label>
+                            <sup class="text-danger top-0">*</sup>
+                            <select id="policeStation" formControlName="psCode" data-errormessage-custom-error="" class="form-control form-select"  [ngClass]="{ 'is-invalid': isSubmitted && f['psCode'].errors }">
+                                <option value="">Select</option>
+                                <option *ngFor="let policestation of policestations" [value]="policestation.value">{{ policestation.text }}</option>
+                            </select>
+                            @if (f['psCode'].errors && isSubmitted) {
+                                <div class="invalid-feedback">
+                                  @if (f['psCode'].errors['required']) {
+                                    <div>Police Station is required</div>
+                                  }
+                                </div>
+                                }
+                        
+                        </div>
+                        <div class="col-md-3  col-12 mb-3">
+                            <label class="form-label"> FIR No.</label>
+                            <sup class="text-danger top-0">*</sup>
+                            <input type="text" formControlName="firNumber"  maxlength="7" tabindex="2"  class="form-control " [ngClass]="{ 'is-invalid': isSubmitted && f['firNumber'].errors }">
+                            @if (f['firNumber'].errors && isSubmitted) {
+                                <div class="invalid-feedback">
+                                  @if (f['firNumber'].errors['required'] && isSubmitted) {
+                                    <div>Fir Number is required</div>
+                                  }
+                                  @if (f['firNumber'].errors['pattern']) {
+                                    <div>Invalid Fir Number</div>
+                                  }
+                                </div>
+                            }
+                        </div>
+                        <div class="col-md-3  col-12 mb-3">
+                            <label class="form-label">Year</label>
+                            <sup class="text-danger top-0">*</sup>
+                            <input type="text" formControlName="year"  maxlength="4" tabindex="2"  class="form-control " [ngClass]="{ 'is-invalid': isSubmitted && f['year'].errors }">
+                            @if (f['year'].errors && isSubmitted) {
+                                <div class="invalid-feedback">
+                                  @if (f['year'].errors['required']) {
+                                    <div>Year is required</div>
+                                  }
+                                  @if (f['year'].errors['pattern']) {
+                                    <div>Invalid year</div>
+                                  }
+                                </div>
+                            }
+                        </div>
+                        <div class="col-md-3 col-12 mb-3 pt-4 mt-1">
+                          
+                        </div>
+                </div>
+                    </div>
+
+                    <div class="col-md-2 col-12 pt-4 mt-2" >
+                           <button type="submit" class="btn btn-success text-white py-1">Search</button>
+                      </div>
+                  </div>
+                    </div>
+            </form>
+            </div>
+            
+        </div>
+        <div class="row" *ngIf="isLoaded">
+            <div class="col-sm-12  p-0">
+                <div class="card">
+                    <div class="card-body pb-0 pt-3">
+                        <p-table [value]="firdata" [paginator]="false" [rows]="20" [responsive]="true" [responsiveLayout]="'scroll'">
+                            <ng-template pTemplate="header">
+                              <tr>
+                                <th>S.No</th>
+                                <th>FIR Number</th>
+                                <th>FIR Registration Date & Time</th>
+                                <th>Status</th>
+                              </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex">
+                              <tr>
+                                <td>{{ rowIndex + 1 }}</td>
+                                <td>
+                                  <a href="javascript:void(0)" (click)="openOtherPillarsTab(rowData.firRegNum)">
+                                    {{ rowData.firShortNumber }}
+                                  </a>
+                                </td>
+                                <td>{{ rowData.firRegDate }}</td>
+                                <td>{{ rowData.firStatus }}</td>
+                              </tr>
+                            </ng-template>
+                          </p-table>
+                    </div>
+                </div>
+            </div>
+        </div>
+      
+      
+    </div>
+</div>
+
+
+<div #dynamicContainer></div>

@@ -1,0 +1,225 @@
+<!-- Modal Content -->
+<ng-template #content let-modal>
+    <div class="modal-header px-3 pt-3 pb-0 border-bottom-0">
+      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body pt-0">
+      <!-- Logo -->
+      <div class="logo mb-4 text-center">
+        <img src="assets/images/new-logo.jpg" alt="Nyaay Setu" width="230px">
+      </div>
+      <h4 class="mb-3 f-w-400 text-center">Login</h4>
+  
+      <!-- State List Dropdown -->
+      <div class="input-group mb-3" *ngIf="isOtpButton">
+        <span class="input-group-text blu-cr">
+          <i class="fa fa-map-marker text-white"></i>
+        </span>
+        <select class="form-select" [(ngModel)]="selectedStateCode" name="state">
+          <option value="0">Select State</option>
+          <option *ngFor="let state of states" [value]="state.StateCode">{{ state.stateName }}</option>
+        </select>
+      </div>
+  
+      <!-- Phone Number Input -->
+      <div class="input-group mb-3" *ngIf="isOtpButton">
+        <span class="input-group-text blu-cr">
+          <i class="fa fa-phone text-white"></i>
+        </span>
+        <input type="text" class="form-control" placeholder="Enter Mobile Number" maxlength="10" [(ngModel)]="mobileNumber" name="mobile" required="true" pattern="[0-9]{10}" />
+      </div>
+  
+      <!-- Captcha Input -->
+    <div *ngIf="isOtpButton" class="captcha-container text-center mb-3">
+        <div class="row">
+         <div class="col-sm-5"><img [src]="captchaUrl" alt="Captcha" /></div>
+         <div class="col-sm-7"> 
+           <div class="d-flex">
+            <a href="javascript:void(0)" (click)="CaptchaRefresh()">
+            <img src="assets/images/refresh.png" alt="refresh" width="40px" class="mr-2">
+            </a> 
+            <input type="text" class="form-control" placeholder="Enter Captcha" [(ngModel)]="captch_input" maxlength="10"></div>
+        </div>
+    </div>
+        
+       
+        <div class="row mt-3">
+            <div class="col-12 col-sm-12 mb-2">
+                <button class="btn btn-success text-white w-100" (click)="verifyMobile()" *ngIf="isOtpButton">Send OTP</button>
+              </div>
+          </div>          
+      </div>
+  
+      <!-- OTP Inputs -->
+      <div *ngIf="isOtpTextVisible" class="d-flex justify-content-center mb-3 otp-filler">
+       
+            <input type="text" class="form-control otp-input" [(ngModel)]="otp1" maxlength="1"(keydown)="moveFocus($event, otp2Input, null)" #otp1Input />
+
+            <input type="text" class="form-control otp-input" [(ngModel)]="otp2" maxlength="1"(keydown)="moveFocus($event, otp3Input, otp1Input)" #otp2Input />
+
+            <input type="text" class="form-control otp-input" [(ngModel)]="otp3" maxlength="1"(keydown)="moveFocus($event, otp4Input, otp2Input)" #otp3Input />
+
+            <input type="text" class="form-control otp-input" [(ngModel)]="otp4" maxlength="1"(keydown)="moveFocus($event, otp5Input, otp3Input)" #otp4Input />
+
+            <input type="text" class="form-control otp-input" [(ngModel)]="otp5" maxlength="1"(keydown)="moveFocus($event, otp6Input, otp4Input)" #otp5Input />
+
+            <input type="text" class="form-control otp-input" [(ngModel)]="otp6" maxlength="1"(keydown)="moveFocus($event, null, otp5Input)" #otp6Input />
+
+      </div>
+  
+      <!-- Action Buttons -->
+      <div class="d-flex justify-content-center">
+        <!-- <button class="btn blu-cr text-white mx-1" (click)="verifyMobile()" *ngIf="isOtpButton">Send OTP</button> -->
+        <button class="btn btn-success text-white mx-1" (click)="verfiyOTPUser()" *ngIf="isOtpVerfiy">Verify OTP</button>
+        <button class="btn blu-cr text-white mx-1" *ngIf="isOtpReSendButton">Resend OTP</button>
+      </div>
+    </div>
+  </ng-template>
+
+<header>
+    <div class="container-xxl">
+        <div class="row d-flex">
+            <div class="col-sm-3 col-6">
+                <div class="logo my-1">
+                    <a href="javascript:void(0)">
+                        <!-- Ensure the file path is correct and check case sensitivity -->
+                        <img src="assets/images/new-logo.jpg" alt="Nyaay Setu" width="230px">
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-xxl-6 col-md-5 col-sm-9 col-6 d-flex align-items-center justify-content-center order-md-0">
+                <h1 class="text-center">Monitoring Platform for Criminal Justice System <span>(An Initiative under ICJS Project)</span></h1>
+                <!--<h1 class="text-center">Platform for Criminal Justice System <span>(An Initiative under ICJS Project)</span></h1>-->
+            </div>
+
+            <div class="col-xxl-3 col-md-4 col-12 text-right pt-3 pt-md-1 new-lg-btn">
+             
+                <select class="form-select py-1 state-slct" [(ngModel)]="selectedStateCode" name="state">
+                    <option value="0">Select State</option>
+                    <option *ngFor="let state of states" [value]="state.StateCode">{{ state.stateName }}</option>
+                  </select>
+            
+                <div class="login-button">
+                    <button type="button" class="btn blu-cr"  (click)="openLoginModal(content)">
+                        <i class="fa fa-sign-in mr-2" aria-hidden="true"></i> Login
+                    </button>
+                </div>
+            <div class="login-button janpar-login">
+                <button type="button" class="btn btn-yellow" (click)="VerifyJanParichay()">
+                    <i class="fa fa-sign-in " aria-hidden="true"></i> Login with JanParichay
+                </button>
+            </div>
+        </div>
+        </div>
+    </div>
+</header>
+
+<div class="hero-section position-relative py-xl-4">
+    <div class="container-xl">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="row">
+                    <div class="col-sm-5 d-none d-sm-block pt-xl-0 pt-3">
+                        <!-- Check that this image path is correct as well -->
+                        <img src="assets/images/hero-banner-image.png" alt="pillars of Nyaay Setu" width="350px">
+                    </div>
+                    <div class="col-sm-7 d-flex align-items-center">
+                        <div class="hero-banner-content">
+                            <!-- <ul class="spl-list">
+                                <li><span>Smart</span> policing</li>
+                                <li>Get data all <span>ICJS pillars</span> at single point</li>
+                                <li>Serving of <span>Summons</span> by police department</li>
+                            </ul>-->
+                             <h2>Significant Step towards Modernizing and Integrating the Criminal Justice System to achieve Smart 
+                                Policing.</h2>
+                        </div>
+                    </div> 
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="about-nyaay-setu py-4 py-xl-5">
+    <div class="container-xl">
+        <div class="row">
+            <div class="col-sm-9">
+                <h2>About <span>NYAY SETU</span></h2>
+                <!--<p>Police department is main agency which interacts with all agencies i.e Prosecution, Forensic, Court and Jail.
+                     Police department should have complete data all the pillars of ICJS on CCTNS.</p>
+                <p>NYAY SETU is developed on the top of CCTNS by using APIs of various pillars of ICJS i.e Prosecution, 
+                    Forensic, Court and Prison. Patches added in Crime and Criminal Tracking Network & Systems (CCTNS)
+                     to integrate it with eProsecution and eFSL for seamless flow of information between CCTNS,
+                      prosecution, and FSL. of newly enacted criminal laws and is intended to provide a holistic solution in a contributory
+                       manner to all the stakeholders looking for such type of service.</p>
+                       <p>Police plays a vital role in the Criminal Justice System and it interacts with all pillars like Prosecution, Forensic, Court, and Prison.</p>
+
+                        <p>Nyay Setu is a Monitoring Dashboard for Police integrating the data from all pillars of ICJS to enhance their efficiency and streamline operations.</p>-->
+                        <p><strong>Nyay Setu Empowering Data-Driven Policing through Integrated Access</strong></p>
+                        <p>To streamline operations and strengthen inter-agency coordination, <strong>Nyay Setu</strong> has been launched as a dedicated digital platform for 
+                            the police. It offers unified access to data from all pillars of the <strong>Inter-Operable Criminal Justice System (ICJS),</strong> enabling law 
+                            enforcement officers to make informed decisions, minimize delays, and improve case outcomes.</p>
+                             <p><strong>Nyay Setu</strong> is built with a <strong>role-based access framework,</strong> ensuring secure, relevant, and need-based data availability according to
+                                 an officer’s designation and responsibilities. By enabling seamless information exchange and fostering data-driven policing, 
+                                 the platform significantly enhances the efficiency, transparency and accountability of the criminal justice system.</p>
+            </div>
+            <!-- <div class="col-sm-9">
+                <h2>About <span>NYAAY SETU</span></h2>
+                <p>Police department is main agency which interacts with all agencies i.e Prosecution, Forensic, Court and Jail. Police department should have complete data all the pillars of ICJS on CCTNS.</p>
+                <p>NYAAY SETU is developed on the top of CCTNS by using APIs of various pillars of ICJS i.e Prosecution, Forensic, Court and Prison. Patches added in Crime and Criminal Tracking Network & Systems (CCTNS) to integrate it with eProsecution and eFSL for seamless flow of information between CCTNS, prosecution, and FSL. of newly enacted criminal laws and is intended to provide a holistic solution in a contributory manner to all the stakeholders looking for such type of service.</p>
+            </div> -->
+            <div class="col-sm-3 pt-2 text-right d-flex align-items-center">
+                <!-- Ensure this image path is also correct -->
+                <img src="assets/images/about-nyaay-setu-image.png" alt="about nyaay setu" class="img-fluid" width="260px">
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="logo-sec py-1 py-xl-2">
+    <div class="container-xl">
+        <div class="row">
+            <div class="col-sm-12">
+                <ul class="d-flex flex-row justify-content-between p-0 mb-0">
+                    <li>
+                        <a href="https://www.mha.gov.in/en" target="_blank">
+                            <img src="assets/images/home-affairs.png" alt="Ministry of Home Affairs">
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://ncrb.gov.in/" target="_blank">
+                            <img src="assets/images/natinal-crime.png" alt="National Crime Records Bureau">
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.nic.in/" target="_blank">
+                            <img src="assets/images/nic-logo.png" alt="NIC">
+                        </a>
+                    </li>
+                    <!-- <li>
+                        <a href="https://chandigarhpolice.gov.in/" target="_blank">
+                            <img src="assets/images/chd-police-logo.png" alt="Chandigarh Police">
+                        </a>
+                    </li> -->
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="fot-bg">
+    <div class="container-xl">
+        <div class="row">
+            <div class="col-sm-12">
+                <!--<p><strong>Disclaimer:</strong> Website is designed, developed and hosted by National Informatics Centre (NIC). 
+                    Site contents are owned, maintained and updated by the concerned department of Chandigarh Administration. 
+                    NIC does not take any responsibility legal or otherwise regarding the contents of this website or the contents 
+                    of the websites linked to it.</p> -->
+            <p>© Content Owned by Ministry of Home Affairs, Government of India | Site Maintained by (NIC) National Informatics Centre version 1.2.0</p>
+            
+            </div>
+        </div>
+    </div>
+</footer>

@@ -1,0 +1,56 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class PredictiveAnalysisService {
+
+ private apiUrl = `${environment.apiUrl}/PredictiveAnalysis/trend-chart`;
+ private apiComparsionChart = `${environment.apiUrl}/PredictiveAnalysis/Comparsion-Chart`;
+ private apiPredictionChart = `${environment.apiUrl}/PredictiveAnalysis/prediction-chart`;
+  private GetPoliceStationApiUrl: string = `${environment.apiUrl}/Public/GetPoliceStationList`;
+   private PredictiveAnalysis: string = `${environment.apiUrl}/PredictiveAnalysis/crime-trend-chart-Final`;
+  constructor(private http: HttpClient) {}
+
+  // getCrimeTrends(stateCode:any): Observable<any> {
+  //   return this.http.get<any>(`${this.apiUrl}${stateCode}`);
+  // }
+//  getCrimeTrends(stateCode: string,psCode: string): Observable<any> {
+//   return this.http.get(`${this.apiUrl}/trend-chart`, {
+//     params: { stateCode, psCode }
+    
+//   });
+// }
+
+//  getCrimeTrends(state_code string, district_code string, ps_code string): Observable<any> {
+    
+//     const body = {
+//       stateCode: stateCode,
+//       psCode: psCode,
+//     };
+//     return this.http.post<any>(this.PredictiveAnalysis, body);
+//   }
+   getCrimeTrends(state_code: any, district_code: any, ps_code: any): Observable<any> {
+    const body = {
+      state_code: state_code,
+      district_code: district_code,
+      ps_code: ps_code,
+    };
+    return this.http.post<any>(this.PredictiveAnalysis, body);
+  }
+
+
+  getCrimeComparisonData(stateCode:any): Observable<any> {
+    return this.http.get<any>(`${this.apiComparsionChart}`);
+  }
+getPredictionChart(stateCode: any): Observable<any> {
+  return this.http.get<any>(`${this.apiPredictionChart}`);
+}
+ LoadPoliceStations(distcodes: number[]): Observable<any[]> {
+    return this.http.post<any[]>(`${this.GetPoliceStationApiUrl}`, {districts:distcodes});
+  }
+
+}

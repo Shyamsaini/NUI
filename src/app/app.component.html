@@ -1,0 +1,17 @@
+<app-loader></app-loader>
+
+<ng-container *ngIf="showLayout">
+  <app-layout></app-layout>
+  <div class="main-container" >
+      <div class="content" style="flex-grow: 1; padding: 20px;">
+          <router-outlet></router-outlet>
+      </div>
+  </div>
+  <app-footer></app-footer>
+</ng-container>
+<ng-container *ngIf="!showLayout">
+  <router-outlet></router-outlet>
+</ng-container>
+
+
+

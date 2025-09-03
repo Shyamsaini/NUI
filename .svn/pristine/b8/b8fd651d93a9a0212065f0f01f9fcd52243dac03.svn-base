@@ -1,0 +1,329 @@
+import { ChangeDetectorRef, Component, ComponentFactoryResolver, Type, ViewChild } from '@angular/core';
+import { DynamicTabDirective } from './dynamic-tab.directive';
+import { CourtComponent } from '../court/court.component';
+import { OtherPillarInformation } from '../../models/otherpillarinformation.model';
+import { IcjsSearchService } from '../../services/icjs-search.service';
+import Swal from 'sweetalert2';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { UtilityService } from '../../services/utility.service';
+import { LoaderService } from '../../services/loader.service';
+interface Tab {
+  title: string;
+  component: Type<any>;
+  data: any;
+}
+
+@Component({
+  selector: 'app-tab-container',
+  templateUrl: './tab-container.component.html',
+  styleUrl: './tab-container.component.css'
+})
+
+export class TabContainerComponent {
+  @ViewChild(DynamicTabDirective, { static: true }) dynamicTab!: DynamicTabDirective;
+  selectedTabIndex = 0;
+  otherPillarData? : OtherPillarInformation;
+  courtCaseInfos: any[] = [];
+  fslInfos: any[] = [];
+  prosecutionInfos: any[] = [];
+  prisonerInfos: any[] = [];
+  miniStatements: any[] = [];
+  medlePrs: any[] = [];
+  refreshTabs? : boolean = true;
+  tabs: Tab[] = [
+  ];
+  psCode:any;
+
+  constructor(private componentFactoryResolver: ComponentFactoryResolver,  private ref: ChangeDetectorRef, private icjsSearchService: IcjsSearchService, private utilityService: UtilityService
+    ,private loaderService: LoaderService
+  ) {}
+
+  ngOnInit() {
+    this.loadComponent(0);
+  }
+
+  selectTab(index: number, psCode: any) {
+    
+      this.selectedTabIndex = index;
+      this.loadComponent(index);
+  }
+
+  loadComponent(index: number) {
+    const tab = this.tabs[index];
+    const psCode=this.otherPillarData;
+    const ps_Code = psCode?.firregnum.slice(0, 7);
+    if (tab.component.name == "_OtherPillarsComponent"){
+      if(this.otherPillarData === undefined || this.otherPillarData.firregnum != tab.data.firNumber){
+        this.loaderService.show();
+        this.loadOtherPillarData(tab.data).subscribe(response => {
+          if (response.isSuccess) {
+            this.psCode=tab.data.policeCode;
+            this.otherPillarData = response.data;
+            this.loadDynamicComponent(index, this.otherPillarData,ps_Code);
+            this.loaderService.hide();
+          }
+           else {
+            this.otherPillarData = undefined;
+            this.loadDynamicComponent(index, this.otherPillarData,ps_Code);
+            Swal.fire({
+              position: 'top-end', // Or 'center-end' for center-right position
+              title: response.message,
+              showConfirmButton: false,
+              timer: 2000,
+              customClass: {
+                popup: 'custom-failure-alert',
+                title: 'custom-title',
+              },
+              background: '#ff0000', // Red background
+            });
+            console.log('API false response:', response);
+            this.loaderService.hide();
+          }
+          
+        },
+        (error: HttpErrorResponse) => {
+          console.error('API error:', error);
+          this.otherPillarData = undefined;
+          this.loadDynamicComponent(index, this.otherPillarData,ps_Code);
+          this.loaderService.hide();
+        });
+      }
+      else{
+        this.loadDynamicComponent(index, this.otherPillarData,ps_Code);
+        this.loaderService.hide();
+      }
+    }
+    else if(tab.component.name == "_CourtComponent"){
+      this.loaderService.show();
+      const cnrInfo = this.courtCaseInfos.find(item => item.cino === tab.title);
+      if(cnrInfo){
+        this.loadDynamicComponent(index, cnrInfo,ps_Code);
+        this.loaderService.hide();
+      }
+      else{
+        this.loadCaseInformation(tab.data).subscribe(response=>{
+          if(response.isSuccess){
+            const data = JSON.parse(response.data);
+            this.courtCaseInfos.push(data);
+            this.loadDynamicComponent(index, data,ps_Code);
+            this.loaderService.hide();
+          }
+          else{
+            this.utilityService.ShowErrorPopup(response.message);
+            this.loaderService.hide();
+          }
+        });
+      }
+    }
+    
+    else if(tab.component.name == "_ForensicComponent"){
+      this.loaderService.show();
+      const fslInfo = this.fslInfos.find(item => item.fslid === tab.title);
+      if(fslInfo){
+        this.loadDynamicComponent(index, fslInfo,ps_Code);
+        this.loaderService.hide();
+      }
+      else{
+        this.loadFslInformation(tab.data).subscribe(response=>{
+          if(response.isSuccess){
+            const data = JSON.parse(response.data);
+            this.fslInfos.push(data);
+            this.loadDynamicComponent(index, data,ps_Code);
+            this.loaderService.hide();
+          }
+          else{
+            this.utilityService.ShowErrorPopup(response.message);
+            this.loaderService.hide();
+          }
+        });
+      }
+    }
+    else if(tab.component.name == "_ProsecutionComponent"){
+      this.loaderService.show();
+      const prosecutionInfo = this.prosecutionInfos.find(item => item.eprocid === tab.title);
+      if(prosecutionInfo){
+        this.loadDynamicComponent(index, prosecutionInfo,ps_Code);
+        this.loaderService.hide();
+      }
+      else{
+        this.loadProsecutionInformation(tab.data,ps_Code).subscribe(response=>{
+          if(response.isSuccess){
+            const data = JSON.parse(response.data);
+            this.prosecutionInfos.push(data.data);
+            this.loadDynamicComponent(index, data.data,ps_Code);
+            this.loaderService.hide();
+          }
+          else{
+            this.utilityService.ShowErrorPopup(response.message);
+            this.loaderService.hide();
+          }
+        });
+      }
+    }
+    else if(tab.component.name == "_PrisonComponent"){
+      debugger
+      this.loaderService.show();
+      const prsionerInfo = this.prisonerInfos.find(item => item.prisonerId === tab.title);
+      if(prsionerInfo){
+        this.loadDynamicComponent(index, prsionerInfo,ps_Code);
+        this.loaderService.hide();
+      }
+      else{
+        this.loadPrisonInformation(tab.data).subscribe(response=>{
+          if(response.isSuccess){
+            const data = JSON.parse(response.data);
+            this.prisonerInfos.push(data);
+            this.loadDynamicComponent(index, data,ps_Code);
+            this.loaderService.hide();
+          }
+          else{
+            this.utilityService.ShowErrorPopup(response.message);
+            this.loaderService.hide();
+          }
+        });
+      }
+    }
+    else if(tab.component.name == "_MiniStatementComponent"){
+      this.loaderService.show();
+      const miniStatement = this.miniStatements.find(item => item === tab.title);
+      if(miniStatement){
+        this.loadDynamicComponent(index, miniStatement,ps_Code);
+        this.loaderService.hide();
+      }
+      else{
+        this.loadMiniStatement(tab.data).subscribe(response=>{
+          if(response.isSuccess){
+            const data = response.data;
+            this.miniStatements.push(data);
+            this.loadDynamicComponent(index, data,ps_Code);
+            this.loaderService.hide();
+          }
+          else{
+            this.utilityService.ShowErrorPopup(response.message);
+            this.loaderService.hide();
+          }
+        });
+      }
+    }
+    else if(tab.component.name == "_MedleprComponent"){
+      this.loaderService.show();
+      const medleprInfo = this.medlePrs.find(item => item === tab.title);
+      if(medleprInfo){
+        this.loadDynamicComponent(index, medleprInfo,ps_Code);
+        this.loaderService.hide();
+      }
+      else{
+        this.loadMedleprInformation(tab.data).subscribe(response=>{
+          if(response.isSuccess){
+            const data = JSON.parse(response.data);
+            this.medlePrs.push(tab.data);
+            this.loadDynamicComponent(index, data,ps_Code);
+            this.loaderService.hide();
+          }
+          else{
+            this.utilityService.ShowErrorPopup(response.message);
+            this.loaderService.hide();
+          }
+        });
+      }
+    }
+  }
+
+  loadDynamicComponent(index: number, componentData: any, ps_Code: string | undefined){
+  
+
+    const tab = this.tabs[index];
+    const componentFactory = this.componentFactoryResolver.resolveComponentFactory(tab.component);
+    const viewContainerRef = this.dynamicTab.viewContainerRef;
+    viewContainerRef.clear();
+    const componentRef = viewContainerRef.createComponent(componentFactory);
+    componentRef.instance.title = tab.title;
+    if(tab.component.name == "_OtherPillarsComponent"){
+      componentRef.instance.loadPillarData(componentData);
+    }
+    else if(tab.component.name == "_CourtComponent"){
+      componentRef.instance.loadCaseinformation(componentData);
+    }
+    else if(tab.component.name == "_ForensicComponent"){
+      componentRef.instance.loadFslInfo(componentData,ps_Code);
+    }
+    else if(tab.component.name == "_ProsecutionComponent"){
+      componentRef.instance.loadProsecutionInfo(componentData,ps_Code);
+    }
+    else if(tab.component.name == "_PrisonComponent"){
+      componentRef.instance.loadPrisonInfo(componentData);
+    }
+    else if(tab.component.name == "_MiniStatementComponent"){
+      componentRef.instance.loadHtml(componentData);
+    }
+    else if(tab.component.name == "_MedleprComponent"){
+      componentRef.instance.loadMedleprInfo(componentData);
+    }
+  }
+
+  loadOtherPillarData(data: any)  {
+    return this.icjsSearchService.LoadOtherPillars(data);
+  }
+
+  loadCaseInformation(cnrNumber: string){
+    return this.utilityService.LoadCourtCaseInformation({cnrNumber: cnrNumber});
+  }
+
+  loadFslInformation(fslId: string){
+    return this.utilityService.LoadFslInformation({fslId: fslId});
+  }
+
+  loadPrisonInformation(data:any){
+    return this.utilityService.LoadPrisonerInformation(data);
+  }
+
+  loadMiniStatement(data:any){
+    return this.utilityService.LoadMiniStatement({firNumber: data});
+  }
+
+  loadProsecutionInformation(eProcId: string, ps_Code: string | undefined){
+    return this.utilityService.LoadProsecutionInformation({eProcId: eProcId,ps_Code:ps_Code});
+  }
+  loadMedleprInformation(transactionNumber: string){
+    return this.utilityService.LoadMedleprInformation({transactionNumber: transactionNumber});
+  }
+
+
+  closeTab(index: number, event: MouseEvent) {
+    event.stopPropagation();
+
+    this.tabs.splice(index, 1);
+
+    if (this.selectedTabIndex === index && this.tabs.length > 0) {
+      this.selectedTabIndex = index === 0 ? 0 : index - 1;
+    } else if (this.tabs.length === 0) {
+      this.selectedTabIndex = -1;
+    }
+
+    if (this.tabs.length > 0) {
+      this.loadComponent(this.selectedTabIndex);
+    } else {
+      this.dynamicTab.viewContainerRef.clear();
+    }
+  }
+
+  addTab(title: string, component: Type<any>, data: any) {
+   
+    this.psCode=data.policeCode;
+    const psCode=this.psCode;
+    const foundElement = this.tabs.find(item => item.title === title);
+    if(foundElement){
+      const foundIndex = this.tabs.findIndex(item => item.title === title);
+      this.selectTab(foundIndex,psCode);
+    }
+    else{
+      
+      const newTab = { title, component, data };
+      this.tabs.push(newTab);
+      this.selectTab(this.tabs.length - 1,psCode);
+    }
+    this.ref.detectChanges();
+  }
+
+}

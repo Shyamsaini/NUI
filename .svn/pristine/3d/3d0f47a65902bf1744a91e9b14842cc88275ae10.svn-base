@@ -1,0 +1,61 @@
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ReportAuthorizationService {
+  private GetDistrictsApiUrl: string = `${environment.apiUrl}/Public/GetNyaySetuDistricts`;
+//  private GetPoliceStationApiUrl: string = `${environment.apiUrl}/Public/GetNyaySetuPoliceStations`;
+  private GetPoliceStationApiUrl: string = `${environment.apiUrl}/Public/GetNyaySetuPoliceStationList`;
+  constructor(private http: HttpClient) { }
+
+  InsertReportAuthority(data: any): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/ReportAuthority/InsertReportAuthority`, data);
+  }
+
+  checkMobileExistence(mobile: any): Observable<any> {
+    let params = new HttpParams().set('mobile', mobile);
+    return this.http.get<any>(`${environment.apiUrl}/ReportAuthority/CheckMobileExistence`, { params });
+  }
+
+
+  ModuleAssign(data: any): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/ReportAuthority/ModuleAssign`, data);
+  }
+
+  getModuleAssignList(mobile: string): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/ReportAuthority/GetModuleAssignByMobile`, {
+      mobile: mobile
+    });
+  }
+
+  UpdateModuleAssign(payload: any): Observable<any> {
+    debugger;
+    return this.http.post(`${environment.apiUrl}/ReportAuthority/UpdateModuleAssign`, payload);
+  }
+
+  LoadDistricts(): Observable<any> {
+    return this.http.get<any>(this.GetDistrictsApiUrl);
+  }
+  LoadPoliceStations(distcodes: number[]): Observable<any[]> {
+    return this.http.post<any[]>(`${this.GetPoliceStationApiUrl}`, { districts: distcodes });
+  }
+
+
+  LoadPoliceStationsList(distcodes: number[]): Observable<any[]> {
+    return this.http.post<any[]>(`${this.GetPoliceStationApiUrl}`, {
+      districts: distcodes,
+    });
+  }
+  PoliceStationList(distcode?: string): Observable<any[]> {
+    if (distcode) {
+      return this.http.get<any[]>(`${environment.apiUrl}/Public/GetNyaySetuPoliceStations?distcode=${distcode}`);
+    } else {
+      return this.http.get<any[]>(`${environment.apiUrl}/Public/GetNyaySetuPoliceStations`);
+    }
+  }
+}
+

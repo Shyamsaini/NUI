@@ -1,0 +1,26 @@
+import {
+  Paginator,
+  PaginatorModule
+} from "./chunk-VS3TP2P5.js";
+import "./chunk-HLBYA7BA.js";
+import "./chunk-UI5IMHZO.js";
+import "./chunk-D2CQFBTE.js";
+import "./chunk-NLNJ5WNT.js";
+import "./chunk-P7RHLNA2.js";
+import "./chunk-WGB7ZFXK.js";
+import "./chunk-JIPXLZMQ.js";
+import "./chunk-5Z462A6V.js";
+import "./chunk-7Z6ZCI7E.js";
+import "./chunk-E4PUWQCW.js";
+import "./chunk-LS6E6TEF.js";
+import "./chunk-GXA4L6ZF.js";
+import "./chunk-2PYGZVND.js";
+import "./chunk-KJWWQY4Y.js";
+import "./chunk-DN6YLHAD.js";
+import "./chunk-WINX6U5G.js";
+import "./chunk-X6JV76XL.js";
+export {
+  Paginator,
+  PaginatorModule
+};
+//# sourceMappingURL=primeng_paginator.js.map

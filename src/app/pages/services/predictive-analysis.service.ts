@@ -1,0 +1,45 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class PredictiveAnalysisService {
+
+//  private apiComparsionChart = `${environment.apiUrl}/PredictiveAnalysis/Comparsion-Chart`;
+ //private apiPredictionChart = `${environment.apiUrl}/PredictiveAnalysis/prediction-chart`;
+  private GetPoliceStationApiUrl: string = `${environment.apiUrl}/Public/GetPoliceStationList`;
+   private PredictiveAnalysis: string = `${environment.apiUrl}/PredictiveAnalysis/crime-trend-chart-Final`;
+   private apiComparsionChart = `${environment.apiUrl}/PredictiveAnalysis/crime-comparsion-chart-Final`;
+    private apiPredictionChart = `${environment.apiUrl}/PredictiveAnalysis/crime-predication-chart-Final`;
+  constructor(private http: HttpClient) {}
+
+
+   getCrimeTrends( district_code: any, ps_code: any): Observable<any> {
+    const body = {
+      district_code: district_code,
+      ps_code: ps_code,
+    };
+    return this.http.post<any>(this.PredictiveAnalysis, body);
+  }
+   getCrimeComparisonData(district_code: any, ps_code: any): Observable<any> {
+    const body = {
+      district_code: district_code,
+      ps_code: ps_code,
+    };
+    return this.http.post<any>(this.apiComparsionChart, body);
+  }
+   getPredictionChart( district_code: any, ps_code: any): Observable<any> {
+    const body = {
+      district_code: district_code,
+      ps_code: ps_code,
+    };
+    return this.http.post<any>(this.apiPredictionChart, body);
+  }
+ LoadPoliceStations(distcodes: number[]): Observable<any[]> {
+    return this.http.post<any[]>(`${this.GetPoliceStationApiUrl}`, {districts:distcodes});
+  }
+
+}

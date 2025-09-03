@@ -1,0 +1,437 @@
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { SchedulerMasterService } from '../services/scheduler-master.service';
+
+import Swal from 'sweetalert2';
+
+
+@Component({
+  selector: 'app-scheduler-master',
+  templateUrl: './scheduler-master.component.html',
+  styleUrls: ['./scheduler-master.component.css'],
+})
+export class SchedulerMasterComponent implements OnInit {
+  schedulerForm!: FormGroup;
+  schedulerRecords: any[] = [];
+  isEditMode = false; 
+  selectedRecordId: number | null = null;
+  filteredSchedulerRecords: any[] = [];
+  intervals: number[] = [];
+
+  serviceStatus: string = 'Unknown';
+  pollingInterval: any;
+
+
+  // serviceList: string[] = [];
+  // selectedService: string = ''
+
+  constructor(private fb: FormBuilder, private schedulerService: SchedulerMasterService) {}
+
+  ngOnInit() {
+
+    this.intervals = Array.from({ length: 12 }, (_, i) => i + 1);
+
+    this.schedulerForm = this.fb.group(
+      {
+      SchedularStateCode: [''],
+      MethodName: ['', Validators.required],
+      ProcessApiUrl: ['', Validators.required],
+      ProcessScheduleType: ['', Validators.required],
+      ScheduleFrequencyType: ['', Validators.required],
+      ScheduleFrequencyInterval: ['', [Validators.required, Validators.min(1)]],
+      ScheduleAMPM: ['', Validators.required],
+      StartDate: ['', Validators.required],
+      IsActive: [false],
+      IsProcessSchedule: [false],
+      FromDate: [{ value: '', disabled: true }],
+      ToDate: [{ value: '', disabled: true }],
+    },
+    { validators: [this.dateValidation()] }
+  );
+
+
+
+  // this.schedulerService.getAvailableServices().subscribe((res: any) => {
+  //   if (res.isSuccess) {
+  //     this.serviceList = res.services;
+  //     this.selectedService = res.defaultService;
+  //   }
+  // });
+
+    
+    this.schedulerForm.get('ScheduleFrequencyType')?.valueChanges.subscribe((value) => {
+      if (value === 'RANGE') {
+        this.schedulerForm.get('FromDate')?.enable();
+        this.schedulerForm.get('ToDate')?.enable();
+      } else {
+        this.schedulerForm.get('FromDate')?.disable();
+        this.schedulerForm.get('ToDate')?.disable();
+      }
+
+    if (value === 'HOURLY') {
+      this.schedulerForm.get('ScheduleAMPM')?.disable();
+      this.schedulerForm.get('ScheduleFrequencyInterval')?.setValue('');
+    } else {
+      this.schedulerForm.get('ScheduleAMPM')?.enable();
+    }
+
+    });
+    this.loadSchedulerRecords();
+
+    this.getServiceStatus();
+  }
+
+
+  getServiceStatus(): void {
+    this.schedulerService.getServiceStatus().subscribe({
+      next: (res: any) => {
+        if (res.isSuccess) {
+          this.serviceStatus = res.status;
+        } else {
+          this.serviceStatus = 'Unknown';
+        }
+      },
+      error: () => {
+        this.serviceStatus = 'Error';
+      }
+    });
+  }
+  
+
+  dateValidation() {
+    return (formGroup: FormGroup) => {
+      const scheduleFrequencyType = formGroup.get('ScheduleFrequencyType')?.value;
+      const fromDate = formGroup.get('FromDate')?.value;
+      const toDate = formGroup.get('ToDate')?.value;
+  
+      
+      formGroup.get('FromDate')?.setErrors(null);
+      formGroup.get('ToDate')?.setErrors(null);
+  
+      
+      if (scheduleFrequencyType === 'RANGE') {
+        if (!fromDate) {
+          formGroup.get('FromDate')?.setErrors({ required: true });
+        }
+        if (!toDate) {
+          formGroup.get('ToDate')?.setErrors({ required: true });
+        }
+        if (fromDate && toDate && new Date(fromDate) > new Date(toDate)) {
+          formGroup.get('ToDate')?.setErrors({ toDateInvalid: true });
+        }
+      }
+    };
+  }
+  
+
+  loadSchedulerRecords() {
+    this.schedulerService.getSchedulers().subscribe({
+        next: (response: any) => {       
+            if (response.isSuccess && response.data) {
+                this.schedulerRecords = response.data.map((record: any) => ({
+                    Id: record.id,
+                    SchedularStateCode: record.schedularStateCode,
+                    MethodName: record.methodName,
+                    ProcessApiUrl: record.processApiUrl,
+                    ProcessScheduleType: record.processScheduleType,
+                    IsProcessSchedule: record.isProcessSchedule,
+                    ScheduleFrequencyType: record.scheduleFrequencyType,
+                    ScheduleFrequencyInterval: record.scheduleFrequencyInterval,
+                    StartDate: record.startDate,
+                    IsActive: record.isActive, 
+                    FromDate: record.fromDate,
+                    ToDate: record.toDate
+                }));
+                this.filteredSchedulerRecords = this.schedulerRecords;
+            } else {
+                console.error('Error: API response indicates failure.', response);
+                this.filteredSchedulerRecords = [];
+            }
+        },
+        error: (err) => {
+            console.error('Error fetching scheduler records:', err);
+            this.filteredSchedulerRecords = [];
+        },
+    });
+}
+
+  onSubmit() {
+    if (this.schedulerForm.valid) {
+
+      const frequencyInterval = this.schedulerForm.value.ScheduleFrequencyInterval;
+
+      const amPm = this.schedulerForm.get('ScheduleFrequencyType')?.value === 'HOURLY'
+      ? ''
+      : this.schedulerForm.value.ScheduleAMPM;
+
+    const combinedFrequency = amPm ? `${frequencyInterval}|${amPm}` : `${frequencyInterval}`;
+
+      const formData = {
+        ...this.schedulerForm.value,
+        IsProcessSchedule: this.schedulerForm.value.IsProcessSchedule || false,
+        IsActive: this.schedulerForm.value.IsActive || false,
+        ScheduleFrequencyInterval: combinedFrequency,
+        LastModifiedBy: 'CurrentUser',
+        LastModifiedOn: new Date().toISOString(),
+        CreatedBy: 'CurrentUser',
+        CreatedOn: new Date().toISOString(),
+        FromDate: this.schedulerForm.value.FromDate || null,
+        ToDate: this.schedulerForm.value.ToDate || null,
+        
+      };
+  
+      if (this.isEditMode) {
+
+        this.schedulerService.updateScheduler(this.selectedRecordId, formData).subscribe({
+          next: (response: any) => {
+              if (response.isSuccess) { 
+                  alert('Record updated successfully!');
+                  this.resetForm();
+                  //this.schedulerForm.reset();
+                  this.loadSchedulerRecords();
+              } else {
+                  alert(response.message || 'Failed to update record.');
+              }
+          },
+          error: (err) => {
+              console.error('Error updating record:', err);
+              alert(err.error.message || 'An error occurred while updating the record.');
+          },
+      });
+        
+      } else {
+        console.log('Form Data:', this.schedulerForm.value);
+        this.schedulerService.createScheduler(formData).subscribe({
+          next: (response: any) => {
+            if (response.isSuccess && response.message=='SUCCESS') {
+                           
+              alert('Record inserted successfully!');
+              this.resetForm();
+              //this.schedulerForm.reset(); 
+              this.loadSchedulerRecords();
+
+            } 
+            else {
+              alert('A record with the same ProcessScheduleType or ProcessApiUrl already exists.');
+          }
+          },
+          error: (err) => {
+            console.error('Error inserting record:', err);
+            alert('Error while inserting record.');
+          },
+        });
+      }
+    } else {
+      
+      if (this.schedulerForm.hasError('toDateInvalid', ['ToDate'])) {
+        alert('From Date must be less than To Date.');
+      } else if (this.schedulerForm.get('FromDate')?.hasError('required') || this.schedulerForm.get('ToDate')?.hasError('required')) {
+        alert('Both From Date and To Date are required for Range type.');
+      } else {
+        alert('Please fill in all required fields.');
+      }
+  }
+}
+    
+
+  editRecord(record: any) {
+    this.isEditMode = true;
+    this.selectedRecordId = record.Id;
+    this.schedulerForm.patchValue(record); 
+
+  const formattedStartDate  = record.StartDate ? record.StartDate.split('T')[0] : null;
+  // const formattedFromDate = record.FromDate ? record.FromDate.split('T')[0] : null;
+  // const formattedToDate = record.ToDate ? record.ToDate.split('T')[0] : null;
+
+  const formattedFromDate = record.FromDate && record.FromDate !== '0001-01-01T00:00:00' 
+    ? record.FromDate.split('T')[0] 
+    : null;
+  const formattedToDate = record.ToDate && record.ToDate !== '0001-01-01T00:00:00' 
+    ? record.ToDate.split('T')[0] 
+    : null;
+    
+     const frequencyInterval = record.ScheduleFrequencyInterval.match(/\d+/)?.[0]; // Extract numeric part
+     const amPm = record.ScheduleFrequencyInterval.match(/[A-Za-z]+/)?.[0]; // Extract AM/PM part
+    //const [frequencyInterval, amPm] = record.ScheduleFrequencyInterval.split('|');
+
+
+  this.schedulerForm.patchValue({
+    ...record,
+    StartDate: formattedStartDate ,
+    ScheduleAMPM: amPm || '',
+    ScheduleFrequencyInterval: frequencyInterval || '',
+    FromDate: formattedFromDate || null,
+    ToDate: formattedToDate || null,
+  });
+
+  const formElement = document.getElementById('schedulerForm');
+  if (formElement) {
+    const yOffset = -170;
+    const yPosition = formElement.getBoundingClientRect().top + window.scrollY + yOffset;
+    window.scrollTo({ top: yPosition, behavior: 'smooth' });
+  }
+  }
+  
+
+  toggleActiveStatus(id: number, currentStatus: boolean) {
+    const updatedStatus = !currentStatus;
+    this.schedulerService.updateActiveStatus(id, updatedStatus).subscribe({
+      next: () => {
+        alert('Status updated successfully!');
+        this.loadSchedulerRecords();
+      },
+      error: (err) => {
+        console.error('Error updating status:', err);
+        alert('Error while updating status.');
+      },
+    });
+  }
+
+
+  isFieldInvalid(fieldName: string): boolean {
+    const control = this.schedulerForm.get(fieldName);
+    return !!(control && control.invalid && control.touched);
+  }
+  
+   
+   preventRedirect(event: Event): void {
+    event.preventDefault();
+    console.log('Button clicked, but redirection is disabled.');
+  }
+
+  onQuickFilter(event: any): void {
+    const filterValue = event.target.value.toLowerCase();
+    this.filteredSchedulerRecords = this.schedulerRecords.filter((schedulerRecords) =>
+      Object.values(schedulerRecords).some((value) =>
+        String(value).toLowerCase().includes(filterValue)
+      )
+    );
+  }
+
+  resetForm() {
+    this.schedulerForm.reset({
+      ScheduleFrequencyType: '',
+      ScheduleFrequencyInterval: '',
+      ScheduleAMPM: '',
+      IsActive: false,
+      IsProcessSchedule: false,
+      MethodName: '',
+    });
+    
+    this.isEditMode = false;
+    this.selectedRecordId = null;
+  }
+
+  getTodayDate(): string {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  }
+
+
+  // restartScheduler() {
+  //   Swal.fire({
+  //     title: 'Start or Stop Scheduler Service?',
+  //     text: 'Click Start to begin, Stop to halt the service.',
+  //     icon: 'warning',
+  //     showCancelButton: true,
+  //     showCloseButton: true,
+  //     confirmButtonText: '<i class="fa fa-play"></i> Start',
+  //     cancelButtonText: '<i class="fa fa-stop"></i> Stop',
+  //     reverseButtons: true,
+  //     customClass: {
+  //       confirmButton: 'btn btn-success',
+  //       cancelButton: 'btn btn-danger'
+  //     }
+  //   }).then((result) => {
+  //     if (result.isConfirmed) {
+  //       this.schedulerService.startService().subscribe({
+  //         next: (response: any) => {
+  //           Swal.fire('Started!', response.message, 'success');
+  //           this.loadSchedulerRecords();
+  //           this.getServiceStatus();
+  //         },
+  //         error: (err) => {
+  //           Swal.fire('Error!', 'Failed to start the service.', 'error');
+  //           this.getServiceStatus();
+  //         }
+  //       });
+  //     } else if (result.dismiss === Swal.DismissReason.cancel) {
+  //       this.schedulerService.stopService().subscribe({
+  //         next: (response: any) => {
+  //           Swal.fire('Stopped!', response.message, 'success');
+  //           this.loadSchedulerRecords();
+  //           this.getServiceStatus();
+  //         },
+  //         error: (err) => {
+  //           Swal.fire('Error!', 'Failed to stop the service.', 'error');
+  //           this.getServiceStatus();
+  //         }
+  //       });
+  //     }
+  //   });
+  // }
+
+  restartScheduler() {
+  const isRunning = this.serviceStatus === 'Running';
+  const isStopped = this.serviceStatus === 'Stopped';
+
+  Swal.fire({
+    title: 'Start or Stop Scheduler Service?',
+    html: `
+      <p>Click Start to begin, Stop to halt the service.</p>
+      <button id="stop-btn" class="swal2-cancel swal2-styled" style="background-color: #dc3545;" ${isStopped ? 'disabled' : ''}>
+        <i class="fa fa-stop"></i> Stop
+      </button>
+      <button id="start-btn" class="swal2-confirm swal2-styled" style="background-color: #6f42c1;" ${isRunning ? 'disabled' : ''}>
+        <i class="fa fa-play"></i> Start
+      </button>
+    `,
+    showConfirmButton: false,
+    showCancelButton: false,
+    didOpen: () => {
+      const startBtn = Swal.getPopup()!.querySelector('#start-btn') as HTMLButtonElement;
+      const stopBtn = Swal.getPopup()!.querySelector('#stop-btn') as HTMLButtonElement;
+
+      if (startBtn) {
+        startBtn.addEventListener('click', () => {
+          this.schedulerService.startService().subscribe({
+            next: (response: any) => {
+              Swal.close();
+              // Swal.fire('Started!', response.message, 'success');
+              Swal.fire('Started!', 'Service started successfully.', 'success');
+              this.loadSchedulerRecords();
+              this.getServiceStatus();
+            },
+            error: () => {
+              Swal.close();
+              Swal.fire('Error!', 'Failed to start the service.', 'error');
+              this.getServiceStatus();
+            }
+          });
+        });
+      }
+
+      if (stopBtn) {
+        stopBtn.addEventListener('click', () => {
+          this.schedulerService.stopService().subscribe({
+            next: (response: any) => {
+              Swal.close();
+              // Swal.fire('Stopped!', response.message, 'success');
+              Swal.fire('Stopped!', 'Service stopped successfully.', 'success')
+              this.loadSchedulerRecords();
+              this.getServiceStatus();
+            },
+            error: () => {
+              Swal.close();
+              Swal.fire('Error!', 'Failed to stop the service.', 'error');
+              this.getServiceStatus();
+            }
+          });
+        });
+      }
+    }
+  });
+}
+
+  
+}

@@ -1,0 +1,170 @@
+import { Component, EventEmitter, OnInit, Output, Renderer2 } from '@angular/core';
+import { AuthService } from '../../services/auth.service';
+import Swal from 'sweetalert2';
+import { Router } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
+import { ParentChildService } from '../../services/parent-child.service';
+import { ChangeDetectorRef } from '@angular/core';
+//import { SocketService } from '../../services/socket.service';
+
+@Component({
+  selector: 'app-layout',
+  templateUrl: './layout.component.html',
+  styleUrls: ['./layout.component.css']
+})
+export class LayoutComponent implements OnInit {
+
+  @Output() buttonClicked = new EventEmitter<void>();
+
+  private isLoggedInSubject = new BehaviorSubject<boolean>(false);
+
+  notifyParent(): void {
+    this.buttonClicked.emit();
+  }
+
+  isSidebarVisible = true;
+  menuItems: any[] = [];
+  userName: string | null = '';
+  roleName: string | null = '';
+  expandedMenu: string | null = null;
+
+  statename: any;
+  constructor(private router: Router, private renderer: Renderer2, private authService: AuthService, private parentChildService: ParentChildService, private cdr: ChangeDetectorRef) {
+    this.loadMenu();
+    this.userName = localStorage.getItem('userName') ?? 'NA';
+   // this.roleName = localStorage.getItem('roleName') ?? 'NA';
+    this.roleName =  localStorage.getItem('roleName') == null ? '' : localStorage.getItem('roleName');
+    this.statename = localStorage.getItem('statename');
+
+//    if (this.statename && this.statename.includes(' - ')) {
+//   const parts = this.statename.split(' - ');
+//   const city = parts[0];       
+//   this.statename = parts[1];  
+// }
+    
+  }
+  //, private socketService: SocketService
+  ngOnInit(): void {
+
+    // this.socketService.connect('1234');
+
+    this.refreshData();
+    this.parentChildService.parentFunction$.subscribe(() => {
+      this.refreshData();
+    });
+  }
+
+  get currentRoute(): string {
+    return this.router.url;
+  }
+
+  toggleMenu(menuName: string, subMenuItems: any[]): void {
+    if (this.expandedMenu === menuName) {
+      this.expandedMenu = null;
+      return;
+    }
+
+    if (subMenuItems.length > 0) {
+      this.expandedMenu = menuName;
+    } else {
+      this.expandedMenu = null;
+    }
+  }
+
+
+  setActiveMenu(subMenuItems: any[]): void {
+    const activeSubMenu = subMenuItems.find(item => this.router.url.includes(item.accessUrl));
+
+    if (activeSubMenu) {
+      this.router.navigate([activeSubMenu.accessUrl]);
+    }
+  }
+
+
+  refreshData(): void {
+    this.loadMenu();
+    this.userName = localStorage.getItem('userName');
+  }
+
+  isSubmenuActive(subMenuItems: any[]): boolean {
+    return subMenuItems.some(item => this.router.url.includes(item.accessUrl));
+  }
+
+  toggleSidebar() {
+    const body = document.getElementById('main-body');
+    if (body) {
+      if (body.classList.contains('adjst-spc')) {
+        this.renderer.removeClass(body, 'adjst-spc');
+      } else {
+        this.renderer.addClass(body, 'adjst-spc');
+      }
+    }
+  }
+
+  toggleSidebarMenu() {
+    const body = document.getElementById('main-body');
+    if (body) {
+      if (body.classList.contains('adjst-spc')) {
+        this.renderer.removeClass(body, 'adjst-spc');
+      } else {
+        //this.renderer.addClass(body, 'adjst-spc');
+      }
+    }
+  }
+
+  logout(event: Event): void {
+    event.preventDefault();
+    const token = localStorage.getItem('AuthorizationToken');
+
+    if (!token) {
+      this.clearSession();
+      //this.showLogoutMessage("Logged out successfully", "success");
+      sessionStorage.clear();
+      this.router.navigate(['/home']);
+      return;
+    }
+
+    this.authService.revokeToken().subscribe({
+      next: () => {
+        sessionStorage.clear();
+        this.router.navigate(['/home']);
+        this.clearSession();
+        //this.showLogoutMessage("Logged out successfully", "success");
+      },
+      error: () => {
+        this.clearSession();
+        this.showLogoutMessage("Logout was successful, but token revocation failed.", "warning");
+      }
+    });
+  }
+
+
+  private showLogoutMessage(message: string, icon: "success" | "warning") {
+    Swal.fire({
+      position: 'top-end',
+      title: message,
+      icon: icon,
+      showConfirmButton: false,
+      timer: 2000
+    });
+  }
+
+
+
+
+  private clearSession(): void {
+    localStorage.removeItem('userData');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('AuthorizationToken');
+    this.router.navigate(['']);
+    // this.router.navigate(['/home']);
+  }
+
+  public loadMenu(): void {
+    const userData = localStorage.getItem('userData');
+    if (userData) {
+      const parsedData = JSON.parse(userData);
+      this.menuItems = parsedData.menu || [];
+    }
+  }
+}

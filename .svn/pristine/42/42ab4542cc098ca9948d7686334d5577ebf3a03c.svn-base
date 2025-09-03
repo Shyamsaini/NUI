@@ -1,0 +1,57 @@
+<div class="pc-container">
+    <div class="pcoded-content pb" style="padding-bottom:90px;">
+      <div class="page-header">
+        <div class="page-block">
+          <div class="row align-items-center">
+            <div class="col-md-6">
+              <div class="page-header-title">
+                <h5 class="m-b-10"> Report Authorization </h5>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="mt-5">
+        <div class="card">
+          <div class="card-body">
+            <form [formGroup]="form" (ngSubmit)="onSubmit()">
+              <div id="searchByFilingNumber" class="row searchbypanel">
+                <div class="col-md-3 col-12 mb-3">
+                  <label class="form-label">District Name</label>
+                  <ng-multiselect-dropdown #multiSelect [settings]="settings" [data]="ListDistict" formControlName="districtCodes" [placeholder]="'Select District'" tabindex="1" (onDropDownClose)="onDistrictDropdownChange($event)">
+                  </ng-multiselect-dropdown>
+                </div>
+  
+                <div class="col-md-3 col-12 mb-3">
+                  <label class="form-label">Police Station</label>
+                  <sup class="text-danger top-0">*</sup>
+                  <ng-multiselect-dropdown #multiSelect [settings]="settings" [data]="policestations" formControlName="PsCds" [placeholder]="'Police Station'" tabindex="2">
+                  </ng-multiselect-dropdown>
+                </div>
+  
+                <div class="col-md-3 col-12 mb-3">
+                    <label class="form-label">Report Name</label>
+                    <sup class="text-danger top-0">*</sup>
+                    <ng-multiselect-dropdown  #multiSelect [settings]="settings" [data]="ListReport" formControlName="ReportName"  [placeholder]="'Select Report'" tabindex="3">
+                    </ng-multiselect-dropdown>
+                  </div>
+                  
+  
+                <div class="col-md-3 col-12 mb-3">
+                  <label class="form-label">Mobile Number</label>
+                  <sup class="text-danger top-0">*</sup>
+                  <input class="form-control" formControlName="Mobile" placeholder="Enter Mobile Number" maxlength="10" pattern="\d{3}-\d{3}-\d{4}" onkeyup="this.value = this.value.replace(/[^0-9-]/g, '');" tabindex="4" />
+                </div>
+              </div>
+  
+              <div class="col-md-12 col-12 mb-3 pt-4 mt-1" style="text-align: right;">
+                <button type="submit" class="btn btn-success text-white py-1" tabindex="5">Submit</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

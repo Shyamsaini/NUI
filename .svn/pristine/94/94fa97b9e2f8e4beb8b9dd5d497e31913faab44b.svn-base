@@ -1,0 +1,66 @@
+.sup-h2 {
+    color: #043872
+}
+
+.sign-container {
+    max-width: 470px;
+}
+
+.icon-height {
+    height: 24px;
+    width: 24px;
+}
+
+.right-box {
+    background: linear-gradient(90deg, rgba(27, 79, 138, 1) 0%, rgba(4, 56, 114, 1) 100%)
+}
+
+.inputbox {
+    border: 1px solid #cfcece;
+    outline: none;
+}
+
+.form-select:focus {
+    border-color: #ced4da;
+    box-shadow: none;
+}
+
+.input-label {
+    top: -12px;
+    left: 3%;
+}
+
+.sign-up {
+    background: #146c43;
+    color: #fff;
+}
+
+.sign-up:hover {
+    background: #fff;
+    color: #146c43;
+    border: 2px solid #146c43;
+}
+
+.signin-border {
+    width: 60px;
+    border: 2px solid #043872;
+}
+
+.grne-cr {
+    background: #146c43 !important;
+}
+
+.rightside-image {
+   background: url(/assets/images/law-image.jpg) no-repeat;
+    background-size: cover;
+    display: inline-block;
+    height: 100%;
+    width: 100%;
+    background-position: center
+}
+
+
+
+
+
+

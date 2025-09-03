@@ -1,0 +1,55 @@
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="text-center">
+                <h3 class="mb-0">Prosecution Details</h3>
+            </div>
+            <div class="card-body">
+                <div class="pb-4">
+                    <div class="row pt-4">
+                        <div class="col-md-12 px-4">
+                            <div class="row">
+                                <div class="col-md-6 mb-2"><span class="titl">Eprocid : </span><strong
+                                        class="titl-detl eprocid">{{data.eprocid}}</strong></div>
+                                <div class="col-md-6 mb-2"><span class="titl">Date and time : </span><strong
+                                        class="titl-detl datetime">{{data.eproc_status_time}}</strong></div>
+                                <div class="col-md-6 mb-2"><span class="titl">Officer Name : </span><strong
+                                        class="titl-detl officername">{{data.officername}}</strong></div>
+                                <div class="col-md-6 mb-2"><span class="titl">Designation : </span><strong
+                                        class="titl-detl designation">{{data.designation}}</strong></div>
+                                <div class="col-md-6 mb-2"><span class="titl">Chargesheet Number : </span><strong
+                                        class="titl-detl chargesheetno">{{data.chargesheetNo}}</strong></div>
+                                <div class="col-md-6 mb-2"><span class="titl">Charge Sheet Date : </span><strong
+                                        class="titl-detl chargesheetdate">{{data.chargesheetDt}}</strong></div>
+                                <div class="col-md-6 mb-2"><span class="titl">Status : </span><strong
+                                        class="titl-detl status">{{data.statusDesc}}</strong></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row pt-4">
+                        <div class="col-md-12 px-4">
+                            <button *ngIf="data.statusDesc !== 'Processing'" type="button"
+                                [disabled]="isProsecutionDetailsHtml" class="btn btn-primary opinion"
+                                (click)="loadProsecutionHtml(data.eprocid)">
+                                View Opinion or Advice
+                            </button>
+
+                            <!-- <button type="button" [disabled]="isProsecutionDetailsHtml" class="btn btn-primary opinion" (click)="loadProsecutionHtml(data.eprocid)">View Opinion or Advice</button> -->
+                            <button type="button" [disabled]="isDownloadingPdf" class="btn btn-success ml-3"
+                                (click)="printProsecution(data.eprocid)" *ngIf="opinionAdviceInHtml !== ''">Download
+                                Opinion as PDF</button>
+                        </div>
+                    </div>
+
+                    <div class="row pt-4">
+                        <div class="col-md-12 opinionadviceinhtml trigger-view-doc" [innerHTML]="opinionAdviceInHtml"
+                            (click)="onDocumentClick($event)" id="prosecution-advice">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

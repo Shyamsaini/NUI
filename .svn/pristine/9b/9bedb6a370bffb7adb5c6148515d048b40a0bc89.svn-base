@@ -1,0 +1,174 @@
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { ChitrakhoziService } from '../services/chitrakhozi.service';
+import { CCTNSKhojiDetail, ChitrakhoziDetail } from '../models/chitra-khozi-model';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Observable, Subscriber } from 'rxjs';
+import { LoaderService } from '../services/loader.service';
+
+@Component({
+  selector: 'app-chitrakhozi',
+  templateUrl: './chitrakhozi.component.html',
+  styleUrls: ['./chitrakhozi.component.css']
+})
+export class ChitrakhoziComponent implements OnInit {
+  
+  chitrakhojiData: ChitrakhoziDetail[] = [];
+  cctnsKhojiData: CCTNSKhojiDetail[] = [];
+  uploadedImage: string | ArrayBuffer | null = null;
+  uploadedImageSrc: string | null = null;
+  
+  isLoadingChitrakhoji: boolean = false;
+  isLoadingCctns: boolean = false;
+  hasSearched: boolean = false;
+  isHideCCTNSChitrakhoji: boolean = false;
+  isHideChitrakhoji: boolean = false;
+  isImageSubmitted: boolean = false;
+   ImageSubmittedLebel: string = "Image Serach";
+  constructor(
+    private chitrakhoziService: ChitrakhoziService,
+    private ref: ChangeDetectorRef,
+    //private loaderService: LoaderService
+  ) {}
+
+  ngOnInit(): void {    
+    this.isHideCCTNSChitrakhoji = true;
+    this.isHideChitrakhoji = true;
+  }
+
+  getChitraKhoziWithImage(): void {
+    
+    if (typeof this.uploadedImage === 'string') {
+      this.hasSearched = true;
+      this.isImageSubmitted = true;
+      this.ImageSubmittedLebel = "Image Uploaded";
+      
+      // Clear previous data
+      this.chitrakhojiData = [];
+      this.cctnsKhojiData = [];
+
+      this.isHideCCTNSChitrakhoji = false;
+      this.isHideChitrakhoji = false;
+
+      // Load Prisoner Data
+      this.loadPrisonerData();
+      
+      // Load Accused Data
+      this.loadAccusedData();
+    } else {
+      console.error('Uploaded image is not a valid base64 string');
+      this.isHideCCTNSChitrakhoji = true;
+      this.isHideChitrakhoji = true;
+    }
+  }
+
+  private loadPrisonerData(): void {
+    this.isLoadingChitrakhoji = true;
+    //this.loaderService.show();
+    
+    this.chitrakhoziService.getChitraKhoziWithImage(this.uploadedImage as string).subscribe(
+      response => {
+        this.isLoadingChitrakhoji = false;
+        //this.loaderService.hide();
+        this.ref.detectChanges();
+        
+        if (response.isSuccess) {
+          this.chitrakhojiData = JSON.parse(response.data.chitrakhojiResponse);
+        } else {
+          console.log('API false response:', response);
+        }
+      },
+      (error: HttpErrorResponse) => {
+        this.isLoadingChitrakhoji = false;
+        //this.loaderService.hide();
+        console.error('API error:', error);
+      }
+    );
+  }
+
+  private loadAccusedData(): void {
+    this.isLoadingCctns = true;
+    //this.loaderService.show();
+    debugger;
+    this.chitrakhoziService.getChitraKhoziWithImageCCTNS(this.uploadedImage as string).subscribe(
+      response => {
+        this.isLoadingCctns = false;
+        //this.loaderService.hide();
+        this.ref.detectChanges();
+        
+        if (response.isSuccess) {
+          this.cctnsKhojiData = JSON.parse(response.data);
+        } else {
+          console.log('API false response:', response);
+        }
+      },
+      (error: HttpErrorResponse) => {
+        this.isLoadingCctns = false;
+        //this.loaderService.hide();
+        console.error('API error:', error);
+      }
+    );
+  }
+
+  onFileSelected(event: Event): void {
+    this.clearPreviousData()
+    this.isImageSubmitted = false;
+    this.ImageSubmittedLebel = "Image search";
+    const input = (event.target as HTMLInputElement).files?.[0];
+    if (input) {
+      this.convertToBase64(input);
+    } else {
+      alert('No file selected or file is undefined');
+    }
+  }
+
+  clearPreviousData(){
+  this.chitrakhojiData = [];
+  this.cctnsKhojiData = [];
+  this.uploadedImage = null;
+  this.uploadedImageSrc = null;
+  this.isLoadingChitrakhoji= false;
+  this.isLoadingCctns = false;
+  this.hasSearched = false;
+  this.isHideCCTNSChitrakhoji = true;
+  this.isHideChitrakhoji = true;
+  }
+
+  convertToBase64(file: File): void {
+    const observable = new Observable((subscriber: Subscriber<any>) => {
+      this.readFile(file, subscriber);
+    });
+
+    observable.subscribe({
+      next: (data) => {
+        this.uploadedImage = data;       
+      },
+      error: (error) => {
+        console.error('Error reading file:', error);
+      }
+    });
+  }
+
+  readFile(file: File, subscriber: Subscriber<any>): void {
+    const fileReader = new FileReader();
+    
+    fileReader.onload = () => {
+      subscriber.next(fileReader.result);
+      subscriber.complete();
+    };
+    
+    fileReader.onerror = (error) => {
+      subscriber.error(error);
+    };
+
+    fileReader.readAsDataURL(file);
+  }
+
+  onQuickFilter(event: any) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    // Implement filtering logic based on the `filterValue` and `courtCasesData`
+  }
+
+  trackByIndex(index: number, item: any): number {
+    return index;
+  }
+}

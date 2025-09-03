@@ -1,0 +1,96 @@
+<!-- menu.component.html -->
+<div class="pc-container">
+  <div class="pcoded-content pb" style="padding-bottom:90px;">
+    <div class="page-header">
+      <div class="page-block">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <div class="page-header-title">
+              <h5 class="m-b-10">Role Assignment</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12 px-0">
+        <div class="card">
+          <div class="card-body">
+            <div class="row role-based">
+              <div class="col-sm-6 mx-auto mb-4">
+                <label class="form-label">Select Role</label>
+                <select class="form-select form-control" aria-label="Default select example" [(ngModel)]="selectedRole" (ngModelChange)="onRoleChange()">
+                  <option selected>Select Role</option>
+                  <option *ngFor="let role of roles" [value]="role.rolE_CD">
+                    {{ role.role }}
+                  </option>
+                </select>
+              </div>
+
+              <!-- Dynamically render menu checkboxes -->
+              <div class="col-sm-12">
+                <div class="form-group row mb-0">
+                  <div *ngFor="let menu of menus" class="col-sm-3">
+                    <!-- Show a checkbox only if the menu doesn't have children -->
+                    <div *ngIf="menu.children.length === 0" class="form-check form-check-inline shd-bx">
+                      <strong>
+                        <input 
+                          class="form-check-input" 
+                          type="checkbox" 
+                          id="menu{{menu.menuId}}" 
+                          [checked]="menu.menuExists" 
+                          [(ngModel)]="menu.menuExists" 
+                          (change)="toggleChildren(menu)" 
+                          value="{{menu.menuId}}">
+                      </strong>
+                      <label class="form-check-label" for="menu{{menu.menuId}}">{{ menu.menU_NAME }}</label>
+                    </div>
+
+                    <!-- Dropdown for child menus (only if children exist) -->
+                    <div *ngIf="menu.children.length > 0" class="pc-h-item dropdown shd-bx ">
+                      <a 
+                        class="pc-head-link dropdown-toggle  w-100 px-3 pt-2" style="min-height:50px;" 
+                        data-toggle="dropdown" 
+                        href="#" 
+                        role="button" 
+                        aria-haspopup="false" 
+                        aria-expanded="false">{{ menu.menU_NAME }}
+                      </a>
+                      <div class="dropdown-menu dropdown-menu-right ">
+                        <ul class="list-unstyled">
+                          <li *ngFor="let child of menu.children">
+                            <!-- Child menu checkbox -->
+                            <div class="form-check form-check-inline">
+                              <strong>
+                                <input 
+                                  class="form-check-input" 
+                                  type="checkbox" 
+                                  id="child{{child.menuId}}" 
+                                  [checked]="child.menuExists" 
+                                  [(ngModel)]="child.menuExists" 
+                                  (change)="onChildChange(menu)" 
+                                  value="{{child.menuId}}">
+                              </strong>
+                              <label class="form-check-label" for="child{{child.menuId}}">{{ child.menU_NAME }}</label>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="isSaveDiv" class="col-sm-12 text-center mt-4">
+                <button class="btn btn-success px-4 me-2" (click)="saveRoleAssignment()">Save</button>
+                <button class="btn btn-primary px-4" (click)="resetRoleAssignment()">Clear</button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

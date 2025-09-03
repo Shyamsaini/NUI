@@ -1,0 +1,22 @@
+:host ::ng-deep .p-dialog .p-fluid .field {
+    margin-bottom: 1.5rem;
+  }
+  
+  :host ::ng-deep .p-dialog .p-fluid .field label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  
+  :host ::ng-deep .p-dialog .p-fluid .field textarea {
+    resize: vertical;
+  }
+  
+  :host ::ng-deep .p-dialog .p-checkbox {
+    margin-top: 0.5rem;
+  }
+  
+  :host ::ng-deep .p-toast.p-toast-top-right {
+    top: 1rem;
+    right: 1rem;
+  }

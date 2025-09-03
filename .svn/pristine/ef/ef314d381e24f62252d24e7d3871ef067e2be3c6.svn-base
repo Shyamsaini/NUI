@@ -1,0 +1,126 @@
+<div class="pc-container">
+    <div class="pcoded-content pb" style="padding-bottom:90px;">
+        <div class="page-header">
+            <div class="page-block">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <div class="page-header-title">
+                            <h5 class="m-b-10" >Medleapr Reports</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+<div class="row">
+    <div class="col-sm-12 px-0">
+        <div class="card">
+            <div class="card-body">
+                 <form #dateForm="ngForm">
+  <div class="row">
+    <div class="col-md-3">
+      <div class="form-group">
+        <label for="fromDate">From Date    <sup class="text-danger top-0">*</sup> </label>
+        <input
+          type="date"
+          class="form-control"
+          id="fromDate"
+          [(ngModel)]="fromDate"
+          name="fromDate"
+          required
+          #fromDateInput="ngModel"
+        />
+        <div *ngIf="fromDateInput.invalid && fromDateInput.touched" class="text-danger">
+          From Date is required.
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="form-group">
+        <label for="toDate">Date    <sup class="text-danger top-0">*</sup> </label>
+        <input
+          type="date"
+          class="form-control"
+          id="toDate"
+          [(ngModel)]="toDate"
+          name="toDate"
+          required
+          #toDateInput="ngModel"
+        />
+        <div *ngIf="toDateInput.invalid && toDateInput.touched" class="text-danger">
+          To Date is required.
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3 pt-4 mt-1">
+      <button
+        type="button"
+        class="btn btn-success mr-2"
+        (click)="onSearch()"
+        [disabled]="!dateForm.valid"
+      >
+        Search
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="onReset()">Reset</button>
+    </div>
+  </div>
+</form>
+</div>
+</div>
+</div>
+</div>
+    <!-- PrimeNG Data Table -->
+    <div class="row">
+      <div class="col-md-6 offset-md-6 d-flex justify-content-end mb-3">
+        <input 
+          type="text" 
+          class="form-control" 
+          placeholder="Search..." 
+          (input)="onQuickFilter($event)" 
+          style="max-width: 300px;"
+        />
+      </div>
+    </div>
+  
+    <div class="row">
+      <div class="col-md-12">
+        <p-table [value]="data" [paginator]="true" [rows]="20" [responsiveLayout]="'scroll'" [rowsPerPageOptions]="[10, 20, 50]">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>S.No.</th>
+              <th>Police Station</th>
+              <th>Type</th>
+              
+              <th>No & Date</th>
+               <th>Hospital</th>
+                <th>Doctor</th>
+                  <th>Victim Name</th>
+              <th>Report Date</th>
+              <th>Download Report</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-rowData let-i="rowIndex">
+            <tr>
+              <td>{{i + 1}}</td>
+              <td>{{rowData.Police_Station_name}}</td>
+              <td>{{rowData.FIR_DDR}}</td>
+              <td>{{rowData.FIRNo}}/{{dateFormatingService.getYearFromDate(rowData.FIR_Date)}}<br/>{{rowData.FIR_Date}}</td>
+               <td>{{rowData.HealthInstituteName}}</td>
+              <td>{{rowData.MLR_PMR_Prepared_By_Doctor}}</td>
+              <td>{{rowData.victim_name}}</td>
+              <td>{{dateFormatingService.formatISODateTime(rowData.cdTranactionDate)}}</td>
+              <td>
+                <a href="javascript:void(0)" (click)="openDyanmicModel(rowData.MLR_PMR_No)">
+                  {{rowData.MLR_PMR_No}}
+                </a>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>     
+  </div>    
+ 
+  <div #dynamicContainer></div>
+

@@ -1,0 +1,26 @@
+
+.blocked-row {
+    background-color: #ffcccc !important; /* Light red background */
+}
+
+/* Optional: Change text color for better contrast */
+.blocked-row td {
+    color: #df4444 !important;
+}
+
+
+/* Add to your component's CSS */
+::ng-deep .blocked-row {
+    background-color: #f8f9fa !important;
+    color: #6c757d !important;
+}
+
+::ng-deep .blocked-row:hover {
+    background-color: #e9ecef !important;
+}
+
+/* Style for disabled checkboxes */
+::ng-deep .p-checkbox-disabled .p-checkbox-box {
+    background-color: #e9ecef !important;
+    border-color: #ced4da !important;
+}

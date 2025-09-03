@@ -1,0 +1,149 @@
+import {  ChangeDetectorRef, Component, ViewChild } from '@angular/core';
+import { UtilityService } from '../services/utility.service';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { IcjsSearchService } from '../services/icjs-search.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ModalService } from '../services/modal.service';
+import { OtherPillarInformation } from '../models/otherpillarinformation.model';
+import { TabContainerComponent } from '../_components/tabs/tab-container.component';
+import { OtherPillarsComponent } from '../_components/otherpillars/other-pillars.component';
+import { DynamicModalService } from '../services/dynamic-modal.service';
+import { ProsecutionComponent } from '../_components/prosecution/prosecution.component';
+import { LoaderService } from '../services/loader.service';
+
+
+
+@Component({
+  selector: 'app-prosecution-search',
+  templateUrl: './prosecution-search.component.html',
+  styleUrl: './prosecution-search.component.css'
+})
+
+export class ProsecutionSearchComponent {
+  otherPillarData? : OtherPillarInformation;
+  isLoaded = false;
+  isSubmitted = false;
+  policestations: any[] = [];
+  firdata: any = [];
+    Districts: any[] = [];
+  form: FormGroup = new FormGroup({
+    psCode: new FormControl(''),
+    firNumber: new FormControl(''),
+    year: new FormControl('')
+  });
+
+  onSubmit(): void {
+    this.loaderService.show();
+    this.isSubmitted = true;
+    if (this.form.invalid) {
+      return;
+    }
+    var data=this.form.getRawValue();
+    var ps=data.psCode;
+    this.icjsSearchService.SearchFir(data).subscribe(response => {
+      this.loaderService.hide();
+      this.isLoaded = true;
+      if (response.isSuccess) {
+        this.firdata = response.data;
+        console.log(response.data);
+      } else {
+        this.utilityService.ShowErrorPopup(response.message);
+      }
+    },
+    (error: HttpErrorResponse) => {
+      this.loaderService.hide();
+      console.error('API error:', error);
+    });    
+  }
+
+  openOtherPillarsTab(firRegNum:any)
+  {
+  this.loaderService.show();
+  this.icjsSearchService.LoadOtherPillars({firNumber: firRegNum}).subscribe(resp=>{
+     this.loaderService.hide();
+    if(resp.isSuccess){     
+      this.otherPillarData = resp.data;
+      if(this.otherPillarData?.prosecutionids.length == 0){
+        this.utilityService.ShowErrorPopup("Prosecution request is not submitted yet");
+      }
+      else{        
+         const psCode = this.form.get('psCode')?.value;  
+        this.dyanmicModelService.open(ProsecutionComponent, { prosecutionId: this.otherPillarData?.prosecutionids[0], psCode });
+      }
+    }
+  });
+ }
+
+  constructor(private utilityService: UtilityService, private formBuilder: FormBuilder, private icjsSearchService: IcjsSearchService, protected  modalService: ModalService,
+    private ref: ChangeDetectorRef, private dyanmicModelService: DynamicModalService,private loaderService: LoaderService
+  ) 
+  {
+    // this.loadPoliceStations();
+     this.district();
+  }
+
+
+  get f(): { [key: string]: AbstractControl } {
+    return this.form.controls;
+  }
+
+  ngOnInit(): void {
+    this.form = this.formBuilder.group(
+      {
+        psCode: ['', Validators.required],
+        firNumber: [
+          '',[Validators.required, Validators.pattern(/^[0-9]{1,7}$/)]
+        ],
+        year: ['', [Validators.required, Validators.pattern(/^(19|20)\d{2}$/)]],
+         district: ['', Validators.required],
+      }
+    );
+    
+  }
+
+  loadPoliceStations(){
+    this.utilityService.PoliceStationList("0").subscribe((data: any[]) => {
+      this.policestations = data;
+    });
+  }
+
+
+  tabCounter = 1;
+  @ViewChild(TabContainerComponent) tabContainer!: TabContainerComponent;
+
+  addOtherPillarTab(firNumber : string, firRegDate: string, firShortNumber: string, policeCode: string) {
+    this.tabContainer.tabs = [];
+    const TabTitle = `ICJS Pillars`;
+    const TabData = {
+      firNumber,
+      firRegDate,
+      firShortNumber,
+      policeCode
+    };
+    const TabComponent = OtherPillarsComponent;
+    this.tabContainer.addTab(TabTitle, TabComponent, TabData);
+    this.tabCounter++;
+  }
+   district(){
+    this.utilityService.Districts().subscribe((data) => {
+      if(data.isSuccess){
+        this.Districts = data.data;
+      }
+    });
+  }
+    onDistrictChange(event: any): void {
+    const selectedDistrict = event.target.value;
+    if (selectedDistrict) {
+       this.utilityService.PoliceStationList(selectedDistrict).subscribe((data: any[]) => {
+      this.policestations = data;
+    });
+    }  
+    else {
+    this.form.controls["psCode"].setValue('');
+    this.form.controls["district"].setValue('');
+     this.form.controls["firNumber"].setValue('');
+      this.form.controls["year"].setValue('');
+      this.policestations = [];
+    }
+  }
+}

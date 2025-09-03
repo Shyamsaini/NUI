@@ -1,0 +1,144 @@
+<div class="pc-container">
+  <div class="pcoded-content pb" style="padding-bottom:90px;">
+    <div class="page-header">
+      <div class="page-block">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <div class="page-header-title">
+              <h5 class="m-b-10"> Report Authorization </h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mt-5">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="card">
+          <div class="card-body">
+            <div id="searchByFilingNumber" class="row searchbypanel">
+
+              <div class="col-md-7 col-12 mb-10 d-flex justify-content-between">
+                <label class="form-label">Search by Name or Belt Number<sup class="text-danger">*</sup></label>
+                <p-autoComplete formControlName="Name" [suggestions]="suggestions" (completeMethod)="getBrands($event)"
+                  (onSelect)="loadModuleAssignData($event)" tabindex="1" [placeholder]="'Search by Name or Belt Number'"
+                  field="FullName" class="width-adjut">
+                </p-autoComplete>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card" *ngIf="suggestions && suggestions.length > 0">
+          <div class="card-body">
+            <div id="searchByFilingNumber" class="row searchbypanel">
+
+              <!-- Radio Buttons -->
+              <div class="row mb-3">
+                <div class="col-md-12">
+                  <h4>Assign Role</h4><br />
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" value="state" formControlName="searchType" />
+                    <label class="form-check-label">State</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" value="district" formControlName="searchType" />
+                    <label class="form-check-label">District</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" value="police" formControlName="searchType" />
+                    <label class="form-check-label">Police</label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- State Dropdown -->
+              <div class="col-md-3 col-12 mb-2" *ngIf="true">
+                <label class="form-label">State <sup class="text-danger">*</sup></label>
+                <select class="form-select" formControlName="state">
+                  <option value="" disabled>Select State</option>
+                  <option *ngFor="let state of states" [value]="state.StateCode">
+                    {{ state.stateName }}
+                  </option>
+                </select>
+                <div *ngIf="isSubmitted && f['state'].errors" class="invalid-feedback d-block">
+                  <div *ngIf="f['state'].errors['required']">State is required</div>
+                </div>
+              </div>
+
+              <!-- District Dropdown -->
+              <div class="col-md-3 col-12 mb-2"
+                *ngIf="form.get('searchType')?.value === 'district' || form.get('searchType')?.value === 'police'">
+                <label class="form-label">District Name</label>
+                <ng-multiselect-dropdown #multiSelect [settings]="settings" [data]="ListDistict"
+                  formControlName="districtCodes" [placeholder]="'Select District'" tabindex="1"
+                  (onDropDownClose)="onDistrictDropdownChange($event)">
+                </ng-multiselect-dropdown>
+                <div *ngIf="isSubmitted && f['districtCodes'].errors" class="invalid-feedback d-block">
+                  <div *ngIf="f['districtCodes'].errors['required']">District is required</div>
+                </div>
+              </div>
+
+              <!-- Police Dropdown -->
+              <div class="col-md-3 col-12 mb-2" *ngIf="form.get('searchType')?.value === 'police'">
+                <label class="form-label">Police Station</label>
+                <ng-multiselect-dropdown #multiSelect [settings]="settings" [data]="policestations"
+                  formControlName="PsCodes" [placeholder]="'Police Station'" tabindex="2">
+                </ng-multiselect-dropdown>
+                <div *ngIf="isSubmitted && f['PsCodes'].errors" class="invalid-feedback d-block">
+                  <div *ngIf="f['PsCodes'].errors['required']">Police Station is required</div>
+                </div>
+              </div>
+
+
+              <div class="col-md-3 col-12 mb-2">
+                <label class="form-label">User Type <sup class="text-danger">*</sup></label>
+                <select class="form-select" formControlName="userType">
+                  <option value="" disabled>Select user type</option>
+                  <option *ngFor="let type of UserType" [value]="type.value">
+                    {{ type.text }}
+                  </option>
+                </select>
+                <div *ngIf="isSubmitted && f['userType']?.errors" class="invalid-feedback d-block">
+                  <div *ngIf="f['userType']?.errors?.['required']">User Type is required</div>
+                </div>
+              </div>
+
+              <div class="col-12 mb-3 pt-4 mt-1" style="text-align: right;">
+                <button type="submit" class="btn btn-success text-white py-1" tabindex="6">Submit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card" *ngIf="moduleAssignList && moduleAssignList.length > 0">
+          <div class="card-body">
+            <div id="searchByFilingNumber" class="row searchbypanel">
+              <div class="row mb-3">
+                <div class="col-md-12">
+                  <h4>{{Name}}</h4><br />
+                </div>
+              </div>
+              <p-table [value]="moduleAssignList" [columns]="moduleAssignColumns" [paginator]="true" [rows]="10"
+                [rowsPerPageOptions]="[10, 20, 50]" [responsive]="true" [rowHover]="true">
+                <ng-template pTemplate="header" let-columns>
+                  <tr>
+                    <th>Sr. No</th>
+                    <th *ngFor="let col of columns">
+                      {{ col.header }}
+                    </th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-row let-columns="columns" let-rowIndex="rowIndex">
+                  <tr>
+                    <td>{{ rowIndex + 1 }}</td>
+                    <td *ngFor="let col of columns">
+                      {{ row[col.field] }}
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

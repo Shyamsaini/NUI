@@ -1,0 +1,10 @@
+/* Smooth transition for the arrow */
+.pc-arrow {
+    transition: transform 0.3s ease; /* Smooth rotation animation */
+  }
+  
+  /* When the menu is expanded, rotate the arrow */
+  .rotate {
+    transform: rotate(90deg); /* 90 degrees rotation */
+  }
+  

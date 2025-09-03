@@ -1,0 +1,90 @@
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { HomeComponent } from './pages/home/home.component';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { IcjsDashboardComponent } from './pages/icjs-dashboard/icjs-dashboard.component';
+import { IcjsSearchComponent } from './pages/icjssearch/icjs-search.component';
+import { PageNotFoundComponent } from './pages/theme/page-not-found/page-not-found.component';
+import { AccessDeniedComponent } from './pages/theme/access-denied/access-denied.component';
+import { FslReportComponent } from './pages/fsl-report/fsl-report.component';
+import { authGuard } from './pages/auth/auth.guard';
+import { ChitrakhoziComponent } from './pages/chitrakhozi/chitrakhozi.component';
+import { SearchcaseComponent } from './pages/searchcase/searchcase.component';
+import { MedleparComponent } from './pages/medlepar/medlepar.component';
+import { NyaayShurutiComponent } from './pages/nyaay-shuruti/nyaay-shuruti.component';
+import { ProsecutionSearchComponent } from './pages/prosecution-search/prosecution-search.component';
+import { IOdashboardComponent } from './pages/iodashboard/iodashboard.component';
+import { TotalFirComponent } from './pages/total-fir/total-fir.component';
+import { PillardashboardReportComponent } from './pages/pillardashboard-report/pillardashboard-report.component';
+// import { SummonReportComponent } from './pages/summon-report/summon-report.component';
+
+import { RoleAssignComponent } from './pages/role-assign/role-assign.component';
+import { CctnsChitrakhoziComponent } from './pages/cctns-chitrakhozi/cctns-chitrakhozi.component';
+import { EsakshyadashboardComponent } from './pages/esakshyadashboard/esakshyadashboard.component';
+import { ReportAuthorizationComponent } from './pages/report-authorization/report-authorization.component';
+import { PredictiveAnalysisComponent } from './pages/predictive-analysis/predictive-analysis.component';
+
+import { DataAnalyticsComponent } from './pages/_components/data-analytics/data-analytics.component';
+import { EsakshyaCompleteDashboardComponent } from './pages/esakshya-complete-dashboard/esakshya-complete-dashboard.component';
+import { SchedulerMasterComponent } from './pages/scheduler-master/scheduler-master.component';
+
+import { UserRegistrationforReportAuthencationComponent } from './pages/user-registrationfor-report-authencation/user-registrationfor-report-authencation.component';
+import { ActsearchComponent } from './pages/actsearch/actsearch.component';
+import { ApiLogsDashboardComponent } from './pages/api-logs-dashboard/api-logs-dashboard.component';
+import { IpWhitelistEsakshyaComponent } from './pages/ip-whitelist-esakshya/ip-whitelist-esakshya.component';
+import { FirViewDashboardUpdateComponent } from './pages/fir-view-dashboard-update/fir-view-dashboard-update.component';
+import { SuperAdminComponent } from './pages/super-admin/super-admin.component';
+import { FirsExceptComponent } from './pages/firs-except/firs-except.component';
+import { UserLoginSummaryComponent } from './pages/user-login-summary/user-login-summary.component';
+// import { ConsolidatedIOdashboardComponent } from './pages/consolidated-iodashboard/consolidated-iodashboard.component';
+
+
+
+
+const routes: Routes = [
+  { path: '', component: HomeComponent },
+  { path: '', component: SuperAdminComponent },
+  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
+  { path: 'court-case-search', component: IcjsDashboardComponent, canActivate: [authGuard] },
+  { path: 'icjs-search', component: IcjsSearchComponent, canActivate: [authGuard] },
+  { path: 'fsl-reports', component: FslReportComponent, canActivate: [authGuard] },
+  { path: 'chitrakhozi', component: ChitrakhoziComponent, canActivate: [authGuard] },
+  { path: 'Medleapr', component: MedleparComponent, canActivate: [authGuard] },
+  { path: 'prosecution', component: ProsecutionSearchComponent, canActivate: [authGuard] },
+  { path: 'Nyay-Shuruti', component: NyaayShurutiComponent },
+  { path: 'total-fir', component: TotalFirComponent },
+  { path: 'io-dashboard', component: IOdashboardComponent },
+  { path: 'access-denied', component: AccessDeniedComponent },
+  { path: 'pillardashboard-report', component: PillardashboardReportComponent },
+  // { path: 'summon-report', component: SummonReportComponent },
+  { path: 'searchcase', component: SearchcaseComponent },
+  { path: 'role-assign', component: RoleAssignComponent },
+  { path: 'cctns-chitrakhozi', component: CctnsChitrakhoziComponent },
+  { path: 'Esakshyadashboard', component: EsakshyadashboardComponent },
+  { path: 'ReportAuthorization', component: ReportAuthorizationComponent },
+  { path: 'PredictiveAnalysis', component: PredictiveAnalysisComponent },
+  { path: 'DataAnalytics', component: DataAnalyticsComponent },
+  { path: 'EsakshyaCompleteDashboardComponent', component: EsakshyaCompleteDashboardComponent },
+  { path: 'scheduler-master', component: SchedulerMasterComponent },
+  { path: 'Act', component: ActsearchComponent },
+  { path: 'UserRegistration', component: UserRegistrationforReportAuthencationComponent },
+  { path: 'api-logs-dashboard', component: ApiLogsDashboardComponent },
+  { path: 'ip-whitelist', component: IpWhitelistEsakshyaComponent },
+  { path: 'fir-view-dashboard-update', component: FirViewDashboardUpdateComponent },
+  { path: 'SuperAdmin', component: SuperAdminComponent },
+  { path: 'home', component: HomeComponent },
+  { path: 'FIRReport', component: FirsExceptComponent },
+   { path: 'UserLoginSummary', component: UserLoginSummaryComponent },
+  /*   { path: 'ConsolidatedIO-dashboard', component:ConsolidatedIOdashboardComponent},   */
+  { path: '**', redirectTo: 'home' },
+  { path: '**', redirectTo: 'SuperAdmin' },
+  { path: '**', redirectTo: '/io-dashboard' },
+  { path: '**', component: PageNotFoundComponent },
+];
+
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }

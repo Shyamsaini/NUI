@@ -1,0 +1,251 @@
+<div class="pc-container">
+    <div class="pcoded-content pb" style="padding-bottom:90px;">
+        <div class="page-header">
+            <div class="page-block">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <div class="page-header-title">
+                            <h5 class="m-b-10">FIR Wise Arrests</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card mt-5">
+            <div class="card-body">
+                <form [formGroup]="form">
+                    <div id="searchByFilingNumber" class="row searchbypanel">
+                        <div class="col-md-3  col-12 mb-3">
+                            <label class="form-label"> District Name</label>
+                            <sup class="text-danger top-0">*</sup>
+                            <ng-multiselect-dropdown #multiSelect [settings]="settings" [data]="ListDistict"
+                                formControlName="districtCodes" [placeholder]="'Select District'" tabindex="1"
+                                (onDropDownClose)="onDistrictDropdownChange($event)">
+                            </ng-multiselect-dropdown>
+                        </div>
+                        <div class="col-md-3 col-12 mb-3">
+                            <label class="form-label">Police Station</label>
+                            <sup class="text-danger top-0">*</sup>
+                            <ng-multiselect-dropdown #multiSelect [settings]="settings" [data]="policestations"
+                                formControlName="PsCds" [placeholder]="' Select Police Station'" tabindex="2"
+                                (onDropDownClose)="onpolicestationsDropdownChange($event)">
+                            </ng-multiselect-dropdown>
+                        </div>
+                        <div class="col-md-2 col-12 mb-3">
+                            <label class="form-label">Crime Type</label>
+                            <sup class="text-danger top-0">*</sup>
+                            <select id="district" class="form-control form-select"
+                                (change)="onCrimeTypeDropdownChange($event)">
+                                <option value="">Select</option>
+                                <option *ngFor="let district of HeniousList" [value]="district.value">
+                                    {{ district.text }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-3  col-12 mb-3">
+                            <label class="form-label">Major Head</label>
+                            <sup class="text-danger top-0">*</sup>
+                            <ng-multiselect-dropdown #multiSelect [settings]="settings" [data]="actList"
+                                formControlName="actName" [placeholder]="'Select Major Head'" tabindex="2">
+                            </ng-multiselect-dropdown>
+
+
+                        </div>
+
+                        <div class="col-md-1 col-12 mb-3" style="padding-top: 32px;">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="button" class="btn btn-success text-white py-1"
+                                (click)="onSubmit()">Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div *ngIf="BackPage" class="row">
+            <div class="col-sm-12 fld">
+                <div class="">
+                    <div class="card-body pb-0 pt-3">
+                        <div class="row">
+                            <div class="col-md-12" style="text-align: right;">
+                                <button type="button" class="btn com-red-clr text-white py-1 px-4"
+                                    (click)="fnback()">Back</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ag-theme-alpine" style="height: 100%; width: 100%;">
+            <div class="ag-theme-alpine" style="height: 100%; width: 100%;">
+                <div *ngIf="isActDetailTable">
+                    <div class="card mt-2">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <p-table [value]="ActWiseCountList" [loading]="loading" [paginatorTemplate]="true"
+                                        [responsive]="true" [rowHover]="true" [lazy]="true"
+                                        (onLazyLoad)="loadFirstReports($event)" [paginator]="true"
+                                        [totalRecords]="totalCountRecords" [rows]="10"
+                                        [rowsPerPageOptions]="[10, 20, 50]">
+                                        <ng-template pTemplate="header">
+                                            <tr>
+                                                <th style="width: 3%;">S.No</th>
+                                                <th scope="col">Police Station</th>
+                                                <!-- <th scope="col">Police Station Code</th> -->
+                                                <th scope="col" style="width: 15%; text-align: center;">FIR Count</th>
+                                                <th scope="col" style="width: 15%; text-align: center;">Accused Count
+                                                </th>
+                                                <th scope="col" style="width: 15%; text-align: center;">Arrest Count
+                                                </th>
+                                            </tr>
+                                        </ng-template>
+                                        <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+                                            <tr>
+                                                <td>{{ rowIndex + 1 }}</td>
+                                                <td>{{item.PS}}</td>
+                                                <td style="text-align: right;">
+                                                    <a href="javascript:void(0)" (click)="openpsComponent(item.PS_CD)">
+                                                        {{item.FIRCount}}
+                                                    </a>
+                                                </td>
+                                                <td style="text-align: right;">
+                                                    <a href="javascript:void(0)"
+                                                        (click)="openAccusedComponent(item.PS_CD)">
+                                                        {{item.AccusedCount}}
+                                                    </a>
+                                                </td>
+                                                <td style="text-align: right;">
+                                                    <a href="javascript:void(0)"
+                                                        (click)="openArrestComponent(item.PS_CD)">
+                                                        {{item.ArrestCount}}
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </ng-template>
+                                        <ng-template pTemplate="paginatorleft">
+                                            <div>
+                                                Showing {{ currentFirst }} to {{ currentLast }} of {{ totalCountRecords
+                                                }} records
+                                            </div>
+                                        </ng-template>
+                                    </p-table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ag-theme-alpine" style="height: 100%; width: 100%;">
+            <div *ngIf="isActSecondTable">
+                <div class="card mt-2">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h3 class="comme-h3">{{ headerText}} </h3>
+                                    </div>
+                                </div>
+                                <p-table [value]="ActWiseList" [loading]="loading" [paginatorTemplate]="true"
+                                    [responsive]="true" [rowHover]="true" [lazy]="true"
+                                    (onLazyLoad)="loadReports($event)" [paginator]="true" [totalRecords]="totalRecords"
+                                    [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
+                                    <ng-template pTemplate="header">
+                                        <tr>
+                                            <th style="width: 3%;">S.No</th>
+                                            <th scope="col">Fir No.</th>
+                                            <th scope="col">Police Station</th>
+                                            <th scope="col">IO Name</th>
+                                            <th scope="col">Registration Date </th>
+                                            <th scope="col">Act Section</th>
+                                            <th scope="col">Status</th>
+                                            <!-- <th *ngFor="let column of columns" style="text-align: left;">
+                                                {{ column }}
+                                              </th> -->
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+                                        <tr>
+                                            <td>{{ rowIndex + 1 }}</td>
+                                            <td>{{item.firnumber}}</td>
+                                            <td>{{item.PS}}</td>
+                                            <td>{{item.first_name}}</td>
+                                            <td>{{item.RegistrationDate}}</td>
+                                            <td>{{item.ACT_SectionName}}</td>
+                                            <td>{{item.FIR_STATUS_TYPE}}</td>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template pTemplate="paginatorleft">
+                                        <div>
+                                            Showing {{ SecondListFirst }} to {{ SecondListLast }} of {{ totalRecords
+                                            }} records
+                                        </div>
+                                    </ng-template>
+                                </p-table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ag-theme-alpine" style="height: 100%; width: 100%;">
+            <div *ngIf="isActThirdTable">
+                <div class="card mt-2">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h3 class="comme-h3">{{ headerText}} </h3>
+                                    </div>
+                                </div>
+                                <p-table [value]="ActWiseList" [loading]="loading" [paginatorTemplate]="true"
+                                    [responsive]="true" [rowHover]="true" [lazy]="true"
+                                    (onLazyLoad)="loadDataReports($event)" [paginator]="true"
+                                    [totalRecords]="totalRecords" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
+                                    <ng-template pTemplate="header">
+                                        <tr>
+                                            <th style="width: 3%;">S.No</th>
+                                            <th scope="col">FIR No</th>
+                                            <th scope="col">District</th>
+                                            <th scope="col">Address</th>
+                                            <th scope="col">Police Station</th>
+                                            <th scope="col">Name</th>
+                                            <th scope="col">Photo</th>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+                                        <tr>
+                                            <td>{{ rowIndex + 1 }}</td>
+                                            <td>{{item.firNo}}</td>
+                                            <td>{{item.district}}</td>
+                                            <td>{{item.accusedAddress}}</td>
+                                            <td>{{item.PS}}</td>
+                                            <td>{{item.arrestName}}</td>
+
+                                            <td>
+                                                <img *ngIf="item.photo" [src]="'data:image/jpeg;base64,' + item.photo"
+                                                    alt="Photo" style="width: 50px; height: 50px;" class="hover-zoom" />
+                                            </td>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template pTemplate="paginatorleft">
+                                        <div>
+                                            Showing {{ SecondListFirst }} to {{ SecondListLast }} of {{ totalRecords
+                                            }} records
+                                        </div>
+                                    </ng-template>
+                                </p-table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

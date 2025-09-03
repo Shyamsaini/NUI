@@ -1,0 +1,404 @@
+import { HttpClient } from '@angular/common/http';
+import { Component, OnInit,ChangeDetectorRef } from '@angular/core';
+import { Chart, ChartConfiguration, registerables } from 'chart.js';
+import { PredictiveAnalysisService } from '../services/predictive-analysis.service';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UtilityService } from '../services/utility.service';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+interface PsCodeOption {
+        text: string;
+        value: string;
+}
+@Component({
+  selector: 'app-predictive-analysis',
+  templateUrl: './predictive-analysis.component.html',
+  styleUrls: ['./predictive-analysis.component.css']
+
+})
+export class PredictiveAnalysisComponent implements OnInit {
+
+  crimeTrends: any[] = [];
+  crimeComparisonData: any = {};
+  chartInstance: any;
+  lineChart: any;
+  PieLoading: boolean = false;
+  LineLoading: boolean = false;
+  BarLoading: boolean = false;
+   settings = {};
+     Districts: any[] = [];
+       policestations: any[] = [];
+        policeStationsCodes : any[] = [];
+   isSubmitted = false;
+   states: any;
+   selectedDistrictNames: string[] = [];
+   selectedPoliceStationName: string[] = [];
+  constructor(private predictiveAnalysisService: PredictiveAnalysisService,private cdr: ChangeDetectorRef,private formBuilder: FormBuilder,private utilityService: UtilityService) {}
+
+  ngOnInit() {
+    const formData = this.form.value;
+      this.form = this.formBuilder.group(
+      {
+        district: [""], 
+        psCode: [""],
+        
+      }
+    );
+    this.district();
+    this.fetchPieChart("","");
+    this.fetchCrimeComparisonData("","");
+    this.fetchLineTrends("","");
+     this.states = localStorage.getItem('selectedStateName');
+  }
+   form:FormGroup = new FormGroup({
+  });
+
+    onReset() {
+         this.crimeComparisonData = {}; 
+    if (this.chartInstance) {
+      this.chartInstance.destroy();
+      this.chartInstance = null;
+    }
+    this.crimeTrends = []; 
+    if (this.lineChart) {
+      this.lineChart.destroy();
+      this.lineChart = null;
+    }
+     this.form.controls["district"].setValue('');
+     this.form.controls["psCode"].setValue('');
+     this.policestations=[],
+      this.selectedPoliceStationName = [];
+    this.selectedDistrictNames = [];
+     this.fetchPieChart("","");
+    this.fetchCrimeComparisonData("","");
+    this.fetchLineTrends("","");
+     this.cdr.detectChanges();
+  }
+
+
+  district(){
+    this.utilityService.Districts().subscribe((data) => {
+      if(data.isSuccess){
+        this.Districts = data.data;
+      }
+    });
+  }
+
+ onDistrictChange(event: any): void {
+  debugger
+ this.crimeComparisonData = {}; 
+  if (this.chartInstance) {
+    this.chartInstance.destroy();
+    this.chartInstance = null;
+  }
+   this.crimeTrends = []; 
+  if (this.lineChart) {
+    this.lineChart.destroy();
+    this.lineChart = null;
+  }
+  
+  this.form.controls["psCode"].setValue('');
+    this.selectedPoliceStationName = [];
+    this.selectedDistrictNames = [];
+    const formData = this.form.value;
+    this.fetchPieChart(formData.district,formData.psCode);
+    this.fetchCrimeComparisonData(formData.district,formData.psCode);
+      this.fetchLineTrends(formData.district,formData.psCode);
+    const selectedDistrict = event.target.value;
+    const formValues = this.form.getRawValue();
+        const selectedIndex = event.target.selectedIndex;
+        this.selectedDistrictNames = event.target.options[selectedIndex].text;
+    if (selectedDistrict) {
+       this.utilityService.PoliceStationList(selectedDistrict).subscribe((data: any[]) => {
+      this.policestations = data;
+     
+    });
+    }  
+    else {
+    this.form.controls["district"].setValue('');
+    this.form.controls["psCode"].setValue('');
+      this.policestations = [];
+    }
+  }
+onPoliceStationChange(event: any): void {
+   this.crimeComparisonData = {}; 
+    if (this.chartInstance) {
+      this.chartInstance.destroy();
+      this.chartInstance = null;
+    }
+    this.crimeTrends = []; 
+    if (this.lineChart) {
+      this.lineChart.destroy();
+      this.lineChart = null;
+    }
+  const formData = this.form.value;
+    this.fetchPieChart(formData.district,formData.psCode);
+    this.fetchCrimeComparisonData(formData.district,formData.psCode);
+      this.fetchLineTrends(formData.district,formData.psCode);
+     const selectedIndex = event.target.selectedIndex;
+     this.selectedPoliceStationName = event.target.options[selectedIndex].text;
+  }
+
+  isSelectAllDistrict(): boolean {
+    return this.selectedDistrictNames.includes('Select');
+  }
+  isSelectAllSelected(): boolean {
+    return this.selectedPoliceStationName.includes('Select All');
+  }
+
+   get f(): { [key: string]: AbstractControl } {
+    return this.form.controls;
+  }
+    onSubmit(): void {
+
+      this.crimeComparisonData = {}; 
+    if (this.chartInstance) {
+      this.chartInstance.destroy();
+      this.chartInstance = null;
+    }
+    this.crimeTrends = []; 
+    if (this.lineChart) {
+      this.lineChart.destroy();
+      this.lineChart = null;
+    }
+       const selectedDistrictCode = this.form.controls['district'].value;
+      const selectedDistrict = this.Districts.find(d => d.value === selectedDistrictCode);
+      this.selectedDistrictNames = selectedDistrict?.text || '';
+
+      const selectedPSCodes: string[] = this.form.controls['psCode'].value || [];
+       this.selectedPoliceStationName = this.policestations.filter(p => selectedPSCodes.includes(p.value)).map(p => p.text);
+
+      const formData = this.form.value;
+      this.fetchPieChart(formData.district,formData.psCode);
+      this.fetchCrimeComparisonData(formData.district,formData.psCode);
+      this.fetchLineTrends(formData.district,formData.psCode);
+    }
+
+    fetchPieChart(district:any,ps_code:any) {
+    this.PieLoading = true;
+    const formData = this.form.value;
+
+    const stateCode = localStorage.getItem('stateCode') ?? '';
+        const requestPayload = {
+          state_code: stateCode,
+          district_code: district,
+          ps_code: ps_code
+        };
+    this.predictiveAnalysisService.getCrimeTrends(requestPayload.state_code, requestPayload.district_code, requestPayload.ps_code).subscribe(
+      response => {
+        if (response?.isSuccess && response.data?.crime_trends) {
+          debugger
+          this.crimeTrends = response.data.crime_trends;
+          this.createPieChart();
+        } else {
+          console.error('Invalid response:', response);
+        }
+        this.PieLoading = false;  
+      },
+     
+    );
+}
+  createPieChart() {
+    if (!this.crimeTrends?.length) return;  
+    const labels = this.crimeTrends.map(item => item.crime_type);
+    const dataValues = this.crimeTrends.map(item => item.sum);
+    const totalSum = dataValues.reduce((acc, val) => acc + val, 0);
+    const percentages = dataValues.map(value => `${((value / totalSum) * 100).toFixed(1)}%`);
+    const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'];
+    Chart.getChart("crimePieChart")?.destroy();
+    Chart.register(ChartDataLabels);
+    new Chart("crimePieChart", {
+      type: 'pie',
+      data: { labels, datasets: [{ data: dataValues, backgroundColor: colors }] },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: true, position: 'top' },
+          tooltip: {
+            callbacks: {
+              label: ({ dataIndex }) => `${labels[dataIndex]}: ${dataValues[dataIndex]} (${percentages[dataIndex]})`
+            }
+          },
+          datalabels: {
+            color: '#000',
+            formatter: (_, ctx) => percentages[ctx.dataIndex],
+            font: { weight: 'bold' }
+          }
+        }
+      }
+    });
+  }
+  fetchCrimeComparisonData(district:any,ps_code:any) {
+    this.BarLoading = true; 
+    const stateCode = localStorage.getItem('stateCode') ?? '';
+     const requestPayload = {
+          state_code: stateCode,
+          district_code: district,
+          ps_code: ps_code
+        };
+    this.predictiveAnalysisService.getCrimeComparisonData(requestPayload.state_code, requestPayload.district_code, requestPayload.ps_code).subscribe(response => {
+      this.BarLoading = false; 
+  
+      if (response?.isSuccess && response.data?.status === 'success' && response.data.x_axis && response.data.y_axis) {
+        this.crimeComparisonData = response.data; 
+        this.createCrimeComparisonChart();
+      } else {
+        console.error('Invalid response format:', response);
+      }
+      
+    }, error => {
+      this.BarLoading = false;
+      console.error('Error fetching crime comparison data:', error);
+    });
+  }
+
+ 
+  
+  createCrimeComparisonChart() {
+    
+    if (!this.crimeComparisonData?.x_axis || !this.crimeComparisonData?.y_axis) return;
+  
+    const ctx = document.getElementById("crimeComparisonChart") as HTMLCanvasElement;
+  
+    this.chartInstance?.destroy();
+  
+    this.chartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: this.crimeComparisonData.x_axis,
+        datasets: [{
+          label: 'Crime Rate Comparison (%)',
+          data: this.crimeComparisonData.y_axis,
+         // backgroundColor: this.crimeComparisonData.y_axis.map((value: number) => value < 0 ? '#FF4D4D' : '#36A2EB'),
+         backgroundColor: [
+          'rgba(255, 99, 132, 0.2)',
+          'rgba(255, 159, 64, 0.2)',
+          'rgba(255, 205, 86, 0.2)',
+          'rgba(75, 192, 192, 0.2)',
+          'rgba(54, 162, 235, 0.2)'
+        ],
+        borderColor: [
+          'rgb(255, 99, 132)',
+          'rgb(255, 159, 64)',
+          'rgb(255, 205, 86)',
+          'rgb(75, 192, 192)',
+          'rgb(54, 162, 235)'
+        ],
+        borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(tooltipItem) {
+                return `${Math.trunc(tooltipItem.raw as number)}%`; 
+              }
+            }
+          },
+          datalabels: { 
+            anchor: 'end',
+            align: 'top',
+            formatter: (value) => Math.trunc(value) 
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: false,
+            title: { display: true, text: "Percentage Change (%)" }
+          },
+          x: {
+            title: { display: true, text: "Crime Categories" }
+          }
+        }
+      },
+      plugins: [ChartDataLabels] 
+    });
+  }
+  
+
+  fetchLineTrends(district:any,ps_code:any) {
+    debugger
+    this.LineLoading = true; 
+    const stateCode = localStorage.getItem('stateCode') ?? '';
+     const requestPayload = {
+          state_code: stateCode,
+          district_code: district,
+          ps_code: ps_code
+        };
+    this.predictiveAnalysisService.getPredictionChart(requestPayload.state_code, requestPayload.district_code, requestPayload.ps_code).subscribe(response => {      
+      if (response?.isSuccess && response.data?.crime_trends) { 
+
+        this.crimeTrends = response.data.crime_trends;
+        this.createLineChart();
+        this.LineLoading = false; 
+      } else {
+        console.error('Invalid response structure:', response);
+        this.LineLoading = false; 
+      }
+    }, error => {
+      console.error('Error fetching crime trends:', error);
+      this.LineLoading = false; 
+    });
+  }
+
+  createLineChart() {
+    if (!this.crimeTrends.length) return;  
+    const labels = this.crimeTrends[0].x_axis.map((year: number) => year.toString());  
+    const colors = [
+      'rgb(255, 99, 132)',
+      'rgb(255, 159, 64)',
+      'rgb(8, 4, 243)',
+      'rgb(75, 192, 192)',
+      'rgb(54, 162, 235)',
+      'rgb(153, 102, 255)',
+      'rgb(245, 4, 4)',
+      'rgb(255, 159, 64)',
+      'rgb(19, 21, 22)'
+    ];   
+    const datasets = this.crimeTrends.map((crime, index) => ({
+      label: crime.crime_type,
+      data: crime.y_axis,
+      borderColor: colors[index % colors.length], 
+      
+    //  backgroundColor: colors[index % colors.length],
+    backgroundColor: [
+      'rgb(255, 99, 132)',
+      'rgb(255, 159, 64)',
+      'rgb(8, 4, 243)',
+      'rgb(75, 192, 192)',
+      'rgb(54, 162, 235)',
+      'rgb(153, 102, 255)',
+      'rgb(245, 4, 4)',
+      'rgb(255, 159, 64)',
+      'rgb(19, 21, 22)'
+    ],
+      borderWidth: 2,
+      fill: false,
+      tension: 0.1
+    }));
+  
+    if (this.lineChart) {
+      this.lineChart.destroy();
+    }
+  
+    this.lineChart = new Chart("crimeLineChart", {
+      type: 'line',
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'top' }
+        },
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+  }
+  
+  private getRandomColor(): string {
+    return `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`;
+  }
+}

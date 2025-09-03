@@ -1,0 +1,85 @@
+.pc-mob-drp h1 {font-size:23px;    color: #fff; font-weight: 600;padding-top:20px;text-transform:uppercase;}
+
+.pc-mob-drp {width:83%;text-align:center;}
+.page-header h5 {border:none;font-size:20px;}
+.green-color {background:#2ea520}
+.green-color:hover {background:#19810d;}
+.topics .col .card{color:#454545;font-size:21px; font-weight:50;border:none; box-shadow:#cdcdcd 0 0 10px;border-radius:15px;}
+.pc-header  {background:#002462;}
+.pc-head-link i {font-size:40px!important;color:#fff!important}
+.pc-head-link .user-name {font-size:20px!important;}
+
+.topics-icon {height:95px; width:95px; border-radius:100%;background-color:#af0b39;background-image:url(../../assets/images/sprite-image.png) ;background-position:0 0 ;display:inline-block;box-shadow:#666666 0 0 10px;margin-bottom:10px;transition: all .31s ease-in 0s;}
+.topics .col:nth-child(4n + 1) .card .topics-icon,  .topics .col:first-child .card .topics-icon{background-color:#ffc107;}
+
+  .topics .col:nth-child(4n) .card .topics-icon{background-color: #2ea520;} 
+  .topics .col:nth-child(4n - 1) .card .topics-icon {background-color:#084298;}
+   .topics h5 {font-size:23px;}
+ .topics .card-body {padding:20px 10px;}
+ 
+.topics-icon.court-case {background-position:0 3px ;}
+.topics-icon.summons {background-position:-114px 4px ;}
+.topics-icon.pre-trail{background-position:-573px 4px ;}
+.topics-icon.forensic{background-position:-382px 6px ;}
+.topics-icon.prosecution{background-position:-483px 6px ;}
+.topics-icon.icjs{background-position:-205px 6px;}
+ .topics-icon.prisoner{background-position:-682px 9px ;}
+  .topics-icon.crime-detail {background-position:-785px 7px ;}
+    .topics-icon.vc {background-position:-878px 7px ;}
+	 .topics-icon.fsl-report {background-position:-980px 5px ;}
+	 .topics-icon.chargesheet-veri {background-position:-1067px 5px ;}
+.topics .col .card:hover h5{color:#fff;}
+.topics .col .card:hover .topics-icon {background-color:#fff;transition:all .31s ease-in 0s;}
+.topics .col:nth-child(4n + 1) .card:hover, .topics .col:first-child .card:hover{background-color:#ffc107;color:#fff;transition: all .31s ease-in 0s;}
+  .topics .col:nth-child(4n) .card:hover{background-color:#198754;} 
+  .topics .col:nth-child(4n - 1) .card:hover{background-color:#084298;color:#fff;transition: all .31s ease-in 0s;}
+.topics .col .card:hover {background-color:#af0b39;color:#fff;}
+.topics .col .card:hover .topics-icon.court-case {background-position:0 -83px ;}
+.topics .col .card:hover .topics-icon.summons {background-position:-114px -83px ;}
+.topics .col .card:hover .topics-icon.pre-trail {background-position:-573px -83px ;}
+.topics .col .card:hover .topics-icon.forensic {background-position:-382px -83px ;}
+.topics .col .card:hover .topics-icon.prosecution {background-position:-483px -83px ;}
+.topics .col .card:hover .topics-icon.icjs{background-position:-205px -83px ;}
+.topics .col .card:hover .topics-icon.prisoner{background-position:-682px -83px ;}
+.topics .col .card:hover .topics-icon.crime-detail {background-position:-785px -83px ;}
+ .topics .col .card:hover .topics-icon.vc {background-position:-878px -83px ;}
+  .topics .col .card:hover .topics-icon.fsl-report {background-position:-980px -85px ;}
+  	 .topics .col .card:hover .topics-icon.chargesheet-veri {background-position:-1067px -83px ;}
+	 
+	 
+.pc-sidebar .pc-link {font-size:17px!important;}
+.card-header h4 {font-size:20px; font-weight:600;background:#084298;color:#fff;padding:20px 10px;margin:0;}
+.inner-page label {font-size:17px; font-weight:500;margin-bottom:5px;}
+.form-control {border-width:1px;}
+.btn {font-size:16px;}
+.table-bordered {border:2px solid #bcbcbc;}
+.table-head tr th {background:#3d3d3d;color:#fff;}
+.table-bordered tbody tr td {border:1px solid #bcbcbc;}
+.btn-blue {background:#084298;}
+.heading-h3 {font-size:20px;margin-bottom:10px; font-weight:600;}
+
+
+
+
+
+   
+
+.nav-tabs {border:none;}
+.nav-tabs > li {    position:relative;margin:0 5px 0 0;    border: 1px solid #ccc;
+    border-top-left-radius: 4px;    border-top-right-radius: 4px;border-bottom:none;}
+.nav-tabs > li > a {    display:inline-block;padding:10px 20px 10px; color:#002462;font-weight:500;border-top-left-radius: 4px;    border-top-right-radius: 4px; }
+.nav-tabs > li > span {    display:none;    cursor:pointer;    position:absolute;
+    right: 5px;    top: 8px;    color: #fff;font-size:15px;font-weight:600;}
+	.tb-cnt-border {border:#ccc solid 1px;}
+.nav-tabs > li:hover > span {    display: inline-block;}
+
+table caption {background:#002462;font-size:18px;padding:7px;}
+
+
+.nav-tabs  li a.active , .nav-tabs  li a:hover {background:#002462;color:#fff;}
+.nav-tabs  li a.active , .nav-tabs  li a:hover {color:#fff;}
+.b-brand {font-size: 21px;    font-weight: 900;    color: #084298 !important;    text-transform: uppercase;line-height: 26px;}
+.pc-sidebar .m-header {padding:15px!important;}
+.pc-header .pc-head-link.active, .pc-header .pc-head-link:active, .pc-header .pc-head-link:focus, .pc-header .pc-head-link:hover {background:none!important;}
+
+.pc-sidebar {background:#002462;}

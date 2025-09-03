@@ -1,0 +1,337 @@
+<div class="pt-4" *ngIf="data !== undefined">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="cnrinformation">
+
+                    <div class="text-center">
+                        <h6 class="complexname">{{data.court_est_name}}</h6>
+                    </div>
+
+                    <table class="table table-bordered caption-top">
+                        <caption class="text-center  ">Case Details</caption>
+                        <tbody>
+                            <tr>
+                                <td class="font-bold">Case Type</td>
+                                <td colspan="3" class="casetype">{{ data.type_name }}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-bold">Filing Number</td>
+                                <td class="filingnumber">{{ data.fil_no }}</td>
+                                <td class="font-bold">Filing Date</td>
+                                <td class="filingdate">{{ data.date_of_filing }}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-bold">Registration Number</td>
+                                <td class="registrationnumber">{{ data.reg_no }}</td>
+
+                                <td class="font-bold" >Registration Date</td>
+                                <td class="registrationdate" >{{ data.dt_regis }}</td>
+                              
+                            </tr>
+                            <tr>
+                                <td class="font-bold">CNR Number</td>
+                                <td colspan="3" class="cnrnumber">{{ data.cino }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table class="table table-bordered caption-top">
+                        <caption class="text-center ">Status of Case</caption>
+                        <tbody>
+                            <tr>
+                                <td class="font-bold">
+                                    First Hearing Date
+                                </td>
+                                <td class="firsthearingdate">{{ data.date_first_list }}</td>
+                            </tr>
+                            <tr  *ngIf="data.pend_disp == 'D'">
+                                <td class="font-bold">Decision Date</td>
+                                <td class="registrationdate" >{{ data.date_of_decision }}</td>
+                            </tr>
+                            <tr class="decisiondatedata" *ngIf="data.pend_disp == 'P'">
+                                <td class="font-bold">
+                                    Date of Next hearing
+                                </td>
+                                <td class="decisiondate">{{ data.date_next_list }}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-bold">
+                                    Stage of Case
+                                </td>
+                                <td class="purposename">{{data.purpose_name}}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-bold">
+                                    Court Number and Judge
+                                </td>
+                                <td class="courtnumberandjudge">{{data.court_no}}-{{ data.desgname }}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-bold">
+                                    Nature of Disposal
+                                </td>
+                                <td *ngIf="data.pend_disp == 'P'" class="casestatus">Pending</td>
+                                <td *ngIf="data.pend_disp == 'D'" class="casestatus">Disposed</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table class="table table-bordered caption-top">
+                        <caption class="text-center ">
+                            Petitioner and Advocate
+                        </caption>
+                        <tbody>
+                            <tr>
+                                <td class="font-bold">
+                                    <span class="petitioner">{{data.pet_name}}</span>
+                                    <span class="petitioneradvocate">{{data.pet_adv}}</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table class="table table-bordered caption-top">
+                        <caption class="text-center ">
+                            Respondent and Advocate
+                        </caption>
+                        <tbody>
+                            <tr>
+                                <td class="font-bold">
+                                    <span class="respondent">{{data.res_name}}</span>
+                                    <span class="respondentadvocate">{{data.res_adv}}</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table class="table table-bordered caption-top">
+                        <caption class="text-center ">
+                            Acts
+                        </caption>
+                        <thead class="table-head">
+                            <tr>
+                                <th>
+                                    Under Act(s)
+                                </th>
+                                <th>
+                                    Under Section(s)
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="caseactinformation" >
+                            <tr *ngFor="let act of data.acts">
+                                <td>
+                                    {{act.actname}}
+                                </td>
+                                <td>{{act.section}}</td>
+                            </tr>
+                            </tbody>
+                    </table>
+
+                    <table class="table table-bordered caption-top">
+                        <caption class="text-center ">
+                            FIR Details
+                        </caption>
+
+                        <tbody>
+                            <tr>
+                                <td class="font-bold">
+                                     Police Station
+                                </td>
+                                <td class="policestation">{{data.police_station}}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-bold">
+                                    Fir Number
+                                </td>
+                                <td class="firnumber">{{data.fir_no}}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-bold">
+                                    Year
+                                </td>
+                                <td class="year">{{data.fir_year}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table class="table table-bordered caption-top">
+                        <caption class="text-center ">
+                            Case History
+                        </caption>
+                        <thead class="table-head">
+                            <tr>
+                                <th>
+                                    Registration Number
+                                </th>
+                                <th>
+                                    Judge
+                                </th>
+                                <th>
+                                    Buisness on Date
+                                </th>
+                                <th>
+                                    Hearing Date
+                                </th>
+                                <th>
+                                    Purpose of Hearing
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="casehistory">
+                            <tr *ngFor="let historyofcasehearing of data.historyofcasehearing">
+                                <td>
+                                    {{data.reg_no}}/{{ data.reg_year}}
+                                </td>
+                                <td>
+                                    {{historyofcasehearing.desgname}}
+                                </td>
+                                <td>
+                                    {{historyofcasehearing.business_date}}
+                                </td>
+                                <td>
+                                    {{ historyofcasehearing.hearing_date }}
+                                </td>
+                                <td>
+                                    {{ historyofcasehearing.purpose_of_listing }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table class="table table-bordered caption-top">
+                        <caption class="text-center  ">
+                            Orders
+                        </caption>
+                        <thead class="table-head">
+                            <tr>
+                                <th>
+                                    Order Number
+                                </th>
+                                <th>
+                                    Order Date
+                                </th>
+                                <th>
+                                    Order Details
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="caseorders">
+                        <tr *ngFor="let interimorder of data.interimorder">
+                            <td>{{ interimorder.order_no }}</td>
+                            <td>{{ interimorder.order_date }}</td>
+                            <td>
+                                <a href="javascript:void(0)" (click)="downloadOrder(data.cino, interimorder.order_no, interimorder.order_date)"> 
+                                    Download Order
+                                </a>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table class="table table-bordered caption-top" *ngIf="data.finalorder != null">
+                        <caption class="text-center  ">
+                            Final Orders
+                        </caption>
+                        <thead class="table-head">
+                            <tr>
+                                <th>
+                                    Order Number
+                                </th>
+                                <th>
+                                    Order Date
+                                </th>
+                                <th>
+                                    Order Details
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="caseorders">
+                        <tr *ngFor="let finalorder of data.finalorder">
+                            <td>{{ finalorder.order_no }}</td>
+                            <td>{{ finalorder.order_date }}</td>
+                            <td>
+                                <a href="javascript:void(0)" (click)="downloadOrder(data.cino, finalorder.order_no, finalorder.order_date)"> 
+                                    Download Order
+                                </a>
+                            </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table class="table table-bordered caption-top processdetailcontainer" *ngIf="data.processes != null">
+                        <caption class="text-center ">
+                            Process Details
+                        </caption>
+                        <thead class="table-head">
+                            <tr>
+                                <th>
+                                    ProcessId
+                                </th>
+                                <th>
+                                    Process Date
+                                </th>
+                                <th>
+                                    Process Title
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="processdetails">
+                            <tr *ngFor="let process of data.processes">
+                                <td>
+                                    {{process.process_id}}
+                                </td>
+                                <td>
+                                    {{process.process_date}}
+                                </td>
+                                <td>
+                                    {{process.process_title}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+
+                    <table class="table table-bordered caption-top transferdetailcontainer" *ngIf="data.transfer != null">
+                        <caption class="text-center ">
+                            Case Transfer Within Establishment
+                        </caption>
+                        <thead class="table-head">
+                            <tr>
+                                <th>
+                                    Transfer Date
+                                </th>
+                                <th>
+                                    From Court Number And Judge
+                                </th>
+                                <th>
+                                    To Court Number And Judge
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="transferdetails">
+                            <tr *ngFor="let transfer of data.transfer">
+                                <td>
+                                    {{transfer.transfer_date}}
+                                </td>
+                                <td>
+                                    {{transfer.from_court_no_desgname}}
+                                </td>
+                                <td>
+                                    {{transfer.to_court_no_desgname}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+
+                    
+
+                    
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

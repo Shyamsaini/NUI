@@ -1,0 +1,183 @@
+<div class="pc-container">
+  <div class="pcoded-content pb" style="padding-bottom:90px;">
+    <div class="page-header">
+      <div class="page-block">
+        <div class="row align-items-center">
+          <div class="col-md-6" style="margin-top: 20px;">
+            <div class="page-header-title">
+              <h5 class="m-b-10">Chitra Khozi</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="card mt-5">
+        <div class="card-body">
+          <div class="row searchbypanel">
+            <div class="col-md-9 d-flex flex-column">
+              <span class="dragBox">Drag and Drop image here
+                <input type="file" id="file" (change)="onFileSelected($event)" />
+              </span>
+              <label for="file" class="btn btn-primary w-25 mx-auto mt-3">Upload Image</label>
+            </div>
+            <div class="col-md-3 col-12 mb-3">
+              <div id="defaultImg">
+                <img *ngIf="!uploadedImage" [src]="'assets/images/UserImage.jpg'" style="text-align: center; object-fit: cover; height: 200px; width: 200px;" />
+              </div>
+              <div #preview></div>
+              <div class="crim-img">
+                <img *ngIf="uploadedImage" [src]="uploadedImage" alt="Uploaded image" style="text-align: center; object-fit: cover; height: 200px; width: 200px;" />
+              </div>
+              <button *ngIf="uploadedImage"  [disabled]="isImageSubmitted"  type="button" class="btn btn-success px-5 mt-3"  (click)="getChitraKhoziWithImage()" id="btnSubmit">{{ImageSubmittedLebel}}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prisoner List from e-Prison -->
+    <div  *ngIf="!isHideChitrakhoji" class="row">
+      <div class="card" id="ChitraKhozi">
+        <div class="card-body pb-0 pt-3">
+          <div class="row">
+            <div class="col-sm-12 fld p-0">
+              <div class="col-md-12"><h5 class="m-b-10">Prisoner List from e-Prison</h5></div>
+              <div class="col-md-12">
+                <!-- Prisoner Loader -->
+                <div *ngIf="isLoadingChitrakhoji" class="text-center p-5" id="prisoner-loader">
+                    <span class="loaderr">L &nbsp; ading</span>
+                  <p class="mt-2">Loading prisoner data...</p>
+                </div>
+                
+                <!-- Prisoner Table -->
+                <p-table
+                  *ngIf="!isLoadingChitrakhoji && chitrakhojiData.length > 0"
+                  [value]="chitrakhojiData"
+                  [paginator]="true"
+                  [rows]="10"
+                  [responsiveLayout]="'scroll'"
+                  [trackBy]="trackByIndex"
+                >
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th>S.No</th>
+                      <th>State</th>
+                      <th>Prisoner ID</th>
+                      <th>Prisoner Name</th>
+                      <th>Gender</th>
+                      <th>Father Name</th>
+                      <th>Location</th>
+                      <th>Jail Name</th>
+                      <th>Photo</th>
+                      <th>Age</th>
+                      <th>Matching%</th>
+                    </tr>
+                  </ng-template>
+
+                  <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex">
+                    <tr>
+                      <td>{{ rowIndex + 1 }}</td>
+                      <td>{{ rowData.statename }}</td>
+                      <td>{{ rowData.pid_no }}</td>
+                      <td>{{ rowData.prisoner_name }}</td>
+                      <td>{{ rowData.gender }}</td>
+                      <td>{{ rowData.fathername }}</td>
+                      <td>{{ rowData.location }}</td>
+                      <td>{{ rowData.jailname }}</td>
+                      <td>
+                        <img
+                          *ngIf="rowData.photo"
+                          [src]="'data:image/jpeg;base64,' + rowData.photo"
+                          alt="Photo"
+                          style="width: 50px; height: 50px;"
+                        />
+                      </td>
+                      <td>{{ rowData.age }}</td>
+                      <td>{{ (rowData.dist * 100).toFixed(0) }}%</td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+                
+                <!-- Empty State -->
+                <div *ngIf="!isLoadingChitrakhoji && chitrakhojiData.length === 0 && hasSearched" class="text-center p-5">
+                  <p>No prisoner data found</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Accused List from CCTNS -->
+    <div *ngIf="!isHideCCTNSChitrakhoji" class="row mt-2">
+      <div class="card">
+        <div class="card-body pb-0 pt-3">
+          <div class="row">
+            <div class="col-sm-12 fld p-0">
+              <div class="col-md-12"><h5 class="m-b-10">Accused List from CCTNS</h5></div>
+              <div class="col-md-12">
+                <!-- Accused Loader -->
+                <div *ngIf="isLoadingCctns" class="text-center p-5" id="accused-loader">                 
+                  <span class="loaderr">L &nbsp; ading</span>
+                  <p class="mt-2">Loading accused data...</p>
+                </div>
+                
+                <!-- Accused Table -->
+                <p-table
+                  *ngIf="!isLoadingCctns && cctnsKhojiData.length > 0"
+                  [value]="cctnsKhojiData"
+                  [paginator]="true"
+                  [rows]="10"
+                  [responsiveLayout]="'scroll'"
+                  [trackBy]="trackByIndex"
+                >
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th>S.No</th>
+                      <th>FIR No.</th>
+                      <th>District</th>
+                      <th>Address</th>
+                      <th>Police Station </th>
+                      <th>Name</th>
+                      <th>Photo</th>
+                      <th>Matching%</th>
+                    </tr>
+                  </ng-template>
+
+                  <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex">
+                    <tr>
+                      <td>{{ rowIndex + 1 }}</td>
+                      <td>{{ rowData.fir_number }}</td>
+                      <td>{{ rowData.district }}</td> 
+                      <td>{{ rowData.address }}</td> 
+                      <td>{{ rowData.PS }}</td>
+                      <td>{{ rowData.name }}</td>
+                   
+                      <td>
+                        <img
+                          *ngIf="rowData.image"
+                          [src]="'data:image/jpeg;base64,' + rowData.image"
+                          alt="Photo"
+                          style="width: 50px; height: 50px;"
+                        />
+                      </td>
+                      <td>{{ (rowData.accuracy).toFixed(0) }}%</td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+                
+                <!-- Empty State -->
+                <div *ngIf="!isLoadingCctns && cctnsKhojiData.length === 0 && hasSearched" class="text-center p-5">
+                  <p>No accused data found</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

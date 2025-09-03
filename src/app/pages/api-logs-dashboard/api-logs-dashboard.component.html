@@ -1,0 +1,292 @@
+<div class="pc-container">
+  <div class="pcoded-content pb" style="padding-bottom:90px;">
+    <div class="page-header">
+      <div class="page-block">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <div class="page-header-title">
+              <h5 class="m-b-10">API Logs Dashboard</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  
+    <div class="card mt-4">
+      <div class="card-body">
+        <form [formGroup]="logSearchForm" (ngSubmit)="searchLogs()">
+          <div class="row">
+            
+            <div class="col-md-3 col-12 mb-3">
+                <label class="form-label">State</label>
+                <sup class="text-danger top-0">*</sup>
+                <select class="form-select" [(ngModel)]="selectedStateCode" name="state" [ngModelOptions]="{ standalone: true }" (change)="onStateChange()">
+                    <option [value]="0" disabled selected>Select</option>
+                    <option *ngFor="let state of states" [value]="state.StateCode">{{ state.stateName }}</option>
+                </select>       
+            </div>
+
+            <!-- <div class="col-md-3 col-12 mb-3">
+              <label class="form-label">From Date</label>
+              <input type="date" formControlName="fromDate" class="form-control" />
+            </div>
+
+            <div class="col-md-3 col-12 mb-3">
+              <label class="form-label">To Date</label>
+              <input type="date" formControlName="toDate" class="form-control" />
+            </div> -->
+
+            <div class="col-md-3 col-12 mb-3">
+              <label class="form-label">Date</label>
+              <sup class="text-danger top-0">*</sup>
+              <input type="date" formControlName="particularDate" class="form-control" />
+            </div>
+
+            <div class="col-md-3 col-12 mb-3">
+              <label class="form-label">API Endpoint</label>
+              <sup class="text-danger top-0">*</sup>
+              <select formControlName="apiEndpoint" class="form-select" [disabled]="apiEndpoints.length === 0">
+                 <option value="select" selected>Select</option>
+                 <option value="">All</option>
+                <option *ngFor="let endpoint of apiEndpoints" [value]="endpoint">{{ endpoint }}</option>
+              </select>
+            </div>
+
+            <div class="col-md-3 col-12 mb-3">
+              <label class="form-label">Process Status</label>
+              <sup class="text-danger top-0">*</sup>
+              <select formControlName="processStatus" class="form-select">
+                <option value="" disabled>Select</option>
+                <option value="1">Success</option>
+                <option value="0">Failure</option>
+              </select>
+            </div>
+
+            
+            <div class="col-md-12 col-12 mb-3 text-right pt-4 mt-2">   
+                <button type="submit" class="btn btn-success text-white" [disabled]="isSearchDisabled">Search</button>
+                <button type="button" class="btn btn-secondary text-white ml-2" (click)="resetForm()">Reset</button>
+            </div>
+            
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+
+    <div class="card mt-4" *ngIf="showTable">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="form-header">API Logs
+          <span class="text-success ml-1" style="font-size: 15px; font-weight: 700;letter-spacing: 1px;">({{ recordCount }} Records Found)</span>
+        </h5>
+        
+            <input 
+            type="text" 
+            class="form-control w-25" 
+            placeholder="Search..." 
+            [(ngModel)]="searchTerm" 
+            (input)="filterLogs()" />
+        </div>
+
+
+        <p-table #logTable [value]="filteredLogs" [paginator]="true" [rows]="10" [resizableColumns]="true" class="p-datatable-gridlines">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>S.No</th>
+              <th>Method Name, API Endpoint & IP</th>
+              <th>Created By & Mob. Number</th>
+              <th>User Request</th>
+              <th>Api Response</th>
+              <th>User Encrypted Request</th>
+              <th>Api Encrypted Response</th>
+              <th>Exception</th>
+              <th>Created On & Status</th>
+              <th>Actions</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-record let-rowIndex="rowIndex">
+            <tr>
+              <td>{{ rowIndex + 1 }}</td>
+
+              <td>
+                METHOD: {{ record.ApiMethodName }} <br />
+                ENDPOINT: {{ record.ApiEndpoint }} <br />
+                IP: {{ record.IP }}
+              </td>
+              <td>
+                NAME: {{ record.CreatedBy }} <br />
+                Number: {{ record.MobileNumber }}
+              </td>
+
+              <td (click)="showRequestData(record.UserRequestParam)" style="cursor: pointer;" title="Click to view full request">
+                {{ record.UserRequestParam | slice: 0:20 }}...
+              </td>
+
+              <td (click)="showResponseData(record.UserResponseParam, false)" style="cursor: pointer;" title="Click to view full response">
+                {{ record.UserResponseParam | slice: 0:20 }}...
+              </td>
+
+              <td (click)="showRequestData(record.EncryptRequestParam, true)" style="cursor: pointer;" title="Click to view full encrypted request">
+                {{ record.EncryptRequestParam | slice: 0:20 }}...
+              </td>
+
+              <td (click)="showResponseData(record.EncryptResponseParam, true)" style="cursor: pointer;" title="Click to view full encrypted response">
+                {{ record.EncryptResponseParam | slice: 0:20 }}...
+              </td>
+
+              <td *ngIf="record.ApiException" (click)="showApiException(record.ApiException)" style="cursor: pointer;" title="Click to view full exception">
+                {{ record.ApiException | slice: 0:20 }}...
+              </td>
+              <td *ngIf="!record.ApiException">N/A</td>
+
+              <td>
+                Created On: {{ record.CreatedOn | date: 'dd-MM-yyyy HH:mm:ss' }}<br />
+                Status: {{ record.ApiStatusDescription }}
+              </td>
+
+              <td>
+                <button class="btn btn-primary btn-sm" (click)="viewDetail(record)">Details</button>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="footer">
+            <tr *ngIf="isLoading">
+              <td colspan="9" class="text-center">
+                <i class="pi pi-spin pi-spinner"></i> Loading...
+              </td>
+            </tr>
+            <tr *ngIf="!isLoading && apiLogs.length === 0">
+              <td colspan="9" class="text-center">No Logs Found.</td>
+            </tr>
+            <tr *ngIf="!isLoading && apiLogs.length > 0 && filteredLogs.length === 0">
+              <td colspan="9" class="text-center">
+                No Records Found
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+
+
+    <p-dialog 
+      header="Error"
+      [(visible)]="errorDialogVisible"
+      [modal]="true"
+      [closable]="true"
+      [style]="{width: '400px'}"
+      [baseZIndex]="10000">
+
+      <div class="text-center">
+        <i class="pi pi-times-circle" style="font-size: 3rem; color: red;"></i>
+        <p class="mt-3" style="font-size: 1.1rem;">{{ errorDialogMessage }}</p>
+        <div class="mt-3">
+          <button pButton type="button" label="OK" class="p-button-rounded p-button-primary" (click)="errorDialogVisible = false"></button>
+        </div>
+      </div>
+    </p-dialog>
+
+    <p-dialog [header]="requestDialogHeader" [(visible)]="requestDialogVisible" [modal]="true" [style]="{width: '50vw'}">
+      <div *ngIf="requestDialogData" class="d-flex justify-content-end mb-2">
+        <button pButton icon="pi pi-copy" label="Copy" (click)="copyToClipboard(requestDialogData)" class="p-button-sm"></button>
+      </div>
+      <pre style="white-space: pre-wrap; word-break: break-word; max-height: 300px; overflow-y: auto;">{{ requestDialogData || 'No data available' }}</pre>
+    </p-dialog>
+
+
+    <p-dialog [header]="responseDialogHeader" [(visible)]="responseDialogVisible" [modal]="true" [style]="{width: '50vw'}">
+      <div *ngIf="responseDialogData" class="d-flex justify-content-end mb-2">
+        <button pButton icon="pi pi-copy" label="Copy" (click)="copyToClipboard(responseDialogData)" class="p-button-sm"></button>
+      </div>
+      <pre style="white-space: pre-wrap; word-break: break-word; max-height: 300px; overflow-y: auto;">{{ responseDialogData || 'No data available' }}</pre>
+    </p-dialog>
+    
+    <p-dialog header="API Exception" [(visible)]="exceptionDialogVisible" [modal]="true" [style]="{width: '50vw'}">
+      <div *ngIf="exceptionDialogData" class="d-flex justify-content-end mb-2">
+        <button pButton icon="pi pi-copy" label="Copy" (click)="copyToClipboard(exceptionDialogData)" class="p-button-sm"></button>
+      </div>
+      <pre style="white-space: pre-wrap; word-break: break-word; max-height: 300px; overflow-y: auto;">{{ exceptionDialogData || 'No exception data available' }}</pre>
+    </p-dialog>
+    
+    <p-dialog header="API Log Details" [(visible)]="showPopup" [modal]="true" [style]="{ width: '60vw' }">
+      <div *ngIf="popupData">
+        <div class="d-flex justify-content-end mb-2">
+          <button pButton icon="pi pi-copy" label="Copy All" class="p-button-sm" (click)="copyToClipboard(formatPopupData(popupData))"></button>
+        </div>
+    
+        <div class="row mb-2 border-bottom">
+          <div class="col-md-3 mb-2">
+            <strong>Execution Time:</strong> {{ popupData.ExecutionDurationMs }} ms
+          </div>
+          <div class="col-md-3 mb-2">
+            <strong>Created On:</strong> {{ popupData.CreatedOn | date: 'dd-MM-yyyy HH:mm:ss' }}
+          </div>
+          <div class="col-md-3 mb-2">
+            <strong>Status:</strong> {{ popupData.ApiStatusDescription }}
+          </div>
+          <div class="col-md-3 mb-2">
+            <strong>IP:</strong> {{ popupData.IP }}
+          </div>
+          <div class="col-md-3 mb-2">
+            <strong>Method:</strong> {{ popupData.ApiMethodName }}
+          </div>
+          <div class="col-md-6 mb-2">
+            <strong>Endpoint:</strong> {{ popupData.ApiEndpoint }}
+          </div>
+        </div>
+    
+        <div class="row mb-2 border-bottom">
+        <div class="col-md-10">
+          <strong>Request:</strong>
+          <pre style="white-space: pre-wrap; word-break: break-word; max-height: 300px; overflow-y: auto;">{{ popupData.UserRequestParam || 'No request data' }}</pre>
+        </div>
+        <div class="col-md-2">
+
+          <div class="d-flex justify-content-end mb-1" *ngIf="popupData.UserRequestParam">
+            <button pButton icon="pi pi-copy" label="Copy" class="p-button-sm" (click)="copyToClipboard(popupData.UserRequestParam)"></button>
+          </div>
+        </div>
+        </div>
+
+        <div class="mt-2">
+          <strong>Encrypted Request:</strong>
+          <div class="d-flex justify-content-end mb-1" *ngIf="popupData.EncryptRequestParam">
+            <button pButton icon="pi pi-copy" label="Copy" class="p-button-sm" (click)="copyToClipboard(popupData.EncryptRequestParam)"></button>
+          </div>
+          <pre style="white-space: pre-wrap; word-break: break-word; max-height: 300px; overflow-y: auto;">{{ popupData.EncryptRequestParam || 'No encrypted request' }}</pre>
+        </div>
+
+    
+        <div class="mt-2">
+          <strong>Response:</strong>
+          <div class="d-flex justify-content-end mb-1" *ngIf="popupData.UserResponseParam">
+            <button pButton icon="pi pi-copy" label="Copy" class="p-button-sm" (click)="copyToClipboard(popupData.UserResponseParam)"></button>
+          </div>
+          <pre style="white-space: pre-wrap; word-break: break-word; max-height: 300px; overflow-y: auto;">{{ popupData.UserResponseParam || 'No response data' }}</pre>
+        </div>
+
+        <div class="mt-2">
+          <strong>Encrypted Response:</strong>
+          <div class="d-flex justify-content-end mb-1" *ngIf="popupData.EncryptResponseParam">
+            <button pButton icon="pi pi-copy" label="Copy" class="p-button-sm" (click)="copyToClipboard(popupData.EncryptResponseParam)"></button>
+          </div>
+          <pre style="white-space: pre-wrap; word-break: break-word; max-height: 300px; overflow-y: auto;">{{ popupData.EncryptResponseParam || 'No encrypted response' }}</pre>
+        </div>
+    
+        <div class="mt-2" *ngIf="popupData.ApiException">
+          <strong>Exception:</strong>
+          <div class="d-flex justify-content-end mb-1">
+            <button pButton icon="pi pi-copy" label="Copy" class="p-button-sm" (click)="copyToClipboard(popupData.ApiException)"></button>
+          </div>
+          <pre style="white-space: pre-wrap; word-break: break-word; max-height: 300px; overflow-y: auto;">{{ popupData.ApiException }}</pre>
+        </div>
+      </div>
+    </p-dialog>
+             
+  </div>
+</div>

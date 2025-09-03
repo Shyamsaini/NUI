@@ -1,0 +1,44 @@
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
+import { Observable } from 'rxjs';
+
+@Injectable({
+   providedIn: 'root'
+})
+export class FirReportService {
+
+   constructor(private http: HttpClient) { }
+
+   private GetExcepteFIRsApiUrl: string = `${environment.apiUrl}/FIRReport/GetExcepteFIRs`;
+   private GetPoliceStationApiUrl: string = `${environment.apiUrl}/Public/GetPoliceStationList`;
+   private GetMajorHeadListApiUrl: string = `${environment.apiUrl}/Act/GetMAJORHEAD`;
+   private GetDistrictsApiUrl: string = `${environment.apiUrl}/Public/GetDistricts`;
+   // LoadFIRReport(): Observable<any> {
+   //    return this.http.get<any>(`${this.GetExcepteFIRsApiUrl}`);
+   // }
+
+   GetMajorHeadList(HeniousType: any): Observable<any> {
+      const data = {
+         HeniousType: HeniousType,
+      };
+      return this.http.post<any[]>(`${this.GetMajorHeadListApiUrl}`, data);
+   }
+   LoadDistricts(): Observable<any> {
+      return this.http.get<any>(this.GetDistrictsApiUrl);
+   }
+   LoadPoliceStations(distcodes: number[]): Observable<any[]> {
+      return this.http.post<any[]>(`${this.GetPoliceStationApiUrl}`, { districts: distcodes });
+   }
+
+   LoadFIRReport(PS_CD: any,ACT_CD:any,Major_Head_Code:any,FromDate:any,ToDate:any): Observable<any[]> {
+       const data = {
+      PS_CD: PS_CD,
+      ACT_CD: ACT_CD,
+      Major_Head_Code: Major_Head_Code,
+      FromDate: FromDate,
+      ToDate: ToDate,
+    }; 
+      return this.http.post<any[]>(`${this.GetExcepteFIRsApiUrl}`, data);
+   }
+}

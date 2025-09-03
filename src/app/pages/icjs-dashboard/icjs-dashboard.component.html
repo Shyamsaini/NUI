@@ -1,0 +1,379 @@
+<div class="pc-container">
+  <div class="pcoded-content pb" style="padding-bottom:90px;">
+            <div class="page-header">
+          <div class="page-block">
+              <div class="row align-items-center">
+                  <div class="col-md-6">
+                      <div class="page-header-title">
+                          <h5 class="m-b-10" >Court-Case</h5>
+                      </div>
+                  </div>
+              </div>
+          </div>
+             </div>
+
+     
+            <div class="card mt-5">
+              <div class="card-body">
+                    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                  <div id="searchByFilingNumber" class="row searchbypanel">
+                      <div class="col-md-3  col-12 mb-3">
+                         <label class="form-label"> District  Name</label>
+                          <!-- <select  id="district" formControlName="district" class="form-control form-select" (change)="onDistrictChange($event)" >
+                              <option value="">Select</option>
+                              <option *ngFor="let district of Districts" [value]="district.value">{{ district.text }}</option>
+                          </select> -->
+                            <ng-multiselect-dropdown #multiSelect [settings]="settings" [data]="Districts" formControlName="district" [placeholder]="'Select District'"
+                        (onDropDownClose)="onDistrictChange($event)">
+                        </ng-multiselect-dropdown>
+                      </div>
+                      <div class="col-md-3  col-12 mb-3">
+                         <label class="form-label"> Police Station</label>
+                         
+                           <ng-multiselect-dropdown #multiSelect [settings]="settings" 
+                           [data]="policestations" 
+                           formControlName="psCode" 
+                           [placeholder]="'Police Station'">
+                           </ng-multiselect-dropdown>
+                          <!-- <select id="policeStation" formControlName="psCode" class="form-control form-select" >
+                              <option value="">Select</option>
+                              <option *ngFor="let policestation of policestations" [value]="policestation.value">{{ policestation.text }}</option>
+                          </select> -->
+                         <!-- @if (f['psCode'].errors && isSubmitted) {
+                              <div class="invalid-feedback">
+                                @if (f['psCode'].errors['required']) {
+                                  <div>Police Station is required</div>
+                                }
+                              </div>
+                              } -->
+                      </div>
+                      <div class="col-lg-2 col-md-3  col-12 mb-3">
+                       <label class="form-label">From Date</label>
+                      <!-- <input type="date" id="bdpFromDate"  class="form-control" formControlName="FromDate" maxlength="7" tabindex="2" >                          
+                     @if (f['FromDate'].errors && isSubmitted) {
+                              <div class="invalid-feedback">
+                                @if (f['FromDate'].errors['required'] && isSubmitted) {
+                                  <div>From  Date is required</div>
+                                }
+                                @if (f['FromDate'].errors['pattern']) {
+                                  <div>Invalid Fir Number</div>
+                                }
+                              </div>
+                          } -->
+                          <p-calendar formControlName="FromDate"  class="form-control mon"
+                             readonlyInput="true" placeholder="Select a date" dateFormat="dd-mm-yy" [showIcon]="true">
+                            </p-calendar>
+                      </div>
+                      <div class="col-lg-2 col-md-3  col-12 mb-3">
+                          <label class="form-label">To Date</label>
+                     
+                       <p-calendar formControlName="ToDate"  class="form-control mon"
+                             readonlyInput="true" placeholder="Select a date" dateFormat="dd-mm-yy" [showIcon]="true">
+                            </p-calendar>
+                      <!-- <input type="date" id="bdpToDate"     class="form-control" formControlName="ToDate" maxlength="7" tabindex="2">
+                      @if (f['ToDate'].errors && isSubmitted) {
+                              <div class="invalid-feedback">
+                                @if (f['ToDate'].errors['required'] && isSubmitted) {
+                                  <div>To  Date is required</div>
+                                }
+                                @if (f['ToDate'].errors['pattern']) {
+                                  <div>Invalid Fir Number</div>
+                                }
+                              </div>
+                          } -->
+                      </div>
+                       <div class="col-md-2 col-12 pt-4 mt-1" style="text-align: center;">
+                          <button type="submit" class="btn btn-success text-white mr-2">Search</button>
+                           <button type="button" class="btn btn-secondary text-white" (click)="onReset()">Reset</button>
+                      </div>
+                  </div>
+                  
+               </form>
+              </div>
+            </div>
+
+        <div class="card mt-4">
+        <div class="card-body">
+          <form [formGroup]="form">
+            <div id="searchByFilingNumber" class="row searchbypanel">
+              <div class="col-md-12 seprtaion">
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="row">
+                      <div class=" col-sm-12 mb-1">
+                           <label class="form-label "> State :</label><span>{{ states || 'No State selected' }} </span>
+                      </div>
+                     <div class="col-sm-12 mb-1" *ngIf="selectedDistrictNames.length">
+                        <label class="form-label"> Distict :</label>
+                        <span class="spl-pd2">
+                          {{ trimmedDistrictNames }}
+                          <a href="#" (click)="toggleReadMoreDistricts(); $event.preventDefault()"
+                            *ngIf="selectedDistrictNames.join(', ').length > 100">
+                            {{ readMoreDistricts ? 'Read less' : 'Read more' }}
+                          </a>
+                        </span>
+                      </div>
+                       <div class="col-sm-12 mb-1" *ngIf="selectedPoliceStations.length">
+                        <label class="form-label"> Police Station :</label>
+                        <span class="spl-pd">
+                          {{ trimmedPoliceStations }}
+                          <a href="#" (click)="toggleReadMore(); $event.preventDefault()"
+                            *ngIf="selectedPoliceStations.join(', ').length > 100">
+                            {{ readMore ? 'Read less' : 'Read more' }}
+                          </a>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+             <div class="card-view row justify-content-around tot-fr">
+              <!-- <div class="col-md-3 mb-4">
+                  <div class="card h-100 com-border-shadow">
+                      <div class="card-body d-flex flex-column justify-content-center ">
+                          <h4 class="card-title text-center md-text " >Total On Going</h4>
+                          <a href="javascript:void(0)" class="card-text text-center md-text  alldata"  id="totalOnGoing" data-type="ongoing" 
+                          (click)="totalDetails($event, 'ongoing')">0</a>
+                      </div>
+                  </div>
+              </div> -->
+
+              <div class="col-md-3 mb-4">
+                  <div class="card h-100 com-border-shadow">
+                      <div class="card-body d-flex flex-column justify-content-center ">
+                          <h4 class="card-title text-center md-text " >Total On Going</h4>
+                          <a href="javascript:void(0)" class="card-text text-center md-text alldata non-clickable"  id="totalOnGoing" data-type="ongoing">0</a>
+                      </div>
+                  </div>
+              </div>
+
+              <div class="col-md-3 mb-4">
+                  <div class="card h-100 com-border-shadow">
+                      <div class="card-body d-flex flex-column justify-content-center ">
+                          <h4 class="card-title text-center md-text " >Listed for Today</h4>
+                           <a href="javascript:void(0)" class="card-text text-center md-text  alldata"  id="listedToday" data-type="today" 
+                          (click)="totalDetails($event, 'today')">0</a>
+                      </div>
+                  </div>
+              </div>
+
+              <div class="col-md-3 mb-4">
+                  <div class="card h-100 com-border-shadow">
+                      <div class="card-body d-flex flex-column justify-content-center ">
+                          <h4 class="card-title text-center md-text" >Listed for Next Seven Days</h4>
+                          
+                          <a href="javascript:void(0)" class="card-text text-center md-text  alldata"  id="listedThisWeek" data-type="nextsevendays" 
+                          (click)="totalDetails($event, 'nextsevendays')">0</a>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- <div class="col-md-3 mb-4">
+                  <div class="card h-100 com-border-shadow">
+                      <div class="card-body d-flex flex-column justify-content-center ">
+                          <h4 class="card-title text-center md-text " >Total Disposed</h4>
+                         
+                           <a href="javascript:void(0)" class="card-text text-center md-text  alldata"  id="totalDisposed" data-type="disposed" 
+                          (click)="totalDetails($event, 'disposed')">0</a>
+                      </div>
+                  </div>
+              </div> -->
+                <div class="col-md-3 mb-4">
+                  <div class="card h-100 com-border-shadow">
+                      <div class="card-body d-flex flex-column justify-content-center ">
+                          <h4 class="card-title text-center md-text " >Total Disposed</h4>
+                           <a href="javascript:void(0)" class="card-text text-center md-text alldata non-clickable" id="totalDisposed" data-type="disposed" >0</a>
+                      </div>
+                  </div>
+              </div>
+              
+             </div>
+              <div *ngIf="BackPage" class="row">
+        <div class="col-sm-12 fld">
+           <div class="">
+             <div class="card-body pb-0 pt-3">
+               <!--<div  class="row">
+                                      <div  class="col-md-12 col-lg-6 col-xl-6">
+                                          <p>
+                                              <label class="cus-labels-name" style="font-size: 20px; font-weight: 600;">{{ lbltype }}</label>
+                                          
+                                          </p>
+                                      </div>
+                                      <div class="col-md-12 col-lg-6 col-xl-6" style="text-align: right;">
+                                      
+                                  
+                                  <img src="assets/images/go-back-icon.png" alt="Nyaay Setu"  width="230px"  height="35px" (click)="lnkbackClick()">
+                                  
+                                      </div>
+                                      
+                                  
+                  </div>-->
+
+                  <div  class="row">
+                                      <div  class="col-md-12 col-lg-6 col-xl-6">
+                                          <p>
+                                              <label class="cus-labels-name" style="font-size: 20px; font-weight: 600;">{{ lbltype }}</label>
+                                          </p>
+                                      </div>
+                                      <div class="col-md-12 col-lg-6 col-xl-6" style="text-align: right;">
+                          <button type="submit" class="btn btn-success text-white mr-2 py-1 px-4" (click)="lnkbackClick()">Back</button>
+                                      </div>
+                  </div>
+
+
+                </div>
+              </div>
+            </div>
+              </div>
+              <div class="ag-theme-alpine" style="height: 100%; width: 100%;">
+                  <div *ngIf="isCourtCaseListTable">
+                     <div class="card mt-2">
+                  <div class="card-body">
+                   <div class="row mb-3">
+                    <div class="col-md-6">
+                      <h5 class="me-3 mb-0">Court cases w.e.f. from : {{ ConsDate | date:'dd-MM-yyyy' }}</h5>
+                    </div>
+                    </div>
+                    <div class="row">
+                          <div class="col-md-12">
+                              <p-table #table [value]="courtCasesData" [paginator]="true" [rows]="25" [rowsPerPageOptions]="[25, 50, 75, 100]" responsiveLayout="scroll">
+                                  <ng-template pTemplate="header">
+                                      <tr>
+                                          <th>S.No</th>
+                                          <th>Police Station</th>
+                                          <th>On Going</th>
+                                          <th>Listed for Today</th>
+                                          <th>Listed for Next Seven Days</th>
+                                          <th>Disposed</th>
+                                      </tr>
+                                  </ng-template>
+                                  <ng-template pTemplate="body" let-case let-rowIndex="rowIndex">
+                                      <tr *ngIf="case.PS !== 'Police Station not mapped'">
+                                          <td>{{ rowIndex + 1 }}</td>
+                                          <td>{{ case.PS }}</td>
+                                          <td>
+                                              <a href="javascript:void(0);" (click)="CourtCasesDetails('ongoing', case.NcPoliceStnCode)">{{ case.ongoing }}</a>
+                                          </td>
+                                          <td>
+                                              <a href="javascript:void(0);" (click)="CourtCasesDetails('today', case.NcPoliceStnCode)">{{ case.today }}</a>
+                                          </td>
+                                          <td>
+                                              <a href="javascript:void(0);" (click)="CourtCasesDetails('nextsevendays', case.NcPoliceStnCode)">{{ case.next7days }}</a>
+                                          </td>
+                                          <td>
+                                              <a href="javascript:void(0);" (click)="CourtCasesDetails('disposed', case.NcPoliceStnCode)">{{ case.disposed }}</a>
+                                          </td>
+                                      </tr>
+                                          <tr *ngIf="case.PS === 'Police Station not mapped'">
+                                          <td>{{ rowIndex + 1 }}</td>
+                                          <td>{{ case.PS }}</td>
+                                          <td>
+                                              <span>{{ case.ongoing }}</span>
+                                          </td>
+                                          <td>
+                                            <span>{{ case.today }}</span>                                              
+                                          </td>
+                                          <td>
+                                            <span>{{ case.next7days }}</span>                                               
+                                          </td>
+                                          <td>
+                                            <span>{{ case.disposed }}</span>                                               
+                                          </td>
+                                      </tr>                                      
+                                      
+                                  </ng-template>
+                              </p-table>
+                              
+                          </div>
+                      </div>
+                            </div>
+                     </div>
+                  </div>
+              </div>
+               <div class="ag-theme-alpine" style="height: 100%; width: 100%;">
+              <div *ngIf="isCourtCaseDetailTable">
+                  <div class="card mt-2">
+                        <div class="card-body">
+                  <div class="row mb-0">
+                              
+                     <div class="col-md-6">
+                      <h5 class="me-3 mb-0">Court cases w.e.f. from : {{ ConsDate | date:'dd-MM-yyyy' }}</h5>
+                    </div>
+                      <div class="col-md-6 d-flex justify-content-end mb-3">
+                          <input 
+                              type="text" 
+                              class="form-control" 
+                              placeholder="Search..." 
+                              (input)="onQuickFilterCaseDetails($event)" 
+                               style="max-width: 300px;"
+                          />
+                      </div>                            
+                  </div>
+                  <div class="row">
+                      <div class="col-md-12">                          
+                         <p-table #table
+                         [value]="DetailscourtCasesData" 
+                          [loading]="loading" 
+                         [paginatorTemplate]="true"
+                        [responsive]="true"
+                        [rowHover]="true"  
+                         [lazy]="true" 
+                         (onLazyLoad)="loadReports($event)" 
+                          [paginator]="true"   
+                          [totalRecords]="DetailscourtCasesTotal" 
+                          [rows]="10">
+                           <ng-template pTemplate="header">
+                                <tr>
+                                  <th>S.No</th>
+                                  <th>CNR No.</th>
+                                  <th>Police Station Name</th>
+                                  <th>FIR Number</th>
+                                  <th>FIR Date</th>
+                                  <th>Next Hearing Date</th>
+                                  <th>Petitioner</th>
+                                  <th>Respondent</th>
+                                  <th>Current Stage</th>
+                                </tr>
+                              </ng-template>
+                            
+                              <ng-template pTemplate="body" let-rowData let-i="rowIndex">
+                                <tr>
+                                  <td>{{i + 1}}</td>
+                                  <td>
+                                    <a href="javascript:void(0)" (click)="openCourtComponent(rowData.Cino)">
+                                      {{rowData.Cino}}
+                                    </a>
+                                  </td>
+                                  <td>{{rowData.PoliceStnName}}</td>
+                                  <td>{{rowData.FirNo}}/{{rowData.FirYear}}</td>
+                                  <td>{{rowData.RegDate}}</td>
+                                  <td>{{rowData.NextDate}}</td>
+                                  <td>{{rowData.Petitioner}}</td>
+                                  <td>{{rowData.Respondent}}</td>
+                                  <td>{{rowData.Stage}}</td>
+                                </tr>
+                              </ng-template>
+                              <ng-template pTemplate="paginatorleft">
+                          <div>
+                            Showing {{ currentFirst }} to {{ currentLast }} of {{ DetailscourtCasesTotal }} records
+                          </div>
+                        </ng-template>
+                            </p-table>
+                      </div>
+                  </div>
+                  </div>
+                  </div>
+              </div>
+              </div>
+  </div>
+</div>
+
+
+     
+

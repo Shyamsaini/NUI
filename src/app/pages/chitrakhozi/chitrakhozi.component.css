@@ -1,0 +1,25 @@
+p {
+  font-family: Lato;
+}
+
+::ng-deep .ui-fileupload-choose .fa-plus::before {
+  content: "\F0A6";
+}
+
+
+.hover-zoom {
+  transition: transform 0.2s ease;
+   border-radius: 4px;
+}
+
+.hover-zoom:hover {
+  transform: scale(3);
+  /* Increase image size on hover */
+  z-index: 6;
+  position: relative;
+   border-radius: 8px; /* Rounded corners */
+}
+
+.hover-zoom {
+  display: inline-block;
+}

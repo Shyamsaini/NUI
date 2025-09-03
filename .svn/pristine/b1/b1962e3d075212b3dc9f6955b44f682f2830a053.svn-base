@@ -1,0 +1,40 @@
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ReportAuthorizationService {
+
+  constructor(private http: HttpClient) { }
+
+  InsertReportAuthority(data: any): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/ReportAuthority/InsertReportAuthority`, data);
+  }
+
+  checkMobileExistence(mobile: any): Observable<any> {
+    let params = new HttpParams().set('mobile', mobile);
+    return this.http.get<any>(`${environment.apiUrl}/ReportAuthority/CheckMobileExistence`, { params });
+  }
+
+
+  ModuleAssign(data: any): Observable<any> {
+       return this.http.post<any>(`${environment.apiUrl}/ReportAuthority/ModuleAssign`, data);
+  }
+
+//   getModuleAssignList(mobile: string): Observable<any> { 
+//      let params = new HttpParams().set('mobile', mobile);
+//     return this.http.get<any>(`${environment.apiUrl}/ReportAuthority/GetModuleAssignByMobile`, { params });
+  
+// }
+
+getModuleAssignList(mobile: string): Observable<any> {
+  return this.http.post<any>(`${environment.apiUrl}/ReportAuthority/GetModuleAssignByMobile`, {
+    mobile: mobile
+  });
+}
+
+
+}

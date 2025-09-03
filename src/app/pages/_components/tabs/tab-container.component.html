@@ -1,0 +1,12 @@
+<div>
+    <ul class="nav nav-tabs">
+      <li class="nav-item dynamictabheader" [class.active]="selectedTabIndex === i"  *ngFor="let tab of tabs; let i = index">
+        <a class="nav-link" (click)="selectTab(i,0)">
+          {{ tab.title }}
+
+          <span class="close removetab" (click)="closeTab(i, $event)" *ngIf="tab.title !== 'ICJS Pillars'">x</span>
+        </a>
+      </li>
+    </ul>
+    <ng-template appDynamicTab></ng-template>
+  </div>

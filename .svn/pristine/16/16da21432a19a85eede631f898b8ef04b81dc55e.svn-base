@@ -1,0 +1,692 @@
+import { Component, Renderer2, Inject, ElementRef, ViewChild, OnInit, ChangeDetectorRef, TemplateRef } from '@angular/core';
+import { DOCUMENT, DatePipe } from '@angular/common';
+import { IodashboardService } from '../services/iodashboard.service';
+import { UtilityService } from '../services/utility.service';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { addDays, format } from 'date-fns';
+import { BsModalService, BsModalRef, ModalOptions } from 'ngx-bootstrap/modal';
+import { TableLazyLoadEvent } from 'primeng/table';
+import { TabContainerComponent } from '../_components/tabs/tab-container.component';
+import { from } from 'rxjs';
+import { OtherPillarsComponent } from '../_components/otherpillars/other-pillars.component';
+import { ModalService } from '../services/modal.service';
+import { LoaderService } from '../services/loader.service';
+import { OtherPillarsServicesService } from '../services/other-pillars-services.service';
+import { AuthService } from '../services/auth.service'
+interface PsCodeOption {
+  text: string;
+  value: string;
+}
+@Component({
+  selector: 'app-iodashboard',
+  templateUrl: './iodashboard.component.html',
+  styleUrl: './iodashboard.component.css'
+})
+export class IOdashboardComponent implements OnInit {
+  fromDate: string = '';
+  toDate: string = '';
+  districtsCodes: any[] = [];
+  policeStationsCodes: any[] = [];
+
+  Districts: any[] = [];
+  // @ViewChild('multiSelect') gridContainer!: ElementRef;
+  @ViewChild(TabContainerComponent) tabContainer!: TabContainerComponent;
+  @ViewChild('gridContainer') gridContainer!: ElementRef;
+  @ViewChild('popupTable') popupTable!: any;
+  CountListRowData: any;
+  ListDistict: any[] = [];
+  detailsListRowData: any;
+  nyaayShurutiFilterData: any[] = [];
+  errorMessage: string = '';
+  TotalPendingFIR = 0;
+  TotalType: string = '';
+  HeinousType: string = '';
+  OtherType: string = '';
+  policestations: any[] = [];
+  settings = {};
+  maxFromDate: any;
+  MaxDateRange: any;
+  isTotalSecondCount: boolean = false;
+  isTotalFirstCount: boolean = true;
+  CountFromDate: string = '';
+  CountToDate: string = '';
+  searchTerm: string = '';
+  currentFirst: number = 1;
+  currentLast: number = 10;
+  searchValue: string = '';
+  pageSize: number = 10;
+  FilteredRecordsCount: number = 0;
+  ListRowData: any;
+  ListTable: boolean = false;
+  DataFilter: any;
+  searchValues: any;
+  headerText: string = '';
+  typeOfFir: string = '';
+  mainType: string = '';
+  timependencies: any[] = [];
+  subType: string = '';
+  pageNumber: number = 1;
+  fromDateTimePendecny: string = '';
+  toDateTimePendecny: string = '';
+  timePendencyHeaderLabel: string = '';
+  sortBy: string = 'ASC';
+  roleName: string | null = '';
+  userName: string | null = '';
+  isTotalFirstCountlbl: boolean = false;
+  //public isEnabled: boolean = true;
+  showPopup = false;
+  popupData: any[] = [];
+  popupDataCount: number = 0;
+  firstRowIndex: number = 0;
+  popupColumns: any[] = [];
+  isToggled = true;
+  deshboardHeaderText: string = 'My Dashboard';
+  //minDateValue: any;
+  //maxDateValue: any;
+  //minToDate: any;
+
+  selectedPoliceStations1: string = '';
+  selectedPoliceStations: string[] = [];
+  selectedDistrictNames: string[] = [];
+  states: any;
+
+  minDateValue: Date = new Date(2024, 6, 1);
+  maxDateValue: Date = new Date();
+  minToDate: Date = new Date(2024, 6, 1);
+  maxToDate: Date = new Date();
+  DashboardType: string = 'ConsolidatedDashboard';
+  actTypeOptions = [
+    { label: 'All', value: 'all' },
+    { label: 'NCL', value: 'NCL' },
+    { label: 'BNS', value: 'BNS' },
+    { label: 'BSA', value: 'BSA' },
+    { label: 'BNSS', value: 'BNSS' },
+    { label: 'POCSO', value: 'POCSO' },
+  ];
+  actType: string | null = 'all'; // Default to 'all'
+  currentDatePlaceholder: string = format(new Date(), 'dd-MM-yyyy');
+  CurrentDefaultFromDate: string = format(new Date(2024, 6, 1), 'dd-MM-yyyy');
+  CurrentDefaultToDate: string = format(new Date(), 'dd-MM-yyyy');
+  constructor(
+    private renderer: Renderer2,
+    @Inject(DOCUMENT) private document: Document,
+    private IodashboardService: IodashboardService,
+    private cdr: ChangeDetectorRef,
+    private formBuilder: FormBuilder,
+    protected modalService: ModalService,
+    private loaderService: LoaderService,
+    private datePipe: DatePipe,
+    private otherPillarsServicesService: OtherPillarsServicesService,
+    private authService: AuthService
+  ) {
+
+  }
+  ngOnInit(): void {
+    debugger
+    this.loaderService.show();
+    this.settings = {
+      singleSelection: false,
+      idField: 'value',
+      textField: 'text',
+      enableCheckAll: true,
+      allowSearchFilter: true,
+      limitSelection: -1,
+      clearSearchFilter: true,
+      maxHeight: 197,
+      itemsShowLimit: 3,
+      searchPlaceholderText: 'Search',
+      closeDropDownOnSelection: false,
+      showSelectedItemsAtTop: false,
+      defaultOpen: false,
+    };
+
+    this.form = this.formBuilder.group(
+      {
+        psCode: [''],
+        FromDate: [''],
+        ToDate: [''],
+        districtCodes: [''],
+        actType: ['all']  // Default to 'all'
+      });
+    this.renderer.removeAttribute(this.document.body, 'class');
+    // this.LoadDistricts();
+    this.LoadDistrictAssignToUser();
+    this.LoadDataForCount();
+    this.roleName = localStorage.getItem('roleName');
+    this.userName = localStorage.getItem('userName') ;
+    this.states = localStorage.getItem('selectedStateName');
+  }
+
+  toggleState() {
+    // this.isToggled = !this.isToggled;
+    //alert('Toggled!');
+    // Add your toggle logic here
+    this.loaderService.show();
+    this.form.controls["districtCodes"].setValue('');
+    this.form.controls["psCode"].setValue('');
+    this.form.controls["ToDate"].setValue('');
+    this.form.controls["FromDate"].setValue('');
+    this.ListDistict = [];
+    this.policestations = [];
+    this.policeStationsCodes = [];
+    this.isTotalFirstCountlbl = false;
+    this.CountListRowData = [];
+    this.ListRowData = [];
+    this.DataFilter = []
+    this.ListTable = false;
+    this.isTotalSecondCount = false;
+    this.isTotalFirstCount = false;
+    this.detailsListRowData = [];
+    this.timependencies = []
+    this.toDate = '';
+    this.form.controls["actType"].setValue('all');
+    //alert('Toggled!');
+    if (this.DashboardType == 'MyDashboard') {
+      //alert('My Dashboard!');
+      this.DashboardType = 'MyDashboard';
+      //this.isTotalFirstCountlbl=true;
+      this.deshboardHeaderText = 'My Dashboard';
+      //this.isTotalFirstCount = true;
+      this.LoadDataForCount();
+      this.LoadDistrictAssignToUser();
+      this.isTotalFirstCount = true;
+      this.policestations = [];
+      this.selectedDistrictNames = [];
+      
+      this.cdr.detectChanges();
+    }
+    else if (this.DashboardType == 'ConsolidatedDashboard') {
+      this.DashboardType = 'ConsolidatedDashboard';
+      this.deshboardHeaderText = 'Consolidated Dashboard';
+      this.LoadDistrictsByState();
+      this.loadPoliceStationListByState();
+      this.LoadDataForCount();
+      this.isTotalFirstCount = true;
+      this.policestations = [];
+      this.selectedDistrictNames = [];
+      this.cdr.detectChanges();
+    }
+        this.selectedPoliceStations = [];
+        this.policestations = [];
+      this.selectedDistrictNames = [];
+    this.cdr.detectChanges();
+  }
+
+  //Loading initial counts
+  LoadDataForCount() {
+    debugger
+    this.loaderService.show();
+
+    this.fromDate = this.datePipe.transform(this.form.controls["FromDate"].value, 'dd-MM-yyyy') || this.CurrentDefaultFromDate;
+    this.toDate = this.datePipe.transform(this.form.controls["ToDate"].value, 'dd-MM-yyyy') || this.CurrentDefaultToDate;
+
+    this.actType = this.form.controls["actType"].value || 'all';
+    if (this.actType == 'all') {
+      this.actType = '';
+    }
+    this.IodashboardService.LoadFirCounts(this.districtsCodes, this.policeStationsCodes, this.fromDate, this.toDate, this.DashboardType, this.actType || '').subscribe({
+      next: (response: any) => {
+        this.loaderService.hide();
+        if (response.isSuccess && response.data && response.data.length > 0) {
+          this.isTotalFirstCountlbl = true;
+          this.CountListRowData = JSON.parse(response.data).data;
+          this.CountFromDate = JSON.parse(response.data).FromDate;
+          this.CountToDate = JSON.parse(response.data).ToDate;
+          this.MaxDateRange = JSON.parse(response.data).MaxDateRange;
+          this.cdr.detectChanges();
+          this.errorMessage = '';
+          this.loaderService.hide();
+        }
+        else {
+          this.isTotalFirstCountlbl = false;
+          this.loaderService.hide();
+          this.errorMessage = 'No data availaible.';
+          this.CountListRowData = "";
+        }
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to load data from the server. Please try again later.';
+        this.CountListRowData = "";
+        this.loaderService.hide();
+      },
+    });
+  }
+
+  LoadDistricts(): void {
+    this.IodashboardService.LoadDistricts().subscribe({
+      next: (response) => {
+        if (response.isSuccess && response.data && response.data.length > 0) {
+          this.ListDistict = response.data;
+          this.errorMessage = '';
+          this.cdr.detectChanges();
+        }
+        else {
+          this.cdr.detectChanges();
+          this.errorMessage = 'No data available';
+          this.ListDistict = [];
+        }
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to load data from the server. Please try again later.';
+        this.ListDistict = [];
+      },
+    });
+  }
+  LoadDistrictsByState(): void {
+    this.IodashboardService.getDistrictsByState().subscribe({
+      next: (response) => {
+        if (response.isSuccess && response.data && response.data.length > 0) {
+          this.ListDistict = response.data;
+          this.errorMessage = '';
+          this.cdr.detectChanges();
+        }
+        else {
+          this.cdr.detectChanges();
+          this.errorMessage = 'No data available';
+          this.ListDistict = [];
+        }
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to load data from the server. Please try again later.';
+        this.ListDistict = [];
+      },
+    });
+  }
+
+  LoadDistrictAssignToUser(): void {
+    this.IodashboardService.GetIOFirDistrictsList().subscribe({
+      next: (response) => {
+        if (response.isSuccess && response.data && response.data.length > 0) {
+          this.ListDistict = response.data;
+          this.errorMessage = '';
+          this.cdr.detectChanges();
+        }
+        else {
+          this.errorMessage = 'No data available';
+          this.ListDistict = [];
+          this.cdr.detectChanges();
+        }
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to load data from the server. Please try again later.';
+        this.ListDistict = [];
+      },
+    });
+  }
+
+  loadPoliceStationListByState(): void {
+    this.IodashboardService.GetPoliceStationListByState().subscribe({
+      next: (response) => {
+        if (response.isSuccess && response.data && response.data.length > 0) {
+          this.policestations = response.data;
+          this.errorMessage = '';
+          this.cdr.detectChanges();
+        }
+        else {
+          this.errorMessage = 'No data available';
+          this.policestations = [];
+          this.cdr.detectChanges();
+        }
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to load data from the server. Please try again later.';
+        this.policestations = [];
+      },
+    });
+  }
+
+  loadPoliceStationListByDistricts(): void {
+
+  }
+
+
+
+  // onDistrictDropdownChange(event: any) {
+  //   var formValues = this.form.getRawValue();
+  //   var districtCodes = formValues.districtCodes.map((item: { value: any; }) => parseInt(item.value));
+  //   this.IodashboardService.LoadPoliceStations(districtCodes).subscribe((data: any) => {
+  //     if (data.isSuccess) {
+  //       this.policestations = data.data;
+  //     }
+  //   });
+  // }
+
+  onDistrictDropdownChange(event: any) {
+    debugger
+    this.policestations = [];
+    const formValues = this.form.getRawValue();
+    const districtCodes = Array.isArray(formValues.districtCodes) && formValues.districtCodes.length > 0 ? formValues.districtCodes.map((item: { value: any }) => parseInt(item.value)) : [];
+    this.selectedDistrictNames = formValues.districtCodes.map((item: any) => item.text);
+    if (this.DashboardType == 'MyDashboard') {
+      if (districtCodes.length > 0) {
+        this.IodashboardService.GetIOFirPoliceStationList(districtCodes).subscribe((data: any) => {
+          if (data.isSuccess) {
+            this.policestations = data.data;
+           // this.selectedPoliceStations = this.policestations.map((ps: any) => ps.text).join(', ');
+          }
+        });
+      }
+      else {
+        this.policestations = []; // Clear policestations if no district is selected
+       // this.selectedPoliceStations = '';
+      }
+      this.cdr.detectChanges();
+    }
+    else if (this.DashboardType == 'ConsolidatedDashboard') {
+      this.IodashboardService.GetAllPoliceStationListBydistricts(districtCodes).subscribe((data: any) => {
+        if (data.isSuccess) {
+          this.policestations = data.data;
+         // this.selectedPoliceStations = this.policestations.map((ps: any) => ps.policeStationName).join(', ');
+        }
+        else {
+          this.policestations = []; // Clear policestations if no district is selected
+         // this.selectedPoliceStations = '';
+
+        }
+      });
+      this.cdr.detectChanges();
+    }
+  }
+readMore: boolean = false;
+   onPsSelect(item: any) {
+   const selectedItems = this.form.get('psCode')?.value || [];
+  this.selectedPoliceStations = selectedItems.map((ps: any) => ps.text);
+  
+   }
+onPsSelectAll(items: any[]) {
+  this.selectedPoliceStations = items.map(item => item.text);
+  
+}
+get trimmedPoliceStations(): string {
+  const stations = this.selectedPoliceStations.join(', ');
+  if (!stations) return '';
+  return this.readMore? stations : stations.length > 100? stations.slice(0, 100) + '...': stations;
+}
+toggleReadMore() {
+  this.readMore = !this.readMore;
+}
+
+
+readMoreDistricts: boolean = false;
+get trimmedDistrictNames(): string { 
+  const names = this.selectedDistrictNames.join(', ');
+  if (!names) return '';
+  return this.readMoreDistricts? names: names.length > 100? names.slice(0, 100) + '...' : names;
+}
+toggleReadMoreDistricts() {
+  this.readMoreDistricts = !this.readMoreDistricts;
+}
+
+
+
+
+
+  onDateChange(selectedDate: Date): void {
+    //this.maxFromDate = new Date(selectedDate);
+    //this.minToDate = new Date(this.maxFromDate);
+    //const daysToAdd = this.MaxDateRange;
+    //this.maxFromDate.setDate(this.maxFromDate.getDate() + daysToAdd);
+  }
+
+  form: FormGroup = new FormGroup({
+
+  });
+
+  onSearch() {
+
+    this.loaderService.show();
+    this.isTotalSecondCount = false;
+    this.isTotalFirstCount = true
+    this.ListTable = false;
+    const districtCodes: PsCodeOption[] = this.form.controls["districtCodes"].value || [];
+    const DistrictCodes = districtCodes.length > 0 ? districtCodes.map((item: PsCodeOption) => Number(item.value)) : [];
+    const psCodeArray: PsCodeOption[] = this.form.controls["psCode"].value || [];
+    const psCodeValues = psCodeArray.length > 0 ? psCodeArray.map((item: PsCodeOption) => Number(item.value)) : [];
+
+    //this.fromDate = this.form.controls["FromDate"].value;
+    //this.toDate = this.form.controls["ToDate"].value;
+    this.fromDate = this.datePipe.transform(this.form.controls["FromDate"].value, 'dd-MM-yyyy') || this.CurrentDefaultFromDate;
+    this.toDate = this.datePipe.transform(this.form.controls["ToDate"].value, 'dd-MM-yyyy') || this.CurrentDefaultToDate;
+    this.districtsCodes = DistrictCodes;
+    this.policeStationsCodes = psCodeValues;
+    this.actType = this.form.controls["actType"].value || 'all';
+    if (this.actType == 'all') {
+      this.actType = '';
+    }
+    this.LoadDataForCount();
+  }
+
+  LoadTimePendency(type: string, mainType: string, mainHeader: string) {
+    this.loaderService.show();
+    this.typeOfFir = mainType;
+    this.isTotalFirstCount = true;
+    this.isTotalSecondCount = false;
+    if (mainType == 'Pending') {
+      this.mainType = type;
+      this.ListTable = false;
+      this.fromDate = this.datePipe.transform(this.form.controls["FromDate"].value, 'dd-MM-yyyy') || this.CurrentDefaultFromDate;
+      this.toDate = this.datePipe.transform(this.form.controls["ToDate"].value, 'dd-MM-yyyy') || this.CurrentDefaultToDate;
+      this.actType = this.form.controls["actType"].value || 'all';
+      if (this.actType == 'all') {
+        this.actType = '';
+      }
+      this.IodashboardService.LoadTimePendency(this.CountFromDate, this.CountToDate, this.fromDate, this.toDate, this.policeStationsCodes, this.districtsCodes, this.mainType, this.DashboardType, this.actType || '').subscribe({
+        next: (response: any) => {
+          this.loaderService.hide();
+          if (response.isSuccess && response.data && response.data.length > 0) {
+            this.isTotalSecondCount = true;
+            this.isTotalFirstCount = true;
+            this.detailsListRowData = JSON.parse(response.data);
+            this.timependencies = this.detailsListRowData.data;
+            this.timePendencyHeaderLabel = this.detailsListRowData.HeaderLabel;
+            this.cdr.detectChanges();
+            this.scrollToGrid();
+            this.loaderService.hide();
+          }
+        },
+        error: (err) => {
+          console.error('Error fetching Nyaay  data:', err);
+          this.errorMessage = 'Failed to load data from the server. Please try again later.';
+          this.detailsListRowData = "";
+          this.loaderService.hide();
+        },
+      });
+    }
+    else {
+      this.headerText = mainHeader;
+      this.subType = type;
+      this.CallFirListApi('', '');
+
+    }
+  }
+
+  LoadFirListPagination(event: TableLazyLoadEvent) {
+    this.loaderService.show();
+    this.sortBy = event.sortOrder == 1 ? 'ASC' : 'DESC';
+    this.pageSize = event.rows ?? 10;
+    const first = event.first ?? 0;
+    this.pageNumber = Math.floor(first / this.pageSize) + 1;
+    this.currentFirst = first + 1;
+    this.currentLast = first + this.pageSize > this.FilteredRecordsCount ? this.FilteredRecordsCount : first + this.pageSize;
+    this.CallFirListApi(this.fromDateTimePendecny, this.toDateTimePendecny);
+  }
+
+  LoadFirList(headerText: any, Type: string, fDate: string, tDate: string, event: TableLazyLoadEvent): void {
+
+    this.loaderService.show();
+    this.sortBy = event.sortOrder == 1 ? 'ASC' : 'DESC';
+    this.pageNumber = 1;
+    this.subType = Type;
+    this.headerText = headerText;
+    this.fromDateTimePendecny = fDate;
+    this.toDateTimePendecny = tDate;
+
+    this.CallFirListApi(fDate, tDate);
+  }
+
+  CallFirListApi(fDate: string, tDate: string) {
+    debugger;
+    if (fDate == '') {
+      fDate = this.fromDate;
+    }
+    if (tDate == '') {
+      tDate = this.toDate;
+    }
+    this.fromDate = this.datePipe.transform(this.form.controls["FromDate"].value, 'dd-MM-yyyy') || this.CurrentDefaultFromDate;
+    this.toDate = this.datePipe.transform(this.form.controls["ToDate"].value, 'dd-MM-yyyy') || this.CurrentDefaultToDate;
+    this.actType = this.form.controls["actType"].value || 'all';
+    if (this.actType == 'all') {
+      this.actType = '';
+    }
+
+    this.IodashboardService.LoadFirList(fDate, tDate, this.fromDate, this.toDate, this.districtsCodes, this.policeStationsCodes, this.subType, this.searchTerm, this.pageNumber, this.pageSize, this.sortBy, this.DashboardType, this.actType || '').subscribe({
+      next: (response: any) => {
+        this.loaderService.hide();
+        if (response.isSuccess && response.data && response.data.length > 0) {
+          this.ListTable = true;
+          this.ListRowData = JSON.parse(response.data).data;
+          this.DataFilter = JSON.parse(response.data).data;
+          this.FilteredRecordsCount = JSON.parse(response.data).totalCount;
+          // try {
+          //   const parsedData =JSON.parse(response.data).data[0];
+          //   this.FilteredRecordsCount = parsedData.TotalCount;
+          //   //console.log("FilteredRecordsCount", this.FilteredRecordsCount);
+          // } catch (e) {
+          //   this.FilteredRecordsCount =0;
+          //   //console.error("Failed to parse JSON:", e);
+          //   //console.error("Problematic data:", response.data[0]);
+          // }
+          this.updatePageInfo();
+          this.cdr.detectChanges();
+          this.loaderService.hide();
+          setTimeout(() => this.scrollToGrid(), 100);
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching Nyaay  data:', err);
+        this.errorMessage = 'Failed to load data from the server. Please try again later.';
+        //this.detailsListRowData = "";
+        this.loaderService.hide();
+      },
+    });
+  }
+
+  updatePageInfo() {
+    // this.currentFirst = 1;
+    // this.currentLast = this.pageSize > this.FilteredRecordsCount ? this.FilteredRecordsCount : this.pageSize;
+  }
+
+  onQuickFilter(event: any): void {
+    const filterValue = event.target.value.toLowerCase();
+    this.searchTerm = filterValue;
+    this.CallFirListApi(this.fromDate, this.toDate)
+    this.cdr.detectChanges();
+  }
+  onReset() {
+    this.form.controls["FromDate"].setValue('');
+    this.form.controls["ToDate"].setValue('');
+    this.form.controls["districtCodes"].setValue('');
+    this.form.controls["psCode"].setValue('');
+    this.districtsCodes = [],
+      this.policeStationsCodes = [],
+      this.fromDate = '',
+      this.toDate = ''
+       this.selectedPoliceStations = [];
+      this.selectedDistrictNames = [];
+    this.LoadDataForCount();
+    this.cdr.detectChanges();
+  }
+
+
+
+
+  scrollToGrid(attempts = 10) {
+    setTimeout(() => {
+      if (this.gridContainer && this.gridContainer.nativeElement) {
+
+        this.gridContainer.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else if (attempts > 0) {
+        console.log(`Grid not available yet, retrying... (${10 - attempts + 1}/10)`);
+        this.scrollToGrid(attempts - 1);
+      } else {
+        console.warn("Scrolling failed: Grid not found after 10 attempts.");
+      }
+    }, 500);
+  }
+
+  onFirCountClick(): void {
+    this.resetPaginator();
+    this.popupColumns = [
+      { field: 'Sno', header: 'S.No' },
+      // { field: 'PS_CD', header: 'PS CD' },
+      { field: 'PS', header: 'Police Station' },
+      { field: 'FIR_COUNT', header: 'Fir Count' }
+    ]
+    this.showPopup = true;
+    this.popDataSetLoad();
+
+  }
+
+  popDataSetLoad(): void {
+
+    this.loaderService.show();
+    this.fromDate = this.datePipe.transform(this.form.controls["FromDate"].value, 'dd-MM-yyyy') || this.CountFromDate;
+    this.toDate = this.datePipe.transform(this.form.controls["ToDate"].value, 'dd-MM-yyyy') || this.CountToDate;
+
+    this.actType = this.form.controls["actType"].value || 'all';
+    if (this.actType == 'all') {
+      this.actType = '';
+    }
+
+    this.IodashboardService.LoadFirListCount(this.fromDateTimePendecny, this.toDateTimePendecny, this.fromDate, this.toDate, this.districtsCodes, this.policeStationsCodes, this.subType, this.searchTerm, this.pageNumber, this.pageSize, this.sortBy, this.DashboardType, this.actType || '').subscribe({
+      next: (response: any) => {
+        this.loaderService.hide();
+        if (response.isSuccess && response.data && response.data.length > 0) {
+          this.loaderService.hide();
+          this.popupDataCount = JSON.parse(response.data).length;
+          this.popupData = JSON.parse(response.data).data;
+          this.updatePageInfo();
+          this.cdr.detectChanges();
+          setTimeout(() => this.scrollToGrid(), 100);
+        }
+      }, error: (err) => {
+        this.loaderService.hide();
+        console.error('Error fetching Nyaay  data:', err);
+      }
+    });
+  }
+  loadPillarData(firNumber: string, firRegDate: string, firShortNumber: string, policeCode: string): void {
+    this.addOtherPillarTab(firNumber, firRegDate, firShortNumber, policeCode);
+  }
+  addOtherPillarTab(firNumber: string, firRegDate: string, firShortNumberStr: string, policeCodeStr: string) {
+    this.modalService.close();
+    this.loaderService.show();
+    this.tabContainer.tabs = [];
+    const TabTitle = `ICJS Pillars`;
+    let firShortNumber: string = `${firShortNumberStr}`;
+    let policeCode: string = `${policeCodeStr}`;
+    const TabData = {
+      firNumber,
+      firRegDate,
+      firShortNumber,
+      policeCode
+    };
+    const TabComponent = OtherPillarsComponent;
+    this.otherPillarsServicesService?.setTabContainer(this.tabContainer);
+    this.otherPillarsServicesService.addTab(TabTitle, TabComponent, TabData);
+    this.cdr.detectChanges();
+  }
+  resetPaginator() {
+    if (this.popupTable) {
+      if (this.popupTable && this.popupTable.reset) {
+        this.popupTable.reset();
+      }
+    }
+  }
+
+
+  closePopup(): void {
+    this.popupData = []; // Clear previous data
+    this.showPopup = false;
+  }
+}

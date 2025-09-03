@@ -1,0 +1,38 @@
+.ng-dropdown-panel .ng-dropdown-panel-items {
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  
+
+  .dropdown-open ng-multiselect-dropdown {
+    border: 1px solid #007bff; /* Example: add border or background */
+    background-color: #bd4602;
+  }
+
+  .btn:hover {
+    color: var(--bs-btn-hover-color);
+    background-color: #bd4602 !important;
+    border-color: #bd4602 !important;
+}
+
+
+.hover-zoom {
+  transition: transform 0.2s ease;
+   border-radius: 4px;
+}
+
+.hover-zoom:hover {
+  transform: scale(3);
+  /* Increase image size on hover */
+  z-index: 6;
+  position: relative;
+   border-radius: 8px; /* Rounded corners */
+}
+
+.hover-zoom {
+  display: inline-block;
+}
+
+  
+/* [ngClass]="{  'raj': form.get('actName')?.dirty && form.get('actName')?.touched && form.get('actName')?.valid
+                          }" */

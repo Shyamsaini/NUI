@@ -1,0 +1,433 @@
+import { ChangeDetectorRef, Component, ElementRef, OnInit, Renderer2 } from '@angular/core';
+import { LoaderService } from '../services/loader.service';
+import { DynamicModalService } from '../services/dynamic-modal.service';
+import { ModalService } from '../services/modal.service';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { UtilityService } from '../services/utility.service';
+import { FirReportService } from '../services/fir-report.service';
+import { addDays, format } from 'date-fns';
+import { ActsearchService } from '../services/actsearch.service';
+import { DatePipe } from '@angular/common';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
+import * as XLSX from 'xlsx';
+import * as FileSaver from 'file-saver';
+import saveAs from 'file-saver';
+interface PsCodeOption {
+  text: string;
+  value: string;
+}
+@Component({
+  selector: 'app-firs-except',
+  templateUrl: './firs-except.component.html',
+  styleUrl: './firs-except.component.css'
+})
+export class FirsExceptComponent implements OnInit {
+  states: any;
+  fromDate: string = '';
+  toDate: string = '';
+  readMore: boolean = false;
+  isActiveDiv: boolean = false;
+  ListFIRReport: any[] = [];
+  ListDistict: any[] = [];
+  policestations: any[] = [];
+  ListMajorHeads: any[] = [];
+  settings = {};
+  errorMessage: string = '';
+  today: Date = new Date();
+  actTypeOptions = [
+    { label: 'All', value: 'All' },
+    { label: 'NCL', value: 'NCL' },
+    { label: 'BNS', value: 'BNS' },
+    { label: 'BSA', value: 'BSA' },
+    { label: 'BNSS', value: 'BNSS' },
+    { label: 'POCSO', value: 'POCSO' },
+  ];
+  form!: FormGroup;
+  actType: string | null = 'all'; // Default to 'all'
+  currentDatePlaceholder: string = format(new Date(), 'dd-MM-yyyy');
+  CurrentDefaultFromDate: string = format(new Date(2024, 6, 1), 'dd-MM-yyyy');
+  CurrentDefaultToDate: string = format(new Date(), 'dd-MM-yyyy');
+  minDateValue: Date = new Date(2024, 6, 1);
+  maxDateValue: Date = new Date();
+  minToDate: Date = new Date(2024, 6, 1);
+  maxToDate: Date = new Date();
+  constructor(private renderer: Renderer2, private apiservice: FirReportService, private el: ElementRef,
+    protected modalService: ModalService, private utilityService: UtilityService, private formBuilder: FormBuilder,
+    private dynamicModelService: DynamicModalService, private loaderService: LoaderService, private apiMaj: ActsearchService,
+    private datePipe: DatePipe, private cdr: ChangeDetectorRef,
+  ) {
+
+  }
+  ngOnInit(): void {
+    this.BindGetMAJORHEAD();
+    this.LoadDistricts();
+    this.form = this.formBuilder.group(
+      {
+        PS_CD: [''],
+        FromDate: [''],
+        ToDate: [''],
+        ACT_CD: [''],
+        Major_Head_Code: [''],
+        districtCodes: ['']
+      });
+    this.settings = {
+      singleSelection: false,
+      idField: 'value',
+      textField: 'text',
+      enableCheckAll: true,
+      allowSearchFilter: true,
+      limitSelection: -1,
+      clearSearchFilter: true,
+      maxHeight: 197,
+      itemsShowLimit: 3,
+      searchPlaceholderText: 'Search',
+      closeDropDownOnSelection: false,
+      showSelectedItemsAtTop: false,
+      defaultOpen: false,
+    };
+    this.LoadDataForCount();
+    this.states = localStorage.getItem('selectedStateName');
+    this.LoadData();
+  }
+  selectedPoliceStations1: string = '';
+  selectedPoliceStations: string[] = [];
+  selectedDistrictNames: string[] = [];
+  onDistrictDropdownChange(event: any): void {
+    if (this.form) {
+      const formValues = this.form.getRawValue();
+      //debugger
+      if (Array.isArray(formValues.districtCodes)) {
+        const districtCodes = formValues.districtCodes.map((item: { value: any; }) => parseInt(item.value));
+        this.selectedDistrictNames = formValues.districtCodes.map((item: any) => item.text);
+        this.apiservice.LoadPoliceStations(districtCodes).subscribe((data: any) => {
+          if (data.isSuccess) {
+            //debugger
+            this.policestations = data.data;
+          }
+        });
+      } else {
+        console.error('districtCodes is not an array');
+      }
+    } else {
+      console.error('Form is not initialized');
+    }
+  }
+
+  LoadDataForCount() {
+
+    this.fromDate = this.datePipe.transform(this.form.controls["FromDate"].value, 'dd-MM-yyyy') || this.CurrentDefaultFromDate;
+    this.toDate = this.datePipe.transform(this.form.controls["ToDate"].value, 'dd-MM-yyyy') || this.CurrentDefaultToDate;
+  }
+  onDateChange(selectedDate: Date): void {
+    //this.maxFromDate = new Date(selectedDate);
+    //this.minToDate = new Date(this.maxFromDate);
+    //const daysToAdd = this.MaxDateRange;
+    //this.maxFromDate.setDate(this.maxFromDate.getDate() + daysToAdd);
+  }
+  BindGetMAJORHEAD(): void {
+
+    this.apiservice.GetMajorHeadList("All").subscribe({
+      next: (response) => {
+        const parsedData = JSON.parse(response.data);
+        if (Array.isArray(parsedData) && parsedData.length > 0) {
+          this.ListMajorHeads = parsedData.map((item: any) => ({
+            value: item.ACT_CD,
+            text: item.ACT_LONG
+          }));
+          this.errorMessage = '';
+          this.cdr.detectChanges();
+        } else {
+          this.ListMajorHeads = [];
+          this.errorMessage = 'No data available.';
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching Nyaay Shuruti data:', err);
+        this.errorMessage = 'Failed to load data from the server. Please try again later.';
+        this.ListMajorHeads = [];
+      },
+    });
+  }
+  LoadDistricts(): void {
+    this.apiservice.LoadDistricts().subscribe({
+      next: (response) => {
+        if (response.isSuccess && response.data && response.data.length > 0) {
+          this.ListDistict = response.data;
+          this.errorMessage = '';
+          this.cdr.detectChanges();
+        }
+        else {
+          this.errorMessage = 'No data available';
+          this.ListDistict = [];
+        }
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to load data from the server. Please try again later.';
+        this.ListDistict = [];
+      },
+    });
+  }
+  onSearch() {
+    this.LoadData();
+  }
+  LoadData() {
+   // debugger
+    const psCodeArray: PsCodeOption[] = this.form.controls["PS_CD"].value || [];
+    const psCodeValues = psCodeArray.length > 0 ? psCodeArray.map((item: PsCodeOption) => Number(item.value)) : [];
+    const MajorHeadsArray: PsCodeOption[] = this.form.controls["Major_Head_Code"].value || [];
+    const MajorHeadsCodes = MajorHeadsArray.length > 0 ? MajorHeadsArray.map((item: PsCodeOption) => Number(item.value)) : [];
+    this.fromDate = this.datePipe.transform(this.form.controls["FromDate"].value, 'dd-MM-yyyy') || this.CurrentDefaultFromDate;
+    this.toDate = this.datePipe.transform(this.form.controls["ToDate"].value, 'dd-MM-yyyy') || this.CurrentDefaultToDate;
+    this.loaderService.show();
+    this.cdr.detectChanges();
+    this.apiservice.LoadFIRReport(psCodeValues, this.form.controls["ACT_CD"].value, MajorHeadsCodes, this.fromDate, this.toDate).subscribe({
+      next: (response: any) => {
+        //debugger
+        if (response.isSuccess && response.data && response.data.length > 0) {
+          try {
+            debugger
+            this.loaderService.hide();            
+            this.ListFIRReport = JSON.parse(response.data);
+            this.errorMessage = '';
+            this.isActiveDiv = true;
+            this.cdr.detectChanges();
+          } catch (error) {
+            console.error("Error parsing JSON:", error);
+            this.loaderService.hide();
+          }
+        }
+        else {
+          this.errorMessage = 'No data availaible.';
+          this.ListFIRReport = [];
+          this.loaderService.hide();
+        }
+        this.cdr.detectChanges();
+      }
+    });
+  }
+  onReset() {
+    this.form.controls["ACT_CD"].setValue('');
+    this.form.controls["PS_CD"].setValue('');
+    this.form.controls["Major_Head_Code"].setValue('');
+    this.form.controls["districtCodes"].setValue('');
+    this.ListDistict = [],
+      this.policestations = [],
+      this.fromDate = '',
+      this.toDate = '',
+      this.selectedPoliceStations = [],
+      this.selectedDistrictNames = []
+    this.cdr.detectChanges();
+    this.isActiveDiv = false;
+    this.LoadData();
+    this.LoadDistricts();
+  }
+  downloadPDF(): void {
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const year = today.getFullYear();
+
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: 'a4' // enough for 7 columns
+    });
+
+    doc.setFontSize(14);
+    doc.text("New Criminal Laws Report", 148, 10, { align: 'left' });
+    doc.setFontSize(14);
+
+    doc.text(`Time Period – From ${this.fromDate} to ${this.toDate}`, 14, 20);
+
+    autoTable(doc, {
+      startY: 30,
+      head: [
+        [
+          { content: 'S.No', rowSpan: 2, styles: { halign: 'center', valign: 'middle', cellWidth: 10 } },
+          { content: 'Police Station', rowSpan: 2, styles: { halign: 'left', valign: 'middle' } },
+          { content: "FIR's REGISTERED (A)", rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+          { content: 'CHARGE SHEETS (CS) FILED (B)', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+          { content: "CHARGE SHEETS % OF TOTAL FIR's (B/A)×100", rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+          { content: 'UNTRACED (C)', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+          { content: 'CANCELLATION / QUASHED (D)', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+          { content: 'DISPOSAL %\n(B+C+D)/A *100', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+          { content: 'CASES IN WHICH PUNISHMENT IS LESS THAN 10 YEARS', colSpan: 3, styles: { halign: 'center' } },
+          { content: 'CASES IN WHICH PUNISHMENT IS MORE THAN 10 YEARS', colSpan: 3, styles: { halign: 'center' } }
+        ],
+        [
+          "TOTAL FIR's",
+          'CHARGE SHEETS WITHIN 60 DAYS FROM DATE OF REGISTRATION',
+          '%AGE',
+          "TOTAL FIR's",
+          'CHARGE SHEETS WITHIN 90 DAYS FROM DATE OF REGISTRATION',
+          '%AGE'
+        ]
+      ],
+
+      body: [
+        ...this.ListFIRReport.map((item, index) => {
+          if (item.Police_Station === 'TOTAL') {
+            return [
+              {
+                content: 'TOTAL',
+                colSpan: 2,
+                styles: { halign: 'center', fontStyle: 'bold' }
+              },
+              item.FIR_COUNT,
+              item.CHARGESHEET_COUNT,
+              String(parseFloat((item.Chargesheet_Percentage || '0').toString().replace('%', '')).toFixed(2)) + '%',
+              item.UNTRACE_COUNT,
+              item.CANCELLATION_COUNT,
+              String(parseFloat((item.Combined_Percentage || '0').toString().replace('%', '')).toFixed(2)) + '%',
+              item.FIR_Less_Than_12000,
+              item.Chargesheet_Within_60_Days_LT_12000,
+              String(parseFloat((item.Percentage_LT_12000_Within_60_Days || '0').toString().replace('%', '')).toFixed(2)) + '%',
+              item.FIR_Greater_Equal_12000,
+              item.Chargesheet_Within_90_Days_GE_12000,
+              String(parseFloat((item.Percentage_GE_12000_Within_90_Days || '0').toString().replace('%', '')).toFixed(2)) + '%',
+            ];
+          } else {
+            return [
+              index + 1,
+              item.Police_Station,
+              item.FIR_COUNT,
+              item.CHARGESHEET_COUNT,
+              String(parseFloat((item.Chargesheet_Percentage || '0').toString().replace('%', '')).toFixed(2)) + '%',
+              item.UNTRACE_COUNT,
+              item.CANCELLATION_COUNT,
+              String(parseFloat((item.Combined_Percentage || '0').toString().replace('%', '')).toFixed(2)) + '%',
+              item.FIR_Less_Than_12000,
+              item.Chargesheet_Within_60_Days_LT_12000,
+              String(parseFloat((item.Percentage_LT_12000_Within_60_Days || '0').toString().replace('%', '')).toFixed(2)) + '%',
+              item.FIR_Greater_Equal_12000,
+              item.Chargesheet_Within_90_Days_GE_12000,
+              String(parseFloat((item.Percentage_GE_12000_Within_90_Days || '0').toString().replace('%', '')).toFixed(2)) + '%',
+            ];
+          }
+        })
+      ],
+      headStyles: {
+        fillColor: [120, 120, 120],
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
+        fontSize: 8,
+        lineWidth: .5,
+        lineColor: [60, 60, 60],
+        halign: 'center',
+        valign: 'middle'
+      },
+      styles: {
+        fontSize: 8,
+        halign: 'right',
+        valign: 'middle',
+        cellPadding: .5,
+        lineWidth: .5,
+        lineColor: [120, 120, 120]
+      },
+      columnStyles: {
+        0: { halign: 'center' },
+        1: { halign: 'left' }
+      },
+
+      tableWidth: 'auto'
+    });
+
+    doc.save('NewCriminalLawsReport.pdf');
+  }
+  downloadExcel(): void {
+    const header1 = [
+      'POLICE STATION',
+      "FIR's REGISTERED (A)",
+      'CHARGE SHEETS (CS) FILED (B)',
+      "CHARGE SHEETS % OF TOTAL FIR's (B/A)×100",
+      'UNTRACED (C)',
+      'CANCELLATION / QUASHED (D)',
+      "DISPOSAL %(B+C+D)/A *100",
+      'CASES IN WHICH PUNISHMENT IS LESS THAN 10 YEARS', '', '',
+      'CASES IN WHICH PUNISHMENT IS MORE THAN 10 YEARS', '', ''
+    ];
+    const header2 = [
+      '', '', '', '', '', '', '',
+      "TOTAL FIR's",
+      'CHARGE SHEETS WITHIN 60 DAYS FROM DATE OF REGISTRATION',
+      '%AGE',
+      "TOTAL FIR's",
+      'CHARGE SHEETS WITHIN 90 DAYS FROM DATE OF REGISTRATION',
+      '%AGE'
+    ];
+
+    const dataRows = this.ListFIRReport.map(item => [
+      item.Police_Station,
+      item.FIR_COUNT,
+      item.CHARGESHEET_COUNT,
+      parseFloat((item.Chargesheet_Percentage || '0').toString().replace('%', '')).toFixed(2) + '%',
+      item.UNTRACE_COUNT,
+      item.CANCELLATION_COUNT,
+      parseFloat((item.Combined_Percentage || '0').toString().replace('%', '')).toFixed(2) + '%',
+      item.FIR_Less_Than_12000,
+      item.Chargesheet_Within_60_Days_LT_12000,
+      parseFloat((item.Percentage_LT_12000_Within_60_Days || '0').toString().replace('%', '')).toFixed(2) + '%',
+      item.FIR_Greater_Equal_12000,
+      item.Chargesheet_Within_90_Days_GE_12000,
+      parseFloat((item.Percentage_GE_12000_Within_90_Days || '0').toString().replace('%', '')).toFixed(2) + '%'
+    ]);
+
+    // Final worksheet data
+    const worksheetData = [header1, header2, ...dataRows];
+
+    // Create worksheet from 2D array
+    const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(worksheetData);
+
+    // Correct merge positions (row and column indices are 0-based)
+    worksheet['!merges'] = [
+      { s: { r: 0, c: 0 }, e: { r: 1, c: 0 } },  // Police Station
+      { s: { r: 0, c: 1 }, e: { r: 1, c: 1 } },  // FIRs Registered
+      { s: { r: 0, c: 2 }, e: { r: 1, c: 2 } },  // CS Filed
+      { s: { r: 0, c: 3 }, e: { r: 1, c: 3 } },  // CS %
+      { s: { r: 0, c: 4 }, e: { r: 1, c: 4 } },  // Untraced
+      { s: { r: 0, c: 5 }, e: { r: 1, c: 5 } },  // Cancellation
+      { s: { r: 0, c: 6 }, e: { r: 1, c: 6 } },  // Disposal
+      { s: { r: 0, c: 7 }, e: { r: 0, c: 9 } },  // <10 Years (3 columns)
+      { s: { r: 0, c: 10 }, e: { r: 0, c: 12 } } // >10 Years (3 columns)
+    ];
+
+    // Create workbook
+    const workbook: XLSX.WorkBook = {
+      Sheets: { 'Punishment Report': worksheet },
+      SheetNames: ['Punishment Report']
+    };
+
+    // Write to buffer
+    const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+
+    // Save as Excel file
+    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    saveAs(blob, 'NewCriminalLawsReport.xlsx');
+  }
+  toggleReadMore() {
+    this.readMore = !this.readMore;
+  }
+  get trimmedPoliceStations(): string {
+    const stations = this.selectedPoliceStations.join(', ');
+    if (!stations) return '';
+    return this.readMore ? stations : stations.length > 100 ? stations.slice(0, 100) + '...' : stations;
+  }
+  readMoreDistricts: boolean = false;
+  get trimmedDistrictNames(): string {
+    const names = this.selectedDistrictNames.join(', ');
+    if (!names) return '';
+    return this.readMoreDistricts ? names : names.length > 100 ? names.slice(0, 100) + '...' : names;
+  }
+  toggleReadMoreDistricts() {
+    this.readMoreDistricts = !this.readMoreDistricts;
+  }
+  onPsSelect(item: any) {
+    const selectedItems = this.form.get('PS_CD')?.value || [];
+    this.selectedPoliceStations = selectedItems.map((ps: any) => ps.text);
+  }
+  onPsSelectAll(items: any[]) {
+    this.selectedPoliceStations = items.map(item => item.text);
+  }
+}

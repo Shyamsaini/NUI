@@ -1,0 +1,119 @@
+<div class="pc-container">
+    <div class="pcoded-content pb" style="padding-bottom:90px;">
+         <div class="page-header">
+            <div class="page-block">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <div class="page-header-title">
+                            <h5 class="m-b-10" >Nyay Shuruti </h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+            <div class="card mt-4" #gridContainer>
+              <div class="card-body">
+                    <form [formGroup]="form">
+                  <div id="searchByFilingNumber" class="row searchbypanel">
+                    <div class="col-md-3  col-12 mb-3">
+                         <label class="form-label"> District  Name</label>
+                          <sup class="text-danger top-0">*</sup>
+                          <select  id="district" formControlName="district" class="form-control form-select" (change)="onDistrictChange($event)" >
+                              <option value="">Select</option>
+                              <option *ngFor="let district of Districts" [value]="district.value">{{ district.text }}</option>
+                          </select>
+                     
+                      </div>
+                       <div class="col-md-3  col-12 mb-3">
+                         <label class="form-label"> Police Station</label>
+                          <sup class="text-danger top-0">*</sup>
+                          <select id="policeStation" formControlName="psCode" class="form-control form-select" (change)='onPoliceStationChange()'>
+                          <option value="" selected="selected" >Select</option>
+                          <option *ngFor="let policestation of policestations" [value]="policestation.value">{{ policestation.text }}</option>
+                        </select>
+                        
+                      </div>
+                </div>
+                    </form>
+              </div>
+            </div>
+
+
+
+
+ <div class="row mt-12">
+        <div class="col-md-12">
+               <div class="row" #gridContainer>
+      <div class="col-sm-12">
+        <div class="card" style="font-size: 1.75rem;">
+          <div class="card-header">
+            <h4>Video Conference</h4>
+          </div>
+          <div class="card-body">
+            
+             <div style="height: 100%; width: 100%;"></div>
+             <div class="row mb-1">
+                    <div class="col-md-6 offset-md-6 d-flex justify-content-end mb-3">
+                    <input type="text" class="form-control" placeholder="Search..." (input)="onQuickFilterNyaayShurut($event)" style="max-width: 300px;" />
+
+                
+                    </div>
+                  </div>
+             <div class="row">
+                    <div class="col-md-12">
+            <p-table [value]="nyaayShurutiRowData" [paginator]="true" [rows]="20" [resizableColumns]="true" class="p-datatable-gridlines"  >
+              <ng-template pTemplate="header">
+                <tr>
+                  <th> S NO. </th>
+                  <th> TITLE </th>
+                  <th> CAUSE DATE </th>
+                  <th> VC DATE </th>
+                  <th> START TIME </th>
+                  <th> END TIME </th>
+                  <th> VC PIN </th>
+                  <th> FIR NUMBER </th>
+                  <th> CASE NUMBER </th>
+                  <th> CNR </th>
+                  <th> ACTION </th>
+                </tr>
+              </ng-template>
+            
+              <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex">
+                <tr>
+                  <td>{{ rowIndex + 1 }}</td>
+                  <td>{{ rowData.title }}</td>
+                  <td>{{ rowData.causeDate ? rowData.causeDate.replace('00:00:00', '').trim() : '' }}</td>
+                  <td>{{ rowData.vcDate ? rowData.vcDate.replace('00:00:00', '').trim() : '' }}</td>
+                  <td>{{ rowData.startTime }}</td>
+                  <td>{{ rowData.endTime }}</td>
+                  <td>{{ rowData.vcSubPin }}</td>
+                  <td>{{ rowData.firNo }}</td>
+                  <td>{{ rowData.caseNo }}</td>
+                  <td>{{ rowData.cnrNo }}</td>
+                  <td>
+                    <a target="_blank" [href]="rowData.vcSubUrl" class="btn btn-blue text-white">
+                      <i class="fa fa-eye mr-2" aria-hidden="true"></i> Launch VC
+                    </a>
+                  </td>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="footer">
+                <tr *ngIf="nyaayShurutiRowData.length === 0">
+                  <td colspan="11" class="text-center">No VC has been  scheduled.</td>
+                </tr>
+              </ng-template>
+
+            </p-table>  
+                    </div>
+             </div>
+             </div>       
+          </div>
+        </div>
+      </div>
+        </div>
+ </div>
+               
+   </div>
+</div>

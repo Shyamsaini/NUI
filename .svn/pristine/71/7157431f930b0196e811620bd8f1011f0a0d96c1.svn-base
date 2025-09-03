@@ -1,0 +1,152 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { User } from './../models/user.model';
+import { environment } from '../../../environments/environment';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+
+  private apStatesUrl = `${environment.apiUrl}/Public/GetStates`;
+
+  private apiVerifyNumberUrl = `${environment.apiUrl}/Login/VerifyMobileWeb`;
+
+  private apiUserDetailsByMobileNumberUrl = `${environment.apiUrl}/Login/UserDetailsByMobileNumber`;
+
+  private apiVerifyOtpUrl = `${environment.apiUrl}/Login/VerifyOtp`;
+
+  private apiVerifyJanParichay = `${environment.apiUrl}/JanParichayOAuth`; 
+
+  private apiLoginWithJanParichay = `${environment.apiUrl}/Login/LoginWithJanParichay`;
+
+  private CallbackbaseUrl =`${environment.apiUrl}/JanParichayOAuth`;
+
+  private apiUserDetails = `${environment.apiUrl}/JanParichayOAuth/user-details`;
+
+    private apiSearchByName = `${environment.apiUrl}/Staffdetail/StaffByNameOrbeltNumber`;
+
+  constructor(private http: HttpClient) { }
+
+  getStates(): Observable<any[]> {
+    return this.http.get<any[]>(this.apStatesUrl);
+  }
+
+
+  UserDetailsByMobileNumber(data: any, stateCode: string): Observable<any> {
+  
+    const body = {
+      mobileNumber: data.MobileNumber, 
+      stateCode: stateCode
+    };
+    return this.http.post<any>(this.apiUserDetailsByMobileNumberUrl, body);
+  }
+
+
+SearchByName(SearchName: string): Observable<string[]> {
+  const payload = {
+    SearchName
+  };
+  return this.http.post<string[]>(this.apiSearchByName, payload);
+}
+
+
+// SearchByName(SearchName: string, districtCodes: any[], PsCodes: any[]): Observable<string[]> {
+//   const payload = {
+//     SearchName,
+//     districtCodes: districtCodes.map(d => d?.value || d), 
+//     PsCodes: PsCodes.map(p => p?.value || p)
+//   };
+//   return this.http.post<string[]>(this.apiSearchByName, payload);
+// }
+   verifyMobile(mobileNumber: string, stateCode: number, captcha: string, captchaId: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Accept': '*/*'
+    });
+
+    const body = {
+      mobileNumber: mobileNumber,
+      stateCode: stateCode,
+      captchaId:captchaId,
+      captchaValue: captcha,
+       
+    };
+    return this.http.post<any>(this.apiVerifyNumberUrl, body, { headers });
+  }
+
+
+
+
+  UserDetails(accessToken: string): Observable<any> {
+    const headers = new HttpHeaders().set('accessToken', accessToken); 
+    return this.http.get<any>(this.apiUserDetails, { headers });
+  }
+    
+  loginWithJanParichay(stateCode: string, mobileNumber: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'accept': '*/*'
+    });
+
+    const body = {
+      stateCode: stateCode,
+      mobileNumber: mobileNumber
+    };
+    return this.http.post<any>(this.apiLoginWithJanParichay, body, { headers });
+  }
+
+  authorize(state: string): Observable<any> {
+    const params = new HttpParams().set('state', state); 
+    return this.http.get<any>(`${this.apiVerifyJanParichay}/authorize`, { params });
+  }
+
+  
+
+  revokeToken(): Observable<any> {
+    const token = localStorage.getItem('AuthorizationToken');
+    if (!token) return new Observable(observer => observer.complete());
+
+    const headers = new HttpHeaders({
+      accessToken: token, 
+    });
+
+    return this.http.get<any>(`${environment.apiUrl}/JanParichayOAuth/revoke`, { headers });
+  }
+
+
+  exchangeToken(code: string, state: string): Observable<any> {
+    return this.http.get(`${this.CallbackbaseUrl}/home`, {
+      params: { code, state },
+    });
+  }
+
+  verifyOtp(stateCode: number, mobileNumber: string, otp: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'accept': '*/*'
+    });
+
+    const body = {
+      stateCode: stateCode,
+      mobileNumber: mobileNumber,
+      otp: otp
+    };
+    return this.http.post<any>(this.apiVerifyOtpUrl, body, { headers });
+  }
+
+  generateCaptcha(){
+    return this.http.get<any>(`${environment.apiUrl}/Public/GenerateCaptcha`);
+  }
+
+
+  getStoredData():any {
+    const storedData = localStorage.getItem('userData');
+    if (storedData) {
+      const parsedData: User = JSON.parse(storedData);
+      return storedData;
+    }
+  }
+
+}

@@ -1,0 +1,153 @@
+<div class="pc-container">
+  <div class="pcoded-content pb">
+    <div class="page-header">
+      <div class="page-block">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <div class="page-header-title">
+              <h5 class="m-b-10">Predictive Analysis </h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-5">
+      <div class="card-body">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+          <div id="searchByFilingNumber" class="row searchbypanel">
+            <div class="col-md-3  col-12 mb-3">
+              <label class="form-label"> District Name</label>
+
+              <select id="district" formControlName="district" class="form-control form-select"
+                (change)="onDistrictChange($event)">
+                <option value="">Select</option>
+                <option *ngFor="let district of Districts" [value]="district.value">{{ district.text }}</option>
+              </select>
+            </div>
+            <div class="col-md-3  col-12 mb-3">
+              <label class="form-label"> Police Station</label>
+
+              <select id="policeStation" formControlName="psCode" data-errormessage-custom-error=""
+                class="form-control form-select"    (change)="onPoliceStationChange($event)">
+                <option value="">Select All</option>
+                <option *ngFor="let policestation of policestations" [value]="policestation.value">{{ policestation.text
+                  }}</option>
+              </select>
+
+
+            </div>
+            <div class="col-md-2 col-12 pt-4 mt-1" style="text-align: center;">
+              <button type="submit" class="btn btn-success text-white mr-2">Search</button>
+              <button type="button" class="btn btn-secondary text-white" (click)="onReset()">Reset</button>
+            </div>
+
+
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+<div class="card">
+        <div class="card-body">
+          <form [formGroup]="form">
+            <div id="searchByFilingNumber" class="row searchbypanel">
+              <div class="col-md-12 seprtaion">
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="row">
+                      <div class=" col-sm-12 mb-1">
+                        <label class="form-label "> State :</label><span>{{ states || 'No State selected' }} </span>
+                      </div>
+                      <div class="col-sm-12 mb-1"  *ngIf="selectedDistrictNames.length && !isSelectAllDistrict()">
+                        <label class="form-label"> Distict :</label>
+                         <span class="spl-pd2">
+                          {{ selectedDistrictNames }}
+                         
+                        </span>
+                      </div>
+                      <div class="col-sm-12 mb-1"  *ngIf="selectedPoliceStationName.length && !isSelectAllSelected()">
+                        <label class="form-label"> Police Station :</label>
+                      <span class="spl-pd2">{{ selectedPoliceStationName }}</span>
+                      </div>
+
+                    </div>
+                  </div>
+
+
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    <div class="row">
+      <div class="col-md-12 pb-5">
+        <div class="">
+          <div class="row">
+            <div class="col-md-5">
+              <div class="card">
+                <div class="card-header">
+                  <h4>Major crimes in last 3 years</h4>
+                </div>
+                <div class="card-body common-loader">
+                  <div *ngIf="PieLoading" class="loader-container">
+                    <div class="loaderbox">
+                      <span class="loaderrr">L &nbsp; ading</span>
+                    </div>
+                  </div>
+                  <div class="col-sm-12 mb-1 fir-det-sec">
+                    <canvas id="crimePieChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+<!-- zxc -->
+            <div class="col-md-7">
+              <div class="card">
+                <div class="card-header">
+                  <h4>Predictive Analysis - Crimes with significant change for year 2025 (%age based)</h4>
+                </div>
+                <div class="card-body common-loader">
+                  <div *ngIf="BarLoading" class="loader-container">
+                    <div class="loaderbox">
+                      <span class="loaderrr">L &nbsp; ading</span>
+                    </div>
+                  </div>
+                  <div class="col-sm-12 mb-1 fir-det-sec">
+                    <canvas id="crimeComparisonChart"></canvas> 
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-2">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header">
+                  <h4>Top crimes with future prediction based upon last 3 years data</h4>
+                </div>
+                <div class="card-body common-loader">
+                  <div *ngIf="LineLoading" class="loader-container">
+                    <div class="loaderbox">
+                      <span class="loaderrr">L &nbsp; ading</span>
+                    </div>
+                  </div>
+                  <div class="col-sm-12 mb-1 fir-det-sec">
+                    <canvas id="crimeLineChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

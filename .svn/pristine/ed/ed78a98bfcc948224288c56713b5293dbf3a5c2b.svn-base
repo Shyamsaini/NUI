@@ -1,0 +1,16 @@
+
+<footer class="fot-bg Dashboard-foter ps-5">
+	<div class="container ps-5">
+	<div class="row">
+	<div class="col-sm-12 d-flex align-items-center justify-content-center">
+	<div class="fot-log">
+	<img src="assets/images/nic-logo-white.png" alt="NIC " width="100px">
+	</div>
+	<!--<p><strong>Disclaimer:</strong> Website is designed, developed and hosted by National Informatics Centre (NIC). Site contents are owned, 
+		maintained and updated by the concerned department of Chandigarh Administration. NIC does not take any responsibility legal or otherwise
+		 regarding the contents of this website or the contents of the websites linked to it.</p>-->
+		 <p class="ms-4">© Content Owned by Ministry of Home Affairs, Government of India | Site Maintained by (NIC) National Informatics Centre version 1.2.0</p>
+	</div>
+	</div>
+	</div>
+	</footer>

@@ -1,0 +1,25 @@
+.fot-bg {
+    background-color: #343a40;
+    color: white;
+    padding: 20px 0;
+  }
+  
+/* Footer styling */
+.Dashboard-footer {
+    width: 100%;
+    position: relative; /* Default position relative to content */
+    background-color: #003366; /* Adjust background color as needed */
+    color: white; /* Adjust text color as needed */
+    text-align: center;
+    padding: 10px 0;
+  }
+  
+  .container p {
+    margin: 0;
+    padding-left: 20px;
+  }
+  
+  .fot-log img {
+    margin-right: 20px;
+  }
+  

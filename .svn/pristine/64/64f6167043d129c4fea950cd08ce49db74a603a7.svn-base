@@ -1,0 +1,76 @@
+<div class="pc-container">
+  <div class="pcoded-content pb" >
+    <div class="page-header">
+      <div class="page-block">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <div class="page-header-title">
+              <h5 class="m-b-10">Predictive Analysis </h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+<div class="row">
+<div class="col-md-12 pb-5">
+   <div class="">
+      <div class="row">
+        <div class="col-md-5">
+          <div class="card">
+            <div class="card-header"><h4>Major crimes in last 3 years</h4></div>
+          <div class="card-body common-loader">
+            <div  *ngIf="PieLoading" class="loader-container">
+              <div class="loaderbox" >
+                <span class="loaderrr">L &nbsp; ading</span>
+              </div>
+            </div>
+              <div class="col-sm-12 mb-1 fir-det-sec" >
+                          <canvas id="crimePieChart" ></canvas>   
+                  </div>                    
+              </div>
+          </div>
+        </div>
+
+        <div class="col-md-7">
+          <div class="card">
+            <div class="card-header">
+              <h4>Predictive Analysis - Crimes with significant change for year 2025 (%age based)</h4>
+            </div>
+              <div class="card-body common-loader">
+                <div *ngIf="BarLoading" class="loader-container">
+                  <div class="loaderbox" >
+                    <span class="loaderrr">L &nbsp; ading</span>
+                  </div>
+                </div>
+                <div class="col-sm-12 mb-1 fir-det-sec">                   
+                  <canvas id="crimeComparisonChart"></canvas>   
+                </div>                    
+              </div>
+          </div>
+       </div>        
+      </div>
+  </div> 
+  
+  <div class="mt-2">
+    <div class="row">
+      <div class="col-md-12">
+          <div class="card">
+            <div class="card-header"><h4>Top crimes with future prediction based upon last 3 years data</h4></div>
+          <div class="card-body common-loader">
+            <div *ngIf="LineLoading" class="loader-container">
+              <div class="loaderbox" >
+                <span class="loaderrr">L &nbsp; ading</span>
+              </div>
+            </div>
+              <div class="col-sm-12 mb-1 fir-det-sec" >
+                <canvas id="crimeLineChart" ></canvas>
+                  </div>                    
+              </div>
+          </div>
+      </div>              
+      </div>
+  </div> 
+  </div>
+</div>
+</div>
+</div>

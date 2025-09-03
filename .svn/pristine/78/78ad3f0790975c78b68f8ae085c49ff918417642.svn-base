@@ -1,0 +1,51 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SchedulerMasterService {
+  private apiUrl = 'http://localhost:5296/api/SchedulerMaster';
+
+  constructor(private http: HttpClient) {}
+
+  createScheduler(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/add-scheduler`, data);
+  }
+
+  getSchedulers(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/get-schedulers`);
+  }
+
+  updateScheduler(id: number | null, data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/update-scheduler/${id}`, data);
+  }
+
+  updateActiveStatus(id: number, isActive: boolean): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/update-active-status/${id}`, { isActive });
+  }
+
+  restartAllSchedulers(): Observable<any> {
+    return this.http.post(`${this.apiUrl}/restart-schedulers`, {});
+  }
+
+  getAvailableServices(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/get-services`);
+  }
+
+  startService(): Observable<any> {
+    return this.http.post(`${this.apiUrl}/start-service`, {});
+  }
+  
+  stopService(): Observable<any> {
+    return this.http.post(`${this.apiUrl}/stop-service`, {});
+  }
+
+  getServiceStatus(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/service-status`);
+  }
+  
+  
+
+}

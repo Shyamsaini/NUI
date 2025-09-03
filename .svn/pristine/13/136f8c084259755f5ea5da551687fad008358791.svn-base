@@ -1,0 +1,65 @@
+<div class="pc-container">
+    <div class="pcoded-content pb" style="padding-bottom:90px;">
+        <div class="page-header">
+            <div class="page-block">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <div class="page-header-title">
+                            <h5 class="m-b-10">FIR Report</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <h5 class="text-center fw-bold mb-2">&nbsp;</h5>
+            <p class="text-start mb-3">
+                <strong>Time Period –</strong> From <strong>01/07/2024</strong> to <strong>{{ today | date:'dd/MM/yyyy'
+                    }}</strong>
+            </p>
+
+            <table class="table table-bordered text-center table-sm custom-fir-table ">
+                <thead>
+                    <tr>
+                        <th rowspan="2">Police Station</th>
+                        <th rowspan="2">FIR's REGISTERED (A)</th>
+                        <th rowspan="2">CHARGE SHEETS (CS) FILED (B)</th>
+                        <th rowspan="2">CHARGE SHEETS % OF TOTAL FIR's (B/A)×100</th>
+                        <th rowspan="2">UNTRACED (C)</th>
+                        <th rowspan="2">CANCELLATION / QUASHED (D)</th>
+                        <th rowspan="2">DISPOSAL %<br>(B+C+D)/A *100</th>
+                        <th colspan="3">CASES IN WHICH PUNISHMENT IS LESS THAN 10 YEARS</th>
+                        <th colspan="3">CASES IN WHICH PUNISHMENT IS MORE THAN 10 YEARS</th>
+                    </tr>
+                    <tr class="sec-tr">
+                        <th class="smm-wd">TOTAL FIR's</th>
+                        <th class="lrg-wd">CHARGE SHEETS WITHIN 60 DAYS FROM DATE OF REGISTRATION</th>
+                        <th class="smm-wd">%AGE</th>
+                        <th>TOTAL FIR's</th>
+                        <th>CHARGE SHEETS WITHIN 90 DAYS FROM DATE OF REGISTRATION</th>
+                        <th>%AGE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let report of ListFIRReport; let i = index" >
+                        <td style="text-align: left;">{{ report.Police_Station }}</td>
+                        <td>{{ report.FIR_COUNT }}</td>
+                        <td>{{ report.CHARGESHEET_COUNT }}</td>
+                        <td>{{ report.Chargesheet_Percentage }} %</td>
+                        <td>{{ report.UNTRACE_COUNT }}</td>
+                        <td>{{ report.CANCELLATION_COUNT }}</td>
+                        <td>{{ report.Combined_Percentage }} %</td>
+                        <td>{{ report.FIR_Less_Than_12000 }}</td>
+                        <td>{{ report.Chargesheet_Within_60_Days_LT_12000 }}</td>
+                        <td>{{ report.Percentage_LT_12000_Within_60_Days }} %</td>
+                        <td>{{ report.FIR_Greater_Equal_12000 }}</td>
+                        <td>{{ report.Chargesheet_Within_90_Days_GE_12000 }}</td>
+                        <td>{{ report.Percentage_GE_12000_Within_90_Days }} %</td>
+                    </tr>
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+</div>

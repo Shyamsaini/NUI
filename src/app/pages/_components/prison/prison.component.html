@@ -1,0 +1,593 @@
+<div class="row">
+    <div class="col-lg-12">
+
+        <div class="accordion" id="accordionPrisonerDetail">
+
+            <div class="card">
+                <div class="card-header">                    
+                    <h5 class="mb-0">
+                        <a href="javascript:void(0)" (click)="toggleSection('PrisonerDetail')" class="collapsed">
+                            Prisoner Detail
+                        </a>
+                    </h5>
+                </div>
+                <div [ngClass]="{'show': activeSection === 'PrisonerDetail', 'collapse': activeSection !== 'PrisonerDetail'}" class="card-body">
+                    <div class="prisoner-detail-box table-bordered pb-4">
+                        <div class="row pt-4">
+                            <div class="col-md-9 px-4">
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-2"><span class="titl">Prisoner Name : </span><strong class="titl-detl prisonername">{{data.PrisonerDetails[0].Prisoner_Name}}</strong></div>
+                                    <div class="col-md-6 mb-2"><span class="titl">PID No : </span><strong class="titl-detl pidno">{{data.PrisonerDetails[0].PID_No}}</strong></div>
+                                    <div class="col-md-6 mb-2"><span class="titl">Father Name : </span><strong class="titl-detl fathername">{{data.PrisonerDetails[0].Father_Name}}</strong></div>
+                                    <div class="col-md-6 mb-2"><span class="titl">Prisoner Type : </span><strong class="titl-detl prisonertype">{{data.PrisonerDetails[0].Prisoner_Type}}</strong></div>
+                                    <div class="col-md-6 mb-2"><span class="titl">Mother Name : </span><strong class="titl-detl mothername">{{data.PrisonerDetails[0].Mother_Name}}</strong></div>
+                                    <div class="col-md-6 mb-2"><span class="titl">Admission Date : </span><strong class="titl-detl admissiondate">{{data.PrisonerDetails[0].Admission_Date}}</strong></div>
+                                    <div class="col-md-6 mb-2"><span class="titl">Spouse Name : </span><strong class="titl-detl spousename">{{data.PrisonerDetails[0].Spouse_Name}}</strong></div>
+                                    <div class="col-md-6 mb-2"><span class="titl">No. of Children : </span><strong class="titl-detl noofchildren">{{data.PrisonerDetails[0].No_of_Children}}</strong></div>
+                                    <div class="col-md-6 mb-2"><span class="titl">Probability Date Release : </span><strong class="titl-detl probailitydaterelease">{{data.PrisonerDetails[0].Prob_Date_Release}}</strong></div>
+                                    <div class="col-md-6 mb-2"><span class="titl">Age : </span><strong class="titl-detl age">{{data.PrisonerDetails[0].age}}</strong></div>
+                                    <div class="col-md-6 mb-2"><span class="titl">Drug Addict : </span>
+                                        <strong class="titl-detl drugaddict" *ngIf="data.PrisonerDetails[0].Drug_Addict">Yes</strong>
+                                        <strong class="titl-detl drugaddict" *ngIf="!data.PrisonerDetails[0].Drug_Addict">No</strong>
+                                    </div>                                    
+                                    <div class="col-md-6 mb-2"><span class="titl">Gender : </span>
+                                        <strong class="titl-detl gender" *ngIf="data.PrisonerDetails[0].Sex_Code == 'M'">Male</strong>
+                                        <strong class="titl-detl gender" *ngIf="data.PrisonerDetails[0].Sex_Code != 'M'">Female</strong>
+                                    </div>
+                                    <div class="col-md-6 mb-2"><span class="titl">ID Marks : </span><strong class="titl-detl idmark">{{data.PrisonerDetails[0].Id_Mark}}</strong></div>
+                                    <div class="col-md-6 mb-2"><span class="titl">Qualification : </span><strong class="titl-detl qualification">{{data.PrisonerDetails[0].Qualification}}</strong></div>
+                                    <div class="col-md-6 mb-2"><span class="titl">Present Status : </span><strong class="titl-detl presentstatus">{{data.PrisonerDetails[0].Present_Status}}</strong></div>
+                                    <div class="col-md-6 mb-2"><span class="titl">Annual Income : </span><strong class="titl-detl annualincome">{{data.PrisonerDetails[0].Annual_Income_Code}}</strong></div>
+                                    <div class="col-md-6 mb-2"><span class="titl">Permanent Police Station : </span><strong class="titl-detl permpolicestation">{{data.PrisonerDetails[0].Perm_PS_Name}}</strong></div>
+                                    <div class="col-md-6 mb-2"><span class="titl">Permanent State : </span><strong class="titl-detl permstate">{{data.PrisonerDetails[0].Perm_State_Name}}</strong></div>
+                                    <div class="col-md-6 mb-2"><span class="titl">DOB : </span><strong class="titl-detl dob">{{data.PrisonerDetails[0].DOB}}</strong></div>
+                                    <div class="col-md-6 mb-2"><span class="titl">Initial Release Date : </span><strong class="titl-detl initialreleasedate">{{data.PrisonerDetails[0].Ini_Rel_Date}}</strong></div>
+                                    <div class="col-md-6 mb-2"><span class="titl">Category : </span><strong class="titl-detl category">{{data.PrisonerDetails[0].Caste}}</strong></div>
+                                    <div class="col-md-6 mb-2"><span class="titl">Initial Admission Date : </span><strong class="titl-detl initialadmissiondate">{{data.PrisonerDetails[0].Ini_Adm_Date}}</strong></div>
+                                    <div class="col-md-6 mb-2"><span class="titl">Nationality : </span><strong class="titl-detl nationality">{{data.PrisonerDetails[0].Nationality}}</strong></div>
+                                    <div class="col-md-6 mb-2"><span class="titl">Religion : </span><strong class="titl-detl religion">{{data.PrisonerDetails[0].Religion}}</strong></div>
+                                    <div class="col-md-6 mb-2"><span class="titl">Present Address : </span><strong class="titl-detl presentaddress">{{data.PrisonerDetails[0].Present_Add}}</strong></div>
+                                    <div class="col-md-6 mb-2"><span class="titl">Permanent Address : </span><strong class="titl-detl permaddress">{{data.PrisonerDetails[0].Permt_Add}}</strong></div>
+                                </div>
+
+
+                            </div>
+
+                            <div class="col-md-3">
+                                <figure class="px-4">
+                                    <img class=" img-fluid prisonerimage" src="data:image/png;base64,{{data.prisonerphoto[0].photo}}">
+                                </figure>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">                    
+                    <h5 class="mb-0">
+                        <a href="javascript:void(0)" (click)="toggleSection('PrisonerEntry')" class="collapsed">
+                            Prisoner Entry
+                        </a>
+                    </h5>
+                </div>
+                <div [ngClass]="{'show': activeSection === 'PrisonerEntry', 'collapse': activeSection !== 'PrisonerEntry'}" class="card-body">
+                    <table class="table table-bordered caption-top">
+
+                        <thead class="table-head">
+                            <tr>
+                                <th>
+                                    S.No.
+                                </th>
+                                <th>
+                                    JD Number
+                                </th>
+                                <th>
+                                    Admission Date
+                                </th>
+                                <th>
+                                    Releasing Date
+                                </th>
+                                <th>
+                                    Location
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="prisonerentry">
+
+                                <tr *ngIf="data.Prisoner_Entry.length === 0">
+                                <td colspan="5" class="text-center">No records found</td>
+                              </tr>
+
+                            <tr *ngFor="let entry of data.Prisoner_Entry">
+                                <td>{{entry.No}}</td>
+                                <td>{{entry["JID No"]}}</td>
+                                <td>{{entry["Adm.Date"]}}</td>
+                                <td>{{entry["Rel.Date"]}}</td>
+                                <td>{{entry["Loc."]}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">                    
+                    <h5 class="mb-0">
+                        <a href="javascript:void(0)" (click)="toggleSection('PrisonerMovements')" class="collapsed">
+                            Prisoner Movements
+                        </a>
+                    </h5>
+                </div>
+                <div [ngClass]="{'show': activeSection === 'PrisonerMovements', 'collapse': activeSection !== 'PrisonerMovements'}" class="card-body">
+                    <table class="table table-bordered caption-top">
+
+                        <thead class="table-head">
+                            <tr>
+                                <th>
+                                    S.No.
+                                </th>
+                                <th>
+                                    JD Number
+                                </th>
+                                <th>
+                                    Date
+                                </th>
+                                <th>
+                                    From
+                                </th>
+                                <th>
+                                    To
+                                </th>
+                                <th>
+                                    Reason
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="prisonermovements">
+                            <tr *ngIf="data.Prisonser_Movements.length === 0">
+                                <td colspan="6" class="text-center">No records found</td>
+                              </tr>
+                              <tr *ngFor="let movement of data.Prisonser_Movements; let i = index;">
+                                <td>{{i + 1}}</td>
+                                <td>{{movement["JID_No"]}}</td>
+                                <td>{{movement["Dated"]}}</td>
+                                <td>{{movement["From"]}}</td>
+                                <td>{{movement["To"]}}</td>
+                                <td>{{movement["Reason"]}}</td>
+                            </tr>
+                    </table>
+                </div>
+            </div>
+
+
+            <div class="card">
+                <div class="card-header">                    
+                    <h5 class="mb-0">
+                        <a href="javascript:void(0)" (click)="toggleSection('CourtCases')" class="collapsed">
+                            Court Cases
+                        </a>
+                    </h5>
+                </div>
+                <div [ngClass]="{'show': activeSection === 'CourtCases', 'collapse': activeSection !== 'CourtCases'}" class="card-body">
+                    <table class="table table-bordered caption-top">
+                        <thead class="table-head">
+                            <tr>
+                                <th>
+                                    S.No.
+                                </th>
+                                <th>
+                                    Case Type
+                                </th>
+                                <th>
+                                    Case Number
+                                </th>
+                                <th>
+                                     Police Station
+                                </th>
+                                <th>
+                                    Act and Section
+                                </th>
+                                <th>
+                                    Date
+                                </th>
+                                <th>
+                                    Court
+                                </th>
+                                <th>
+                                    Status
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="courtcases">
+                            <tr *ngIf="data.Court_Cases.length === 0">
+                                <td colspan="8" class="text-center">No records found</td>
+                              </tr>
+                              <tr *ngFor="let courtcase of data.Court_Cases; let i = index;">
+                                <td>{{i + 1}}</td>
+                                <td>{{courtcase["Case Type"]}}</td>
+                                <td>{{courtcase["No"]}}</td>
+                                <td>{{courtcase["PS"]}}</td>
+                                <td>{{courtcase["Act/Sec"]}}</td>
+                                <td>{{courtcase["Dated"]}}</td>
+                                <td>{{courtcase["Court"]}}</td>
+                                <td>{{courtcase["Status"]}}</td>
+                            </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">                    
+                    <h5 class="mb-0">
+                        <a href="javascript:void(0)" (click)="toggleSection('CourtActions')" class="collapsed">
+                            Court Actions
+                        </a>
+                    </h5>
+                </div>
+                <div [ngClass]="{'show': activeSection === 'CourtActions', 'collapse': activeSection !== 'CourtActions'}" class="card-body">
+                    <table class="table table-bordered caption-top">
+                        <thead class="table-head">
+                            <tr>
+                                <th>
+                                    S.No.
+                                </th>
+                                <th>
+                                    Date
+                                </th>
+                                <th>
+                                    Next Date
+                                </th>
+                                <th>
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="courtactions">
+                            <tr *ngIf="data.Court_Actions.length === 0">
+                                <td colspan="4" class="text-center">No records found</td>
+                              </tr>
+                              <tr *ngFor="let courtaction of data.Court_Actions; let i = index;">
+                                <td>{{i + 1}}</td>
+                                <td>{{courtaction["Dated"]}}</td>
+                                <td>{{courtaction["Next date"]}}</td>
+                                <td>{{courtaction["Action"]}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">                    
+                    <h5 class="mb-0">
+                        <a href="javascript:void(0)" (click)="toggleSection('Convictions')" class="collapsed">
+                            Convictions
+                        </a>
+                    </h5>
+                </div>
+                <div [ngClass]="{'show': activeSection === 'Convictions', 'collapse': activeSection !== 'Convictions'}" class="card-body">
+                    <table class="table table-bordered caption-top">
+
+                        <thead class="table-head">
+                            <tr>
+                                <th>
+                                    S.No.
+                                </th>
+                                <th>
+                                    Court
+                                </th>
+                                <th>
+                                    Name
+                                </th>
+                                <th>
+                                    Date
+                                </th>
+                                <th>
+                                    Years
+                                </th>
+                                <th>
+                                    Months
+                                </th>
+                                <th>
+                                    Days
+                                </th>
+
+                            </tr>
+                        </thead>
+                        <tbody class="convictions">
+                                <tr *ngIf="data.Convictions.length === 0">
+                                <td colspan="7" class="text-center">No records found</td>
+                              </tr>
+                              <tr *ngFor="let conviction of data.Convictions; let i = index;">
+                                <td>{{i + 1}}</td>
+                                <td>{{conviction["Court"]}}</td>
+                                <td>{{conviction["J.Name"]}}</td>
+                                <td>{{conviction["Dated"]}}</td>
+                                <td>{{conviction["Yr"]}}</td>
+                                <td>{{conviction["Mon"]}}</td>
+                                <td>{{conviction["Days"]}}</td>
+                            </tr>
+                    </table>
+                </div>
+            </div>
+        
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <a href="javascript:void(0)" (click)="toggleSection('appeals')" class="collapsed">
+                            Appeals
+                        </a>
+                    </h5>
+                </div>
+                <div [ngClass]="{'show': activeSection === 'appeals', 'collapse': activeSection !== 'appeals'}" class="card-body">
+                    <table class="table table-bordered caption-top">
+                        <thead class="table-head">
+                            <tr>
+                                <th>S.No.</th>
+                                <th>Court No.</th>
+                                <th>Court</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="appeals">
+                            <tr *ngIf="data.Appeal.length === 0">
+                                <td colspan="5" class="text-center">No records found</td>
+                            </tr>
+                            <tr *ngFor="let appeal of data.Appeal; let i = index;">
+                                <td>{{i + 1}}</td>
+                                <td>{{appeal.CourtNo}}</td>
+                                <td>{{appeal.Court}}</td>
+                                <td>{{appeal.Dated}}</td>
+                                <td>{{appeal.Status}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <a href="javascript:void(0)" (click)="toggleSection('remissions')" class="collapsed">
+                            Remissions
+                        </a>
+                    </h5>
+                </div>
+                <div [ngClass]="{'show': activeSection === 'remissions', 'collapse': activeSection !== 'remissions'}" class="card-body">
+                    <table class="table table-bordered caption-top">
+                        <thead class="table-head">
+                            <tr>
+                                <th>S.No.</th>
+                                <th>Date</th>
+                                <th>For</th>
+                                <th>Type</th>
+                                <th>Days</th>
+                            </tr>
+                        </thead>
+                        <tbody class="remission">
+                            <tr *ngIf="data.Remission.length === 0">
+                                <td colspan="5" class="text-center">No records found</td>
+                            </tr>
+                            <tr *ngFor="let remission of data.Remission; let i = index;">
+                                <td>{{i + 1}}</td>
+                                <td>{{remission.Dated}}</td>
+                                <td>{{remission.For}}</td>
+                                <td>{{remission.Type}}</td>
+                                <td>{{remission.Day}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+
+            <div class="card">
+                <div class="card-header">                    
+                    <h5 class="mb-0">
+                        <a href="javascript:void(0)" (click)="toggleSection('Parole')" class="collapsed">
+                            Parole
+                        </a>
+                    </h5>
+                </div>
+                <div [ngClass]="{'show': activeSection === 'Parole', 'collapse': activeSection !== 'Parole'}" class="card-body">
+                    <table class="table table-bordered caption-top">
+
+                        <thead class="table-head">
+                            <tr>
+                                <th>
+                                    S.No.
+                                </th>
+                                <th>
+                                    Ground
+                                </th>
+                                <th>
+                                    Parole Date
+                                </th>
+                                <th>
+                                    From Date
+                                </th>
+                                <th>
+                                    To date
+                                </th>
+                                <th>
+                                    Days
+                                </th>
+                                <th>
+                                    Status
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="parole">
+                              <tr *ngIf="data[' Parole'].length == 0">
+                                <td colspan="7" class="text-center">No records found</td>
+                              </tr>
+                              <tr *ngFor="let parole of data[' Parole']; let i = index;">
+                                <td>{{i + 1}}</td>
+                                <td>{{parole["Ground"]}}</td>
+                                <td>{{parole["Column1"]}}</td>
+                                <td>{{parole["Column2"]}}</td>
+                                <td>{{parole["Column3"]}}</td>
+                                <td>{{parole["for"]}}</td>
+                                <td>{{parole["Status"]}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">                 
+                    <h5 class="mb-0">
+                        <a href="javascript:void(0)" (click)="toggleSection('AllowedVisitors')" class="collapsed">
+                            Allowed Visitors
+                        </a>
+                    </h5>
+                </div>
+                <div [ngClass]="{'show': activeSection === 'AllowedVisitors', 'collapse': activeSection !== 'AllowedVisitors'}" class="card-body">
+                    <table class="table table-bordered caption-top">
+                        <thead class="table-head">
+                            <tr>
+                                <th>
+                                    S.No.
+                                </th>
+                                <th>
+                                    PID No
+                                </th>
+                                <th>
+                                    Name
+                                </th>
+                                <th>
+                                    Age
+                                </th>
+                                <th>
+                                    Gender
+                                </th>
+                                <th>
+                                    Father Name
+                                </th>
+                                <th>
+                                    Phone No.
+                                </th>
+
+                                <th>
+                                    IdDetails
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="allowedvisitors">
+                            <tr *ngIf="data.Allowed_visitors.length == 0">
+                                <td colspan="8" class="text-center">No records found</td>
+                              </tr>
+                              <tr *ngFor="let allowedvisitor of data.Allowed_visitors; let i = index;">
+                                <td>{{i + 1}}</td>
+                                <td>{{allowedvisitor["PID_NO"]}}</td>
+                                <td>{{allowedvisitor["Vis_Name"]}}</td>
+                                <td>{{allowedvisitor["Vis_Age"]}}</td>
+                                <td *ngIf="allowedvisitor['Vis_Sex'] == 'M'">Male</td>
+                                <td *ngIf="allowedvisitor['Vis_Sex'] != 'M'">Female</td>
+                                <td>{{allowedvisitor["F_Name"]}}</td>
+                                <td>{{allowedvisitor["Vis_PhoneNo"]}}</td>
+                                <td>{{allowedvisitor["Id_details"]}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">                 
+                    <h5 class="mb-0">
+                        <a href="javascript:void(0)" (click)="toggleSection('Visitors')" class="collapsed">
+                            Visitors
+                        </a>
+                    </h5>
+                </div>
+                <div [ngClass]="{'show': activeSection === 'Visitors', 'collapse': activeSection !== 'Visitors'}" class="card-body">
+                    <table class="table table-bordered caption-top">
+                        <thead class="table-head">
+                            <tr>
+                                <th>
+                                    S.No.
+                                </th>
+                                <th>
+                                    Visitor No.
+                                </th>
+                                <th>
+                                    Name
+                                </th>
+                                <th>
+                                    Date
+                                </th>
+                                <th>
+                                    Relation
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="visitors">
+                            <tr *ngIf="data.Visitors.length == 0">
+                                <td colspan="5" class="text-center">No records found</td>
+                              </tr>
+                              <tr *ngFor="let visitor of data.Visitors; let i = index;">
+                                <td>{{i + 1}}</td>
+                                <td>{{visitor["No"]}}</td>
+                                <td>{{visitor["Name"]}}</td>
+                                <td>{{visitor["Dated"]}}</td>
+                                <td>{{visitor["Relation"]}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">                  
+                    <h5 class="mb-0">
+                        <a href="javascript:void(0)" (click)="toggleSection('Lodging')" class="collapsed">
+                            Lodging
+                        </a>
+                    </h5>
+                </div>
+                <div [ngClass]="{'show': activeSection === 'Lodging', 'collapse': activeSection !== 'Lodging'}" class="card-body">
+                    <table class="table table-bordered caption-top">
+                        <thead class="table-head">
+                            <tr>
+                                <th>
+                                    S.No.
+                                </th>
+                                <th>
+                                    JID No.
+                                </th>
+                                <th>
+                                    Lodging Date
+                                </th>
+                                <th>
+                                    Ward No.
+                                </th>
+                                <th>
+                                    Barrack No.
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="lodging">
+                            <tr *ngIf="data.Lodging.length == 0">
+                                <td colspan="6" class="text-center">No records found</td>
+                              </tr>
+                              <tr *ngFor="let lodging of data.Lodging; let i = index;">
+                                <td>{{i + 1}}</td>
+                                <td>{{lodging["JID_No"]}}</td>
+                                <td>{{lodging["Lodging Date"]}}</td>
+                                <td>{{lodging["Ward_No"]}}</td>
+                                <td>{{lodging["Barrack_No"]}}</td>
+                                <td>{{lodging["Remarks"]}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,47 @@
+import { Component, ElementRef, Renderer2 } from '@angular/core';
+import { LoaderService } from '../services/loader.service';
+import { DynamicModalService } from '../services/dynamic-modal.service';
+import { ModalService } from '../services/modal.service';
+import { FormBuilder } from '@angular/forms';
+import { UtilityService } from '../services/utility.service';
+import { FirReportService } from '../services/fir-report.service';
+
+@Component({
+  selector: 'app-firs-except',
+  templateUrl: './firs-except.component.html',
+  styleUrl: './firs-except.component.css'
+})
+export class FirsExceptComponent {
+  ListFIRReport: any[] = [];
+  errorMessage: string = '';
+   today: Date = new Date();
+  constructor(private renderer: Renderer2, private apiservice: FirReportService, private el: ElementRef,
+    protected modalService: ModalService, private utilityService: UtilityService, private formBuilder: FormBuilder,
+    private dynamicModelService: DynamicModalService, private loaderService: LoaderService
+
+  ) {
+
+  }
+  ngOnInit(): void {
+    this.BindFIRReport();
+  }
+  BindFIRReport(): void {
+    this.apiservice.LoadFIRReport().subscribe({
+      next: (response) => {
+        debugger;
+        if (response.isSuccess && response.data.length > 0) {
+          this.ListFIRReport = JSON.parse(response.data); // ✅ assign actual array
+          this.errorMessage = '';
+        } else {
+          this.errorMessage = 'No data available for Nyaay Shuruti.';
+          this.ListFIRReport = [];
+        }
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to load data from the server. Please try again later.';
+        this.ListFIRReport = [];
+      },
+    });
+
+  }
+}

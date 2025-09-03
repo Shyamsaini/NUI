@@ -1,0 +1,494 @@
+<div class="pc-container">
+    <div class="pcoded-content pb"  style="padding-bottom:90px;" >
+      <div class="page-header">
+        <div class="page-block">
+          <div class="row align-items-center">
+            <div class="col-md-6">
+              <div class="page-header-title">
+                <h5 class="m-b-10">eSakshaya Created By Me</h5>
+              </div>
+            </div>
+            <div class="col-md-6 text-right">
+              <!-- <button [routerLink]="['/EsakshyaCompleteDashboardComponent']" class="btn btn-primary text-white py-1">Consolidated eSakshaya Dashboard</button> -->
+                               <div class="toggle-container">
+  <label class="radio-option">
+    <input 
+      type="radio" 
+      name="dashboard" 
+      value="eSakshayaDashboard" 
+      [(ngModel)]="DashboardType" 
+      (change)="toggleState()">
+    <span class="toggle-label" [class.active]="DashboardType === 'eSakshayaDashboard'">
+      My Sakshaya 
+    </span>
+  </label>
+
+  <label class="radio-option">
+    <input 
+      type="radio" 
+      name="dashboard" 
+      value="ConsolidatedDashboard" 
+      [(ngModel)]="DashboardType" 
+      (change)="toggleState()">
+    <span class="toggle-label" [class.active]="DashboardType === 'ConsolidatedDashboard'">
+      Consolidated Dashboard
+    </span>
+  </label>
+</div>
+            </div>
+            <!-- <div class="col-md-6 text-right">
+            <button (click)=" RefresheSakshya()" class="btn btn-primary text-white py-1">Reload eSakshaya</button>
+            </div> -->
+          </div>
+        </div>
+       </div>
+   
+        <div class="mt-5">
+        <div class="card">
+        <div class="card-body">
+            <form [formGroup]="form" (ngSubmit)="onSearch()">
+            <div id="searchByFilingNumber" class="row searchbypanel">  
+                <!-- <div class="col-md-3  col-12 mb-3">
+                    <label class="form-label"> Police Station</label>
+                    <sup class="text-danger top-0">*</sup>
+                    <ng-multiselect-dropdown
+                    #multiSelect
+                    [settings]="settings"
+                    [data]="policestations"
+                   
+                    formControlName="psCode"
+                    [placeholder]="'Police Station'" >
+                  </ng-multiselect-dropdown>
+                </div> -->
+                
+
+
+                <div class="col-md-3 col-12 mb-3">
+                  <label class="form-label">SID from date</label>
+                  <sup class="text-danger top-0">*</sup>
+                  <p-calendar
+                    formControlName="FromDate"
+                    [minDate]="minDateValue"
+                    [maxDate]="maxDateValue"
+                    class="form-control"
+                    readonlyInput="true"
+                    placeholder="Select a date"
+                    dateFormat="dd/mm/yy">
+                  </p-calendar>
+                  <div *ngIf="form.get('FromDate')?.invalid && form.get('FromDate')?.touched" class="text-danger">
+                    From Date is required.
+                  </div>
+                </div>
+                
+                <div class="col-md-3 col-12 mb-3">
+                  <label class="form-label">SID to date</label>
+                  <sup class="text-danger top-0">*</sup>
+                  <p-calendar
+                    formControlName="ToDate"
+                    [minDate]="minDateValue2"
+                    [maxDate]="maxDateValue2"
+                    class="form-control"
+                    placeholder="Select a date"
+                    dateFormat="dd/mm/yy">
+                  </p-calendar>
+                  <div *ngIf="form.get('ToDate')?.invalid && form.get('ToDate')?.touched" class="text-danger">
+                    To Date is required.
+                  </div>
+                </div>
+                
+                <div class="col-md-4 col-12 mb-3 pt-4 mt-2">
+                 
+                
+                  <button type="submit" class="btn btn-success text-white py-1 me-2" [disabled]="form.invalid">Search</button>
+                  
+                </div>
+                               
+            </div>
+             
+              </form>
+        </div>
+        <router-outlet></router-outlet>
+
+        </div>
+        </div>
+
+        <!-- <div class="mt-5">
+            <div class="card">
+            <div class="card-body">
+<div class="col-sm-12 mb-1 fir-det-sec" >
+  <div class="row">
+    <div class="col-sm-4">
+        <a
+          href="javascript:void(0)"
+          class="card text-center p-4 com-border-shadow"         
+          (click)="loadLinkedStatusCountRecords(null)"
+        >
+          <h4>Total SID</h4>
+          <span>{{ TotalCount }}</span>
+        </a>
+      </div>
+      
+    <div class="col-sm-4">
+      <a  href="javascript:void(0)"   class="card text-center p-4 com-border-shadow" (click)="loadLinkedStatusCountRecords('Y')"  >
+        <h4>Linked SID</h4>
+        <span>{{ LinkedStatusYes }}</span>
+      </a>
+    </div>
+    <div class="col-sm-4">
+      <a href="javascript:void(0)" class="card text-center p-4 com-border-shadow" (click)="loadLinkedStatusCountRecords('N')">
+        <h4>Not linked SID</h4>
+        <span>{{ LinkedStatusNo }}</span>
+      </a>
+    
+    </div>
+  </div>
+   </div>
+
+            </div>
+            </div>
+        </div> -->
+
+      <div class="mt-5">
+            <div class="card">
+            <div class="card-body">
+            <div class="col-sm-12 mb-1 fir-det-sec" >
+  <div class="row">
+
+    <div class="col-sm-6 col-lg-3">
+      <a  href="javascript:void(0)"   class="card text-center p-4 com-border-shadow" (click)="loadLinkedStatusCountRecords('')"   >
+        <h4>Total SID</h4>
+        <span>{{ TotalCount }}</span>
+      </a>
+    </div>
+
+
+    <div class="col-sm-6 col-lg-3">
+      <a  href="javascript:void(0)"   class="card text-center p-4 com-border-shadow" (click)="loadLinkedStatusCountRecords('Y')"  >
+        <h4>Linked SID</h4>
+        <span>{{ LinkedStatusYes }}</span>
+      </a>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <a href="javascript:void(0)" class="card text-center p-4 com-border-shadow" (click)="loadLinkedStatusCountRecords('N')">
+        <h4>Not linked SID</h4>
+        <span>{{ LinkedStatusNo }}</span>
+      </a>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <a href="javascript:void(0)" class="card text-center p-4 com-border-shadow" (click)="loadLinkedStatusCountRecords('D')">
+        <h4>Deleted SID</h4>
+        <span>{{ LinkedStatusDeleted }}</span>
+      </a>
+    </div>
+  </div>
+   </div>
+            </div>
+            </div>
+     </div>
+       <p-dialog [(visible)]="displayModal" [modal]="true" header="Sakshya Details" [style]="{ width: '70%' }">
+    <hr>
+    <div class="mt-3">
+        <div class="card"  style="background:#f5f6fa">
+        <div class="card-body">
+    <ul class="e-shaksheya list-unstyled mb-0">
+        <li><strong>SID:</strong> <span> {{ Sid  }}</span></li>
+        <li><strong>Sakshya Date:</strong> <span> {{ SidOpeningDate  }}</span></li>
+        <li><strong>Mobile Number:</strong> <span> {{ MobileNumber }}</span></li>
+        <li><strong>Reference No.:</strong> <span> {{ ReferenceNumber }}</span></li>
+    </ul>
+        </div>
+        </div>
+    </div>
+
+
+        <ng-container *ngIf="modalData">
+            <div class="mt-3">
+                <div class="card">
+                <div class="card-body">
+          <h5><i class="fa fa-bars me-3" style="font-size:20px"></i>List of captured evidences at crime scene</h5>      
+          <h5 class="mt-4"><i class="fa fa-video-camera me-3" style="font-size:20px"></i>Videography</h5>
+          <p-table
+      [columns]="videoColumns"
+      [value]="modalData?.evidence_videos_list"
+      [paginator]="false"
+      [rows]="5"
+      [totalRecords]="modalData?.evidence_videos_list?.length"
+      [loading]="loading"
+      [rowsPerPageOptions]="[5, 10, 20]"
+      [responsive]="true"
+      [rowHover]="true">
+      <ng-template pTemplate="header" let-columns>
+        <tr>
+          <th *ngFor="let col of columns">{{ col.header }}</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-rowData let-columns="columns">
+        <tr *ngIf="modalData?.evidence_videos_list?.length > 0; else noRecords">
+          <td *ngFor="let col of columns">
+            <ng-container *ngIf="col.field === 'video'">
+              {{ rowData }}
+            </ng-container>
+            <ng-container *ngIf="col.field === 'view'">
+              <a href="javascript:void(0)" (click)="viewVideo(rowData)">
+                <i class="fa fa-eye" aria-hidden="true" style="cursor: pointer;font-size:24px;"></i>
+              </a>
+            </ng-container>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #noRecords>
+        <tr>
+          <td [attr.colspan]="videoColumns.length" class="text-center text-muted p-3">No records found</td>
+        </tr>
+      </ng-template>
+          </p-table>
+
+
+        
+
+          <h5 class="mt-4"><i class="fa fa-camera me-3" style="font-size:20px "></i>Photography</h5>
+          <p-table
+          [columns]="imageColumns"
+          [value]="modalData?.evidence_images_list"
+          [paginator]="false"
+          [rows]="5"
+          [totalRecords]="modalData?.evidence_images_list?.length"
+          [loading]="loading"
+          [rowsPerPageOptions]="[5, 10, 20]"
+          [responsive]="true"
+          [rowHover]="true">
+          <ng-template pTemplate="header" let-columns>
+            <tr>
+              <th *ngFor="let col of columns">{{ col.header }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-rowData let-columns="columns">
+            <tr *ngIf="modalData?.evidence_images_list?.length > 0; else noRecords">
+              <td *ngFor="let col of columns">
+                <ng-container *ngIf="col.field === 'image'">
+                  {{ rowData }}
+                </ng-container>
+                
+                <ng-container *ngIf="col.field === 'view'">
+                  <a href="javascript:void(0)" (click)="viewVideo(rowData)">
+                    <i class="fa fa-eye" aria-hidden="true" style="cursor: pointer;font-size:24px;"></i>
+                  </a>
+                </ng-container>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template #noRecords>
+            <tr>
+              <td [attr.colspan]="imageColumns.length" class="text-center text-muted p-3">No records found</td>
+            </tr>
+          </ng-template>
+        </p-table>
+        
+      
+          <h5 class="mt-4"><i class="fa fa-file-text-o me-3" style="font-size:20px"></i>Certificate</h5>
+          <p-table
+          [columns]="certificateColumns"
+          [value]="modalData?.certificate_path || []"
+          [paginator]="false"
+          [rows]="5"
+          [totalRecords]="modalData?.certificate_path?.length || 0"
+          [loading]="loading"
+          [rowsPerPageOptions]="[5, 10, 20]"
+          [responsive]="true"
+          [rowHover]="true">
+          <ng-template pTemplate="header" let-columns>
+            <tr>
+              <th *ngFor="let col of columns">{{ col.header }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-rowData let-columns="columns">
+            <tr *ngIf="modalData?.certificate_path?.length > 0; else noRecords">
+              <td *ngFor="let col of columns">
+                <ng-container *ngIf="col.field === 'certificate'">
+                  {{ rowData }}
+                </ng-container>
+                <ng-container *ngIf="col.field === 'view'">
+                  <a href="javascript:void(0)" (click)="DownloadPDF(rowData)">
+                    <i [class]="col.icon" aria-hidden="true" style="cursor: pointer;font-size:24px;"></i>
+                  </a>
+                </ng-container>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template #noRecords>
+            <tr>
+              <td [attr.colspan]="certificateColumns.length" class="text-center text-muted p-3">
+                No records found
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>   
+                </div>
+                </div>
+            </div>
+            <div class="mt-3">
+                <div class="card">
+                <div class="card-body">
+
+        <h5><i class="fa fa-address-card-o me-3" style="font-size:20px"></i>Witness details</h5>
+        <p-table
+        [columns]="WitnessColumns"
+        [value]="modalData?.witness_images_list || []"
+        [paginator]="false"
+        [rows]="5"
+        [totalRecords]="modalData?.witness_images_list?.length || 0"
+        [loading]="loading"
+        [rowsPerPageOptions]="[5, 10, 20]"
+        [responsive]="true"
+        [rowHover]="true">
+        <ng-template pTemplate="header" let-columns>
+          <tr>
+            <th *ngFor="let col of columns">{{ col.header }}</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-rowData let-columns="columns">
+          <tr *ngIf="modalData?.witness_images_list?.length > 0; else noRecords">
+            <td *ngFor="let col of columns">
+              <ng-container *ngIf="col.field === 'Witness'">
+                {{ rowData }}
+              </ng-container>
+              <ng-container *ngIf="col.field === 'view'">
+                <a href="javascript:void(0)" (click)="viewVideo(rowData)">
+                  <i [class]="col.icon " aria-hidden="true" style="cursor: pointer;font-size:24px;"></i>
+                </a>
+              </ng-container>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template #noRecords>
+          <tr>
+            <td [attr.colspan]="WitnessColumns.length" class="text-center text-muted p-3">
+              No records found
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+                </div>
+                </div>
+            </div>
+        </ng-container>
+      </p-dialog>
+  
+      <p-dialog
+      [(visible)]="OpenDoc"
+      [modal]="true"
+      header="Preview"
+      [style]="{ width: '50%' }"
+      (onHide)="close()"
+      >
+      <ng-container *ngIf="fileType === 'video'">
+        <video controls [src]="videoUrl" style="width: 100%; height: 600px;"></video>
+      </ng-container>
+      <ng-container *ngIf="fileType === 'image'">
+        <img [src]="videoUrl" alt="Image Preview" style="width: 100%;height: 600px;" />
+      </ng-container>
+
+      <ng-container *ngIf="fileType === 'pdf' && pdfData">
+        <div id="pdfViewer" style="height: 500px; overflow-y: auto;"></div>
+      </ng-container>
+      <ng-container *ngIf="fileType === 'unknown'">
+        <p>Unsupported file format.</p>
+      </ng-container>
+      </p-dialog>
+  
+      <div class="mt-5">
+      <div class="row mt-12" *ngIf="showResults">
+    <div class="col-md-12">
+      <div class="card" style="font-size: 1.75rem;">
+        <div class="card-body">
+          <div style="height: 100%; width: 100%;">
+
+
+            <div class="row">
+              <div class="col-md-6">
+                <h3 class="comme-h3"> {{message}}</h3>
+              </div>
+              <div class="col-md-6">
+                <div class="d-flex justify-content-end mb-2">
+                  <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Search..."
+                  (input)="onQuickFilterESakshya($event)"
+                  style="max-width: 300px;"
+                />
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <p-table
+                  #esakshyaDataTableDetails
+                  [columns]="columns"
+                  [value]="EsakshyaFilterData"
+                  [paginator]="true"
+                  [rows]="10"
+                  [totalRecords]="FilteredRecordsCount"
+                  [loading]="loading"
+                  [rowsPerPageOptions]="[10, 20, 50]"
+                  [responsive]="true"
+                  [first]="firstRowIndex"
+                  [rowHover]="true"
+                >
+                  <ng-template pTemplate="header" let-columns>
+                    <tr>
+                      <th *ngFor="let col of columns" class="header-style">
+                        {{ col.header }}
+                      </th>
+                    </tr>
+                  </ng-template>
+  
+                  <ng-template pTemplate="body" let-rowData let-columns="columns">
+                    <tr *ngIf="EsakshyaFilterData.length > 0; else noRecords">
+                      <td *ngFor="let col of columns" class="body-cell-style">
+                        <ng-container *ngIf="col.field === 'Sid'; else nonSidField">
+                          <a
+                            *ngIf="rowData.LinkedFIRNumber !== 'Not linked'; else nonClickableSid"
+                            href="javascript:void(0)"
+                            (click)="onSidClick(rowData)"
+                          >
+                            {{ rowData[col.field] }}
+                          </a>
+                          <ng-template #nonClickableSid>
+                            <span>{{ rowData[col.field] }}</span>
+                          </ng-template>
+                        </ng-container>
+                        <ng-template #nonSidField>
+                          <span>{{ rowData[col.field] }}</span>
+                        </ng-template>
+                      </td>
+                    </tr>
+                  </ng-template>
+                  
+  
+                  <ng-template #noRecords>
+                    <tr>
+                      <td
+                        [attr.colspan]="columns.length"
+                        class="text-center text-muted p-3"
+                      >
+                        No records found
+                      </td>
+                    </tr>
+                  </ng-template>
+  
+                  <ng-template pTemplate="paginatorleft">
+                    <div>Showing {{ FilteredRecordsCount }} records</div>
+                  </ng-template>
+                </p-table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+      </div>
+      </div>
+    </div>
+  </div>

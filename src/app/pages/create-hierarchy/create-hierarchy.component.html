@@ -1,0 +1,268 @@
+<div class="pc-container">
+    <div class="pcoded-content pb" style="padding-bottom:90px;">
+        <div class="page-header">
+            <div class="page-block">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <div class="page-header-title">
+                            <h5 class="m-b-10"> Create Hierarchy</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <form [formGroup]="formRangeType">
+            <div class="row mt-5">
+                <div class="col-sm-12 px-0">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" value="Range"
+                                            formControlName="searchType" name="searchType" />
+                                        <label class="form-check-label">Range</label>
+                                    </div>
+
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" value="SubDivision"
+                                            formControlName="searchType" name="searchType" />
+                                        <label class="form-check-label">Sub Division</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="row mt-2" *ngIf="formRangeType.get('searchType')?.value === 'Range'">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form [formGroup]="formRange" (ngSubmit)="onSubmit()">
+                            <div class="row mb-3">
+                                <div class="col-md-3 col-4 mb-2">
+                                    <label class="form-label">District Name</label>
+                                    <ng-multiselect-dropdown #multiSelect [settings]="settings" [data]="ListDistict"
+                                        formControlName="districtCodes" [placeholder]="'Select District'" tabindex="1">
+                                    </ng-multiselect-dropdown>
+                                    <div *ngIf="isSubmitted && formRange.get('districtCodes')?.errors"
+                                        class="invalid-feedback d-block">
+                                        <div *ngIf="formRange.get('districtCodes')?.errors?.['required']">District is
+                                            required</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-4 mb-2">
+                                    <label class="form-label">Range Name <sup class="text-danger top-0">*</sup></label>
+                                    <input class="form-control" formControlName="Name" placeholder="Enter Range"
+                                        tabindex="2"
+                                        [ngClass]="{'is-invalid': isSubmitted && formRange.get('Name')?.invalid}" />
+                                    <div *ngIf="isSubmitted && formRange.get('Name')?.errors"
+                                        class="invalid-feedback d-block">
+                                        <div *ngIf="formRange.get('Name')?.errors?.['required']">Range Name is required
+                                        </div>
+                                    </div>
+
+                                    
+                                </div>
+                                <div class="col-md-3 col-4 mb-2 pt-4 mt-1 text-end">
+                                    <button type="submit" class="btn btn-success text-white py-1"
+                                        tabindex="3">Submit</button>
+                                </div>
+                            </div>
+                        </form>                    
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row searchbypanel" *ngIf="formRangeType.get('searchType')?.value === 'SubDivision'">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form [formGroup]="formSubDivision" (ngSubmit)="onSubdivision()">
+                            <div class="row mb-3">
+
+                                <!-- Range Name -->
+                                <div class="col-md-3 col-12 mb-3">
+                                    <label class="form-label">Range Name <sup class="text-danger">*</sup></label>
+                                    <select formControlName="Range" class="form-control form-select" tabindex="1"
+                                        (change)="loadDistricts($event)"
+                                        [ngClass]="{ 'is-invalid': isSubmitted && formSubDivision.get('Range')?.invalid }">
+                                        <option value="">Select</option>
+                                        <option *ngFor="let range of Ranges" [value]="range.value">
+                                            {{ range.text }}
+                                        </option>
+                                    </select>
+                                    <div *ngIf="isSubmitted && formSubDivision.get('Range')?.errors?.['required']"
+                                        class="invalid-feedback d-block">
+                                        Range is required
+                                    </div>
+                                </div>
+
+                                <!-- District Name -->
+                                <div class="col-md-3 col-12 mb-3">
+                                    <label class="form-label">District Name <sup class="text-danger">*</sup></label>
+                                    <select formControlName="District" class="form-control form-select" tabindex="2"
+                                        (change)="onDistrictChange($event)"
+                                        [ngClass]="{ 'is-invalid': isSubmitted && formSubDivision.get('District')?.invalid }">
+                                        <option value="">Select District</option>
+                                        <option *ngFor="let district of Districts" [value]="district.value">
+                                            {{ district.text }}
+                                        </option>
+                                    </select>
+                                    <div *ngIf="isSubmitted && formSubDivision.get('District')?.errors?.['required']"
+                                        class="invalid-feedback d-block">
+                                        District is required
+                                    </div>
+                                </div>
+
+                                <!-- Police Station -->
+                                <div class="col-md-3 col-12 mb-3">
+                                    <label class="form-label">Police Station <sup class="text-danger">*</sup></label>
+                                    <ng-multiselect-dropdown #multiSelect [settings]="settings" [data]="policestations"
+                                        formControlName="PsCodes" [placeholder]="'Police Station'" tabindex="3"
+                                        [ngClass]="{ 'is-invalid': isSubmitted && formSubDivision.get('PsCodes')?.invalid }">
+                                    </ng-multiselect-dropdown>
+                                    <div *ngIf="isSubmitted && formSubDivision.get('PsCodes')?.errors?.['required']"
+                                        class="invalid-feedback d-block">
+                                        Police Station is required
+                                    </div>
+                                </div>
+
+                                <!-- Sub Division -->
+                                <div class="col-md-3 col-6 mb-2">
+                                    <label class="form-label">Sub Division Name <sup class="text-danger">*</sup></label>
+                                    <input class="form-control" formControlName="SubDivision"
+                                        placeholder="Enter Sub Division Name" maxlength="10" tabindex="4"
+                                        [ngClass]="{ 'is-invalid': isSubmitted && formSubDivision.get('SubDivision')?.invalid }" />
+                                    <div *ngIf="isSubmitted && formSubDivision.get('SubDivision')?.errors?.['required']"
+                                        class="invalid-feedback d-block">
+                                        Sub Division Name is required
+                                    </div>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="col-md-12 col-12 mb-3 pt-4 mt-1 text-end">
+                                    <button type="submit" class="btn btn-success text-white py-1" tabindex="5">
+                                        Submit
+                                    </button>
+                                </div>
+
+                            </div>
+                        </form>
+
+                        </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-2" *ngIf="formRangeType.get('searchType')?.value === 'Range'">
+            <div class="card">
+                <div class="card-body pb-0 pt-3">
+                    <div class="row">
+                        <div class="col-sm-12 fld p-0">
+                            <div class="col-md-12">
+                                <h5 class="mb-3">Range Details</h5>
+                                <div class="col-md-2">
+                                    <div class="d-flex justify-content-end mb-2 pt-2">
+                                        <input type="text" pInputText placeholder="Search..." class="form-control w-100"
+                                            (input)="table.filterGlobal($any($event.target).value, 'contains')" />
+                                    </div>
+                                </div>
+                                <p-table #table [value]="rangeList" [lazy]="true" (onLazyLoad)="loadRanges($event)"
+                                    [totalRecords]="totalRecords" [paginator]="true" [rows]="10" [sortField]="sortField"
+                                    [sortOrder]="sortOrder" [loading]="loading"
+                                    [globalFilterFields]="['DISTRICT', 'Range_name', 'Created_on']"
+                                    [responsiveLayout]="'scroll'">
+
+                                    <ng-template pTemplate="header">
+                                        <tr>
+                                            <th>S.No</th>
+                                            <th>State</th>
+                                            <th>District</th>
+                                            <th>Range Name</th>
+                                            <th pSortableColumn="Created_on">Created On <p-sortIcon
+                                                    field="Created_on"></p-sortIcon></th>
+                                        </tr>
+                                    </ng-template>
+
+                                    <ng-template pTemplate="body" let-rowData let-i="rowIndex">
+                                        <tr>
+                                            <td>{{ i + 1 }}</td>
+                                            <td>{{ rowData.STATE }}</td>
+                                            <td>{{ rowData.DISTRICT }}</td>
+                                            <td>{{ rowData.Range_name }}</td>
+                                            <td>{{ rowData.Created_on ? (rowData.Created_on | date:'dd-MM-yyyy HH:mm') : 'N/A' }}</td>
+                                        </tr>
+                                    </ng-template>
+                                </p-table>
+
+                                <div *ngIf="!isLoading && rangeList.length === 0" class="text-center p-5">
+                                    <p>No range details found</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row mt-2" *ngIf="formRangeType.get('searchType')?.value === 'SubDivision'">
+            <div class="card">
+                <div class="card-body pb-0 pt-3">
+                    <div class="row">
+                        <div class="col-sm-12 fld p-0">
+                            <div class="col-md-12">
+                                <h5 class="mb-3">Range Details</h5>
+                                <div class="col-md-2">
+                                    <div class="d-flex justify-content-end mb-2 pt-2">
+                                        <input type="text" pInputText placeholder="Search..." class="form-control w-100"
+                                            (input)="table.filterGlobal($any($event.target).value, 'contains')" />
+                                    </div>
+                                </div>
+                                <p-table #table [value]="subdivisionList" [lazy]="true"
+                                    (onLazyLoad)="bindsubdivision($event)" [totalRecords]="totalRecords"
+                                    [paginator]="true" [rows]="10" [sortField]="sortField" [sortOrder]="sortOrder"
+                                    [loading]="loading" [globalFilterFields]="['DISTRICT', 'Range_name', 'Created_on']"
+                                    [responsiveLayout]="'scroll'">
+
+                                    <ng-template pTemplate="header">
+                                        <tr>
+                                            <th>S.No</th>
+                                            <th>State</th>
+                                            <th>District</th>
+                                            <th>Police Station</th>
+                                            <th>Range Name</th>
+                                            <th>Sub Division Name</th>
+                                            <th pSortableColumn="Created_on">Created On <p-sortIcon
+                                                    field="Created_on"></p-sortIcon></th>
+                                        </tr>
+                                    </ng-template>
+
+                                    <ng-template pTemplate="body" let-rowData let-i="rowIndex">
+                                        <tr>
+                                            <td>{{ i + 1 }}</td>
+                                            <td>{{ rowData.STATE }}</td>
+                                            <td>{{ rowData.DISTRICT }}</td>
+                                            <td>{{ rowData.PS }}</td>
+                                            <td>{{ rowData.Range_name }}</td>
+                                            <td>{{ rowData.SubdivisionName }}</td>
+                                            <td>{{ rowData.Created_on ? (rowData.Created_on | date:'dd-MM-yyyy  HH:mm') : 'N/A' }}</td>
+                                        </tr>
+                                    </ng-template>
+                                </p-table>
+
+                                <div *ngIf="!isLoading && rangeList.length === 0" class="text-center p-5">
+                                    <p>No range details found</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>

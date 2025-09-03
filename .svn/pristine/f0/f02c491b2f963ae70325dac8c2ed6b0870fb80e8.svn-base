@@ -1,0 +1,166 @@
+p {
+  font-family: Lato;
+}
+
+::ng-deep .ui-fileupload-choose .fa-plus::before {
+  content: "\F0A6";
+}
+
+
+/* .toggle-container {
+  display: inline-flex;
+  background: #f0f0f0;
+  border-radius: 30px;
+  padding: 5px;
+  position: relative;
+}
+
+.radio-option {
+  position: relative;
+  cursor: pointer;
+  margin: 0 2px;
+}
+
+input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-label {
+  display: block;
+  padding: 10px 30px;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+  color: #666;
+  position: relative;
+  z-index: 1;
+}
+
+.toggle-label.active {
+  background: #002462;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 36, 98, 0.2);
+}
+
+input:checked + .slider {
+  background-color: #002462;  
+}
+
+input:checked + .slider .knob {
+  transform: translateX(200px);
+  background-color: #ffffff;
+
+.toggle-label:not(.active):hover {
+  background: #e0e0e0;
+} */
+
+
+
+
+
+
+
+
+
+.toggle-container {
+  display: flex;
+  gap: 1rem;
+  justify-content: end;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toggle-label {
+  cursor: pointer;
+}
+
+.toggle-label.active {
+  font-weight: bold;
+  color: #007bff;
+}
+
+
+
+
+/* .toggle-switch {
+  display: inline-block;
+  position: relative;
+  width: 180px;  
+  height: 34px;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #b9b9b9;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.knob {
+  position: absolute;
+  height: 26px;
+  width: 25px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+  z-index: 2;
+}
+
+.on, .off {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #000;
+  font-size: 11px;  
+  font-weight: bold;
+  z-index: 1;
+  transition: .4s;
+  white-space: nowrap;
+}
+
+.on {
+  left: 15px;
+  display: none;
+  color: white !important;
+}
+
+.off {
+  right: 15px;
+}
+
+input:checked + .slider {
+  background-color: #002462;
+}
+
+input:checked + .slider .knob {
+  transform: translateX(145px);  
+}
+
+input:checked + .slider .on {
+  display: block;
+}
+
+input:checked + .slider .off {
+  display: none;
+}  */
+
+.clickable-card-section {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.clickable-card-section:hover {
+  background-color: rgba(0,0,0,0.03);
+}

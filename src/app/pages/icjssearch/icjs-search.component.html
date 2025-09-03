@@ -1,0 +1,383 @@
+<div class="pc-container">
+  <div class="pcoded-content pb">
+    <div class="page-header">
+      <div class="page-block">
+        <div class="row align-items-center">
+          <div class="col-md-6" style="margin-top: 20px;">
+            <div class="page-header-title">
+              <h5 class="m-b-10">ICJS Search</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card mt-5">
+      <div class="card-body">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <div class="col-md-12">
+            <div class="row">
+              <div class="col-md-10">
+
+                <div class="row searchbypanel">
+                  <div class="col-md-3  col-12 mb-3">
+                    <label class="form-label"> District Name</label>
+                    <sup class="text-danger top-0">*</sup>
+                    <select id="district" formControlName="district" class="form-control form-select"
+                      (change)="onDistrictChange($event)">
+                      <option value="">Select</option>
+                      <option *ngFor="let district of Districts" [value]="district.value">{{ district.text }}</option>
+                    </select>
+
+                  </div>
+                  <div class="col-md-3  col-12 mb-3">
+                    <label class="form-label"> Police Station</label>
+                    <sup class="text-danger top-0">*</sup>
+                    <select id="policeStation" formControlName="psCode" data-errormessage-custom-error=""
+                      class="form-control form-select" [ngClass]="{ 'is-invalid': isSubmitted && f['psCode'].errors }">
+                      <option value="">Select</option>
+                      <option *ngFor="let policestation of policestations" [value]="policestation.value">{{
+                        policestation.text }}</option>
+                    </select>
+                    @if (f['psCode'].errors && isSubmitted) {
+                    <div class="invalid-feedback">
+                      @if (f['psCode'].errors['required']) {
+                      <div>Police Station is required</div>
+                      }
+                    </div>
+                    }
+
+                  </div>
+                  <div class="col-md-3  col-12 mb-3">
+                    <label class="form-label"> FIR No.</label>
+                    <sup class="text-danger top-0">*</sup>
+                    <input type="text" formControlName="firNumber" maxlength="7" tabindex="2" class="form-control "
+                      [ngClass]="{ 'is-invalid': isSubmitted && f['firNumber'].errors }">
+                    @if (f['firNumber'].errors && isSubmitted) {
+                    <div class="invalid-feedback">
+                      @if (f['firNumber'].errors['required'] && isSubmitted) {
+                      <div>Fir Number is required</div>
+                      }
+                      @if (f['firNumber'].errors['pattern']) {
+                      <div>Invalid Fir Number</div>
+                      }
+                    </div>
+                    }
+                  </div>
+                  <div class="col-md-3  col-12 mb-3">
+                    <label class="form-label">Year</label>
+                    <sup class="text-danger top-0">*</sup>
+                    <input type="text" formControlName="year" maxlength="4" tabindex="2" class="form-control "
+                      [ngClass]="{ 'is-invalid': isSubmitted && f['year'].errors }">
+                    @if (f['year'].errors && isSubmitted) {
+                    <div class="invalid-feedback">
+                      @if (f['year'].errors['required']) {
+                      <div>Year is required</div>
+                      }
+                      @if (f['year'].errors['pattern']) {
+                      <div>Invalid year</div>
+                      }
+                    </div>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-2 col-12 pt-4 mt-2">
+                <button type="submit" class="btn btn-success text-white py-1">Search</button>
+              </div>
+
+            </div>
+          </div>
+        </form>
+      </div>
+
+    </div>
+    <div class="card" *ngIf="selectedDistrictName || selectedPoliceStationName || formattedFir">
+      <div class="card-body">
+
+        <div class="row ">
+          <div class="col-md-4 seprtaion sp">
+            <label class="form-label">District Name:</label>
+            <span>{{ selectedDistrictName || 'N/A' }} </span>
+          </div>
+          <div class="col-md-4 seprtaion sp">
+            <label class="form-label">Police Station :</label>
+            <span>{{ selectedPoliceStationName || 'N/A' }} </span>
+          </div>
+          <div class="col-md-4 seprtaion sp">
+            <label class="form-label">FIR No/Year :</label>
+            <span>{{ formattedFir || 'N/A' }} </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- <div class="container-fluid py-2 px-0">
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="card overflow-hidden icjs-card">
+            <div class="card-body py-0 pl-0 pr-2">
+              <div class="row">
+                <div class="col-lg-4">
+                  <img src="assets/images/user-image.jpg" alt="" class="img-fluid h-100">
+                </div>
+                <div class="col-lg-8 py-2">
+                  <div class="row mb-1">
+                    <div class="col-lg-6 "><strong>Name</strong></div>
+                    <div class="col-lg-6"><span>ABCDJHFDM</span></div>
+                  </div>
+                  <div class="row mb-1">
+                    <div class="col-lg-6 "><strong>Address</strong></div>
+                    <div class="col-lg-6"><span>ABCDJHFDM v ABCDJHFDM ABCDJHFDM</span></div>
+                  </div>
+                  <div class="row mb-1">
+                    <div class="col-lg-6 "><strong>Arrest Date</strong></div>
+                    <div class="col-lg-6"><span>01-05-2025</span></div>
+                  </div>
+                  <div class="row mb-1">
+                    <div class="col-lg-6 "><strong>Chargesheet (y/n)</strong></div>
+                    <div class="col-lg-6"><span>Y</span></div>
+                  </div>
+                  <div class="row mb-1">
+                    <div class="col-lg-6 "><strong>Chargesheet Date</strong></div>
+                    <div class="col-lg-6"><span>01-05-2025</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="card overflow-hidden icjs-card">
+            <div class="card-body py-0 pl-0 pr-2">
+              <div class="row">
+                <div class="col-lg-4">
+                  <img src="assets/images/user-image.jpg" alt="" class="img-fluid h-100">
+                </div>
+                <div class="col-lg-8 py-2">
+                  <div class="row mb-1">
+                    <div class="col-lg-6 "><strong>Name</strong></div>
+                    <div class="col-lg-6"><span>ABCDJHFDM</span></div>
+                  </div>
+                  <div class="row mb-1">
+                    <div class="col-lg-6 "><strong>Address</strong></div>
+                    <div class="col-lg-6"><span>ABCDJHFDM v ABCDJHFDM ABCDJHFDM</span></div>
+                  </div>
+                  <div class="row mb-1">
+                    <div class="col-lg-6 "><strong>Arrest Date</strong></div>
+                    <div class="col-lg-6"><span>01-05-2025</span></div>
+                  </div>
+                  <div class="row mb-1">
+                    <div class="col-lg-6 "><strong>Chargesheet (y/n)</strong></div>
+                    <div class="col-lg-6"><span>Y</span></div>
+                  </div>
+                  <div class="row mb-1">
+                    <div class="col-lg-6 "><strong>Chargesheet Date</strong></div>
+                    <div class="col-lg-6"><span>01-05-2025</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>   -->
+
+
+
+
+    <div class="row" *ngIf="isLoaded">
+      <div class="col-sm-12  p-0">
+        <div class="card">
+          <div class="card-body pt-3">
+            <!-- icjs-search.component.html -->
+            <p-table [value]="firdata" [paginator]="false" [rows]="20" [columns]="columns" [responsive]="true">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>S.No</th>
+                  <th>FIR Number</th>
+                  <th>FIR Registration Date & Time</th>
+                  <th>IO NAME</th>
+                  <th>IO MOBILE NO</th>
+                  <th>ACTS AND SECTIONS</th>
+                  <th>MAJOR HEAD</th>
+                  <th>FIR Status</th>
+                  <th>Total Accused </th>
+                  <th>Arrested </th>
+                  <th>Not Arrested</th>
+                  <th>Cancelled / Quashed</th>
+                  <th>UNTRACED</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-rowData let-i="rowIndex">
+                <tr>
+                  <td>{{ i + 1 }}</td>
+                  <td>
+                    <a href="javascript:void(0)"
+                      (click)="loadPillarData(rowData.firRegNum, rowData.FIRREGDATE, form.controls['firNumber'].value, form.controls['psCode'].value)">
+                      {{ rowData.firShortNumber }}
+                    </a>
+                  </td>
+                  <td>{{ rowData.FIRREGDATE }}</td>
+                  <td>{{ rowData.IO_NAME }}</td>
+                  <td>{{ rowData.IO_MOBILE_No }}</td>
+                  <td>{{ rowData.ACTS_AND_SECTIONS }}</td>
+                  <td>{{ rowData.MAJOR_HEAD }}</td>
+                  <td>{{ rowData.firStatus }}</td>
+                  <!-- For TotalArrested -->
+
+                  <td [style.color]="rowData.TotalAccused > 0 ? '#7267EF' : ''"
+                    [class.disabled]="rowData.TotalAccused === 0" [class.clickable]="rowData.TotalAccused !== 0"
+                    (click)="rowData.TotalAccused !== 0 && ArrestedClickHandler('All')">
+                    {{ rowData.TotalAccused }}
+                  </td>
+                  <td [style.color]="rowData.TotalArrested > 0 ? '#7267EF' : ''"
+                    [class.disabled]="rowData.TotalArrested === 0" [class.clickable]="rowData.TotalArrested !== 0"
+                    (click)="rowData.TotalArrested !== 0 && ArrestedClickHandler('Arrested')">
+                    {{ rowData.TotalArrested }}
+                  </td>
+
+                  <!-- For TotalNotArrested -->
+                  <td [style.color]="rowData.TotalNotArrested > 0 ? '#7267EF' : ''"
+                    [class.disabled]="rowData.TotalNotArrested === 0" [class.clickable]="rowData.TotalNotArrested !== 0"
+                    (click)="rowData.TotalNotArrested !== 0 && ArrestedClickHandler('NotArrested')">
+                    {{ rowData.TotalNotArrested }}
+                  </td>
+                  <td>{{ rowData.IsCANCELLATION }}</td>
+                  <td>{{ rowData.IsUNTRACED }}</td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </div>
+      </div>
+    </div>
+<div class="container-fluid py-2 px-0" *ngIf="AccusedData.length > 0">
+    <div class="card">
+      <div class="card-body">
+        <div class="row" >
+          <div class="col-sm-6" *ngFor="let accused of AccusedData let i = index" >
+            <div class="card overflow-hidden icjs-card mb-3">
+              <div class="card-body py-0 pl-0 pr-2">
+                <div class="row">
+                <div class="col-lg-4">
+                    <div class="photo-frame-square">
+                      <img
+                        [src]="accused.photo ? 'data:image/jpeg;base64,' + accused.photo : 'assets/images/user-image.jpg'"
+                        alt="Accused Photo" class="img-fluid h-100 img-in-frame" />
+                    </div>
+
+                    <!-- Show 'Arrested' and 'Arrest Date' below image -->
+                    <div *ngIf="accused.IsArrested" class="text-danger text-center font-weight-bold mt-2">
+                      Arrested<br>
+                      <span class="text-dark font-weight-normal">{{ accused.ARREST_SURRENDER_DT || 'N/A' }}</span>
+                    </div>
+                  </div>
+                  <div class="col-lg-8 py-2">
+                    <div class="row mb-1">
+                    <div class="col-lg-6"><strong>Accused S. No.</strong></div>
+                    <div class="col-lg-6">
+                    <span>{{ i + 1 }}</span>
+                    <!-- <span *ngIf="accused.IsArrested" class="text-danger font-weight-bold ml-2">(Arrested)</span> -->
+                  </div>
+                  </div>
+                    <div class="row mb-1">
+                      <div class="col-lg-6"><strong>Name</strong></div>
+                      <div class="col-lg-6"><span>{{ accused.arrestName }}</span></div>
+                    </div>
+                    <div class="row mb-1">
+                      <div class="col-lg-6"><strong>Address</strong></div>
+                      <div class="col-lg-6"><span>{{ accused.accusedAddress }}</span></div>
+                    </div>
+                    <!-- <div class="row mb-1">
+                      <div class="col-lg-6"><strong>Arrest Date</strong></div>
+                      <div class="col-lg-6"><span>{{ accused.ARREST_SURRENDER_DT ? accused.ARREST_SURRENDER_DT : 'N/A'
+                          }}</span></div>
+                    </div> -->
+                    <div class="row mb-1">
+                      <div class="col-lg-6"><strong>Chargesheet (y/n)</strong></div>
+                      <div class="col-lg-6"><span>{{ accused.CHARGSHEET_Status ? accused.CHARGSHEET_Status : 'N/A'
+                          }}</span></div>
+                    </div>
+                    <div class="row mb-1">
+                      <div class="col-lg-6"><strong>Chargesheet Date</strong></div>
+                      <div class="col-lg-6"><span>{{ accused.CHARGESHEET_DT ? accused.CHARGESHEET_DT : 'N/A' }}</span>
+                      </div>
+                    </div>
+                    <div class="row mb-1">
+                      <div class="col-lg-6"><strong>Days Passed Since FIR/Arrest</strong></div>
+                      <div class="col-lg-6"><span>{{ accused.DaysPassed ? accused.DaysPassed : 'N/A' }}</span>
+                      </div>
+                    </div>
+                    
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+
+    <modal id="modal-othterpillerdata">
+      <div class="modal-header">
+        <button type="button" class="btn-close" (click)="modalService.close();"></button>
+      </div>
+      <div class="modal-body">
+        <app-tab-container></app-tab-container>
+      </div>
+    </modal>
+
+    <p-dialog [(visible)]="showPopup" [modal]="true" [responsive]="true" [style]="{ width: '80%' }" [closable]="true"
+      (onShow)="resetPaginator()" (onHide)="closePopup()">
+
+      <p-header>
+        {{ AccusedDataPOPHeader }}
+      </p-header>
+
+      <div class="modal-body">
+        <p-table #popupTable [columns]="popupColumns" [value]="popupData" [paginator]="true" [rows]="10"
+          [first]="firstRowIndex" [rowsPerPageOptions]="[10, 20, 50]" [responsive]="true" [rowHover]="true">
+
+          <ng-template pTemplate="header" let-columns>
+            <tr>
+              <th class="header-style">Sr. No</th>
+              <th *ngFor="let col of columns" class="header-style" [hidden]="col.field === 'Sno'">
+                {{ col.header }}
+              </th>
+              <th>Arrested Status</th>
+              <th class="header-style">Photo</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-rowData let-columns="columns" let-rowIndex="rowIndex">
+            <tr>
+              <!-- Serial Number -->
+              <td class="body-cell-style">{{ rowIndex + 1 }}</td>
+
+              <!-- Dynamic Columns -->
+              <td *ngFor="let col of columns" class="body-cell-style" [ngClass]="{ 'd-none': col.field === 'Sno' }">
+                {{ rowData[col.field] ?? 'N/A' }}
+              </td>
+
+              <!-- Arrest Status -->
+              <td class="body-cell-style">
+                {{ rowData.IsArrested ? 'Arrested' : 'Not Arrested' }}
+              </td>
+
+              <!-- Photo -->
+              <td class="body-cell-style">
+                <img *ngIf="rowData.photo" [src]="'data:image/jpeg;base64,' + rowData.photo" alt="Photo"
+                  style="width: 50px; height: 50px; object-fit: cover;" />
+              </td>
+            </tr>
+          </ng-template>
+
+        </p-table>
+      </div>
+    </p-dialog>
+  </div>
+</div>

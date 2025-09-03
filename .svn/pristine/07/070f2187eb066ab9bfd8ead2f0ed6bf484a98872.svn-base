@@ -1,0 +1,280 @@
+import { Component, OnInit, ChangeDetectorRef, ViewChild, TemplateRef, ComponentFactoryResolver, ViewContainerRef, ComponentRef } from '@angular/core';
+import { FslReportServiceService } from '../services/fsl-report-service.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { GlobalEventService } from '../services/global-event.service';
+import { Subscription } from 'rxjs';
+import { ForensicComponent } from '../_components/forensic/forensic.component';
+import { UtilityService } from '../services/utility.service';
+import { DynamicModalService } from '../services/dynamic-modal.service';
+import { TableLazyLoadEvent } from 'primeng/table';
+import { LoaderService } from '../services/loader.service';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+ interface PsCodeOption {
+      text: string;
+      value: string;
+    }
+@Component({
+  selector: 'app-fsl-report',
+  templateUrl: './fsl-report.component.html',
+  styleUrls: ['./fsl-report.component.css']
+})
+export class FslReportComponent implements  OnInit {
+  columns = [
+    { field: 'RowNum', header: 'S.No' },
+    { field: 'stateDesc', header: 'State' },
+    { field: 'distDesc', header: 'District' },
+    { field: 'PsDesc', header: 'Police Station' },
+   
+    { field: 'firno', header: 'FIR No.' },
+    // { field: 'enteredon', header: 'Sample Received Date' },
+    { field: 'exmreportdate', header: 'Report Date' },
+    { field: 'fulldispno', header: 'Download Report' },
+  ];
+  
+  loading: boolean = false;
+  @ViewChild('dynamicContainer', { read: ViewContainerRef, static: true })
+  dynamicContainer!: ViewContainerRef;
+  private clickFSlSubscription!: Subscription;
+  @ViewChild('content') content!: TemplateRef<any>;
+  Total: number = 0;
+  ReportsGenerated: number = 0;
+  ReportsNotGenerated: number = 0;
+  fromDate: string = '';
+  toDate: string = '';
+  pageSize: number = 10;
+  selectedFullDispNo: string = '';
+  FSLData: any[] = [];
+  showResults: boolean = false;
+  policestations: any[] = [];
+  currentFirst: number = 1; 
+  currentLast: number = 10; 
+  searchValue : string = '';
+  FilteredRecordsCount:number = 0;
+  Districts: any[] = [];
+  settings = {};
+    policeStationsCodes : any[] = [];
+   
+    
+  constructor(
+    private fslReportService: FslReportServiceService,
+    private cdr: ChangeDetectorRef,
+    private modalService: NgbModal,
+    private globalEventService: GlobalEventService, private componentFactoryResolver: ComponentFactoryResolver, private utilityService: UtilityService,
+    private dyanmicModelService: DynamicModalService,private loaderService: LoaderService,private formBuilder: FormBuilder
+  ) 
+  {
+
+    // const toDate = new Date();
+    // var fromDate = new Date();
+    // fromDate.setDate(fromDate.getDate() - 90);
+    // this.fromDate = fromDate.toISOString().split('T')[0];
+    // this.toDate = toDate.toISOString().split('T')[0];
+    
+
+  }
+
+  ngOnInit(): void {
+      this.settings = {
+      singleSelection: false,
+      idField: 'value',
+      textField: 'text',
+      enableCheckAll: true,
+      allowSearchFilter: true,
+      limitSelection: -1,
+      clearSearchFilter: true,
+      maxHeight: 197,
+      itemsShowLimit: 3,
+      searchPlaceholderText: 'Search',
+      closeDropDownOnSelection: false,
+      showSelectedItemsAtTop: false,
+      defaultOpen: false,
+    };
+    this.Total = 0;
+    this.ReportsGenerated = 0;
+    this.ReportsNotGenerated = 0;
+    this.searchValue = '';
+    const toDate = new Date();
+    var fromDate = new Date();
+    fromDate.setDate(fromDate.getDate() - 90);
+    this.fromDate = fromDate.toISOString().split('T')[0];
+    this.toDate = toDate.toISOString().split('T')[0];
+     this.form = this.formBuilder.group(
+      {
+         district: [''], 
+        psCode: [''],
+        FromDate: fromDate,
+        toDate: toDate
+      }
+      
+    );
+    this.district();
+    this.onSearch();
+  }
+
+  onSearch() {
+    debugger
+    this.loaderService.show();
+    this.searchValue = ''; 
+
+  
+    const psCodeArray: PsCodeOption[] = this.form.controls["psCode"].value || [];
+    const psCodeValues = psCodeArray.length > 0 ? psCodeArray.map((item: PsCodeOption) => Number(item.value)) : [];
+    this.policeStationsCodes = psCodeValues;
+    const requestPayload = {
+      policestationcode: this.policeStationsCodes,
+      fromDate: this.fromDate,
+      toDate: this.toDate,
+      pageNumber: 1,
+      pageSize: this.pageSize,
+      searchTerm: this.searchValue
+    };
+
+    this.fslReportService.getFslReports(requestPayload).subscribe(
+      (response: any) => {
+        if (response.isSuccess) {
+          this.FSLData = response.data.records;
+          this.Total = response.data.totalRecords;
+          this.ReportsGenerated = response.data.totalReportGenerated;
+          this.ReportsNotGenerated = response.data.totalReportNotGenerated;
+          this.FilteredRecordsCount =  response.data.filteredRecordsCount;
+          this.updatePageInfo(); // Update page info after search
+          this.showResults = true; // Show results on successful search
+          this.cdr.detectChanges();
+          this.loaderService.hide();
+        }
+      }
+    );
+  }
+
+  onReset() {
+    this.loaderService.show();
+    this.form.controls["district"].setValue('');
+    this.form.controls["psCode"].setValue('');
+    this.showResults = false; // Hide results when reset
+    this.cdr.detectChanges();
+    this.loaderService.hide();
+    this.policestations=[],
+    this.FSLData = [];
+    this.FilteredRecordsCount = 0;
+    this.loadFslReports({ first: 0, rows: 10 }); 
+  }
+
+  loadFslReports(event: TableLazyLoadEvent) {
+
+     const psCodeArray: PsCodeOption[] = this.form.controls["psCode"].value || [];
+    const psCodeValues = psCodeArray.length > 0 ? psCodeArray.map((item: PsCodeOption) => Number(item.value)) : [];
+    this.policeStationsCodes = psCodeValues;
+    this.loading = true;
+    const pageSize = event.rows ?? 10;  
+    const first = event.first ?? 0;    
+    const pageNumber = Math.floor(first / pageSize) + 1; 
+    const requestPayload = {
+       policestationcode: this.policeStationsCodes,
+      fromDate: this.fromDate,
+      toDate: this.toDate,
+      pageNumber: pageNumber,
+      pageSize: pageSize,
+      searchTerm: this.searchValue
+    };
+
+    // Update the paginator info
+    this.currentFirst = first + 1;
+    this.currentLast = first + pageSize > this.FilteredRecordsCount ? this.FilteredRecordsCount : first + pageSize;
+
+    this.fslReportService.getFslReports(requestPayload).subscribe(
+      (response: any) => {
+
+        if (response.isSuccess) {
+          this.FSLData = response.data.records;
+          this.Total = response.data.totalRecords;
+          this.ReportsGenerated = response.data.totalReportGenerated;
+          this.ReportsNotGenerated = response.data.totalReportNotGenerated;
+          this.FilteredRecordsCount =  response.data.filteredRecordsCount;
+        }
+
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      () => (this.loading = false)
+    );
+  }
+
+  updatePageInfo() {
+    this.currentFirst = 1;
+    this.currentLast = this.pageSize > this.FilteredRecordsCount ? this.FilteredRecordsCount : this.pageSize;
+  }
+
+  open(content: any, fulldispno: string): void {
+    this.selectedFullDispNo = fulldispno;
+    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' });
+  }
+
+  openModalWithDispNo(content: any, fulldispno: string): void {
+   this.dyanmicModelService.open(ForensicComponent,fulldispno,);
+  
+  }
+
+  onQuickFilter(event: any) {
+    const filterValue = event.target.value.toLowerCase();
+    if (filterValue.length >= 3) {
+      this.searchValue = filterValue;
+      this.loadFslReports({ first: 0, rows: this.pageSize });
+    } else if(filterValue == '') {
+      this.searchValue = '';
+      this.loadFslReports({ first: 0, rows: this.pageSize });
+    }
+  }
+
+  private componentRef!: ComponentRef<ForensicComponent>;
+  loadOtherComponent(fslId: any): void {
+    debugger; 
+    this.utilityService.LoadFslInformation({fslId: fslId}).subscribe((response)=>{
+      if(response.isSuccess){
+        const data = JSON.parse(response.data);
+        const componentFactory = this.componentFactoryResolver.resolveComponentFactory(ForensicComponent);
+        this.dynamicContainer.remove();
+        this.dynamicContainer.clear();
+        this.componentRef = this.dynamicContainer.createComponent(componentFactory);
+     
+        this.componentRef.instance.loadFslInfo(data,data.psCode);
+        this.modalService.open("content", { ariaLabelledBy: 'modal-basic-title' });
+      }
+      else{
+        this.utilityService.ShowErrorPopup(response.message);
+      }
+    });
+  }
+ form:FormGroup = new FormGroup({
+  });
+   onDistrictChange(event: any) {
+    var formValues = this.form.getRawValue();
+    var districtCodes = formValues.district.map((item: { value: any; }) => parseInt(item.value));
+    this.policestations = [];
+    if (districtCodes.length > 0) {
+        this.fslReportService.LoadPoliceStations(districtCodes).subscribe((data: any) => {
+          if (data.isSuccess) {
+            this.policestations = data.data;
+          }
+          this.cdr.detectChanges();
+        });
+    }
+    this.cdr.detectChanges();
+  }
+  district(){
+    this.utilityService.Districts().subscribe((data) => {
+      if(data.isSuccess){
+        this.Districts = data.data;
+      }
+    });
+  }
+}
+
+
+
+
+
+
+
+
+
+

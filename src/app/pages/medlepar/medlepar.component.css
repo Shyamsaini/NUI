@@ -1,0 +1,5 @@
+.multi-line-cell {
+    white-space: pre-wrap;  /* Preserve new lines and wrap text */
+    word-wrap: break-word;  /* Break long words */
+    overflow: hidden;       /* Optional: avoid overflow */
+  }

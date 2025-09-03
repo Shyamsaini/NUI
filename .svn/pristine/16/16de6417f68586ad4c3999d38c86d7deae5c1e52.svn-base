@@ -1,0 +1,116 @@
+import { Component, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { AuthService } from '../services/auth.service';
+import { Table } from 'primeng/table';
+import { IodashboardService } from '../services/iodashboard.service';
+import Swal from 'sweetalert2';
+import { LoaderService } from '../services/loader.service';
+
+@Component({
+  selector: 'app-fir-view-dashboard-update',
+  templateUrl: './fir-view-dashboard-update.component.html',
+  styleUrl: './fir-view-dashboard-update.component.css'
+})
+export class FirViewDashboardUpdateComponent {
+  
+  logSearchForm!: FormGroup;
+  apiLogs: any[] = [];
+  showTable: boolean = false;
+  modalRef: NgbModalRef | undefined; 
+  selectedStateCode: number = 0; 
+  apiEndpoints: string[] = [];
+  isLoading: boolean = false;
+  popupData: any = null;
+  showPopup: boolean = false;
+
+  requestDialogVisible = false;
+  responseDialogVisible = false;
+  exceptionDialogVisible = false;
+
+  requestDialogData: string = '';
+  responseDialogData: string = '';
+  exceptionDialogData: string = '';
+
+  errorDialogVisible = false;
+  errorDialogMessage = 'An unexpected error occurred';
+
+  isLoadingFirViewUpdated = false;
+
+  progressMessage: string = '';
+  estimatedTime: string = 'about 5 minutes'; // You would calculate this dynamically
+    
+  states: any[] = [];
+
+  constructor(private fb: FormBuilder,    private loaderService: LoaderService,  private IodashboardService: IodashboardService, private modalService: NgbModal,private authService: AuthService) {}
+
+
+  ngOnInit(): void {
+    this.logSearchForm = this.fb.group({
+      selectedStateCodeform: ['']
+    }); 
+    this.authService.getStates().subscribe((data: any[]) => {
+      this.states = data;
+    });
+   
+  }
+
+  get isSearchDisabled(): boolean {
+    return (
+      this.selectedStateCode === 0 
+    );
+  }
+
+  UpdateFirViewLogs(): void {
+    this.isLoadingFirViewUpdated = true;
+    const formValues = this.logSearchForm.value;
+    const stateCode = formValues.selectedStateCodeform || null;
+
+    this.IodashboardService.FirViewDashboardUpdate(stateCode).subscribe({
+      next: (res: any) => {
+       this.isLoadingFirViewUpdated = false;
+        if (res.isSuccess) {
+
+                Swal.fire({
+                      position: 'center',
+                      icon: 'success',
+                      title: res.message || 'FIR Views Updated Successfully',
+                      showConfirmButton: false,
+                      background: '#fff3cd', 
+                      color: '#000000',    
+                      timer: 3000,
+                    });
+       
+
+        } else {
+            Swal.fire({
+             position: 'center',
+             title:  'Failed to Update Fir View Dashboard',
+             icon: 'error',
+             showConfirmButton: true,
+             background: '#fff3cd', 
+               color: '#000000', 
+           });
+        }
+        
+      },
+      error: () => {
+        this.isLoadingFirViewUpdated = false;
+          Swal.fire({
+             position: 'center',
+             title:  'Failed to Update Fir View Dashboard',
+             icon: 'error',
+             showConfirmButton: true,
+             background: '#fff3cd', 
+               color: '#000000', 
+           });
+      }
+    });
+  }
+
+  resetForm(): void {
+    this.logSearchForm.reset();
+    this.selectedStateCode = 0;
+  }
+  
+}

@@ -1,0 +1,119 @@
+<div class="pc-container">
+  <div class="pcoded-content pb" style="padding-bottom:90px;">
+    <div class="page-header">
+      <div class="page-block">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <div class="page-header-title">
+              <h5 class="m-b-10">Log</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ag-theme-alpine" style="height: 100%; width: 100%;">
+      <div>
+        <div class="card mt-2">
+          <div class="card-body">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <h5 class="me-3 mb-0">Log Details</h5>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">    
+                <p-table [value]="CountData" [paginator]="true" [rows]="25" [rowsPerPageOptions]="[25, 50, 75, 100]"
+                  responsiveLayout="scroll">
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th>S.No</th>
+                      <th>MobileNumber</th>
+                      <th>UserName</th>
+                      <th>LastLogin</th>
+                      <th>IP</th>
+                      <th>LoginCount</th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-case let-rowIndex="rowIndex">
+                    <tr>
+                      <td>{{ rowIndex + 1 }}</td>
+                      <td>{{ case.MobileNumber }}</td>
+                      <td>
+                        <span>{{ case.UserName }}</span>
+                      </td>
+                      <td>
+                        <span>{{ case.LastLogin }}</span>
+                      </td>
+                      <td>
+                        <span>{{ case.IP }}</span>
+                      </td>
+                      <td>
+
+                        <a href="javascript:void(0);" (click)="LogDetails(case.MobileNumber)">{{ case.LoginCount }}</a>
+                      </td>
+                    </tr>
+
+
+                  </ng-template>
+                </p-table>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <p-dialog [(visible)]="displayPopup" [modal]="true" header="" [style]="{ width: '70%' }" [closable]="true">
+          <div class="row">
+            <div class="col-sm-12 p-0">
+              <div class="card">
+                <div class="card-body pb-0 pt-3">
+                  <div>
+                    <h5 class="m-b-10">Log Details  
+                    </h5>
+                    <p-table #table [value]="GetLogDetails" [paginator]="true" [rows]="10" [responsiveLayout]="'scroll'"
+                      [rowsPerPageOptions]="[10, 20, 50]">
+                      <ng-template pTemplate="header">
+                        <tr>
+                          <th>Sr.No.</th>
+                          <th>IP</th>
+                          <th>last Login Date</th>
+                         <th>last Login Time</th> 
+                        </tr>
+                      </ng-template>
+                      <ng-template pTemplate="body" let-rowData let-i="rowIndex">
+                        <tr>
+                          <td>{{ i + 1 }}</td>
+                          <td>{{ rowData.IpAddress }}</td>
+                          <td>{{ rowData.lastLoginDate }}</td>
+                           <td>{{ rowData.lastLoginTime }}</td>
+                         
+                        </tr>
+                      </ng-template>
+                      <ng-template pTemplate="emptymessage">
+                        <tr>
+                          <td colspan="4" class="text-center text-muted p-3">
+                            No records found
+                          </td>
+                        </tr>
+                      </ng-template>
+                    </p-table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+
+          </div>
+
+
+
+
+        </p-dialog>
+      </div>
+    </div>
+  </div>
+</div>

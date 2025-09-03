@@ -1,0 +1,9 @@
+<modal id="modal-dynamicpopup">
+    <div class="modal-header">
+        <h5 class="modal-title headertitle">{{ header }}</h5>
+        <button type="button" class="btn-close" (click)="modalService.close();"></button>
+    </div>
+    <div class="modal-body">
+        <ng-container #dynamicContent></ng-container>
+    </div>
+</modal>

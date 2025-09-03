@@ -1,0 +1,94 @@
+<div class="container mt-2">
+    <div class="card">
+        <div class="card-body">
+            <div class="row mt-1">
+                <div class="col-sm-4">
+                    <p><strong>Doctor : </strong> <span class="doctorname">{{data.MLR_PMR_Prepared_By_Doctor}}</span></p>
+                </div>
+                <div class="col-sm-4">
+                    <p><strong>Health Institute Name : </strong> <span class="hospital">{{data.HealthInstituteName}}</span></p>
+                </div>
+                <div class="col-sm-4">
+                    <p><strong>Victim Name : </strong> <span class="victimname">{{data.victim_name}}</span></p>
+                </div>
+            </div>
+            <hr>
+
+            <div class="row mt-1">
+                <div class="col-sm-4">
+                    <p><strong>Police Station : </strong> <span class="policestation">{{data.Police_Station_name}}</span></p>
+                </div>
+                <div class="col-sm-4">
+                    <p><strong>State : </strong> <span class="state">{{data.Statename}}</span></p>
+                </div>
+                <div class="col-sm-4">
+                    <p><strong>District : </strong> <span class="district">{{data.Districtname}}</span></p>
+                </div>
+            </div>
+            <hr>
+            <div class="row mt-1">
+                <div class="col-sm-4">
+                    <p><strong>MLR PMR No : </strong> <span class="mlrpmrnumber">{{data.MLR_PMR_No}}</span></p>
+                </div>
+                <div class="col-sm-4">
+                    <p><strong>Entry Date : </strong> <span class="transactiondate">{{data.cdTranactionDate}}</span></p>
+                </div>
+            </div>
+
+            <hr>
+            <div class="row mt-1">
+                <div class="col-sm-4">
+                    <p><strong>Fir No. : </strong> <span class="firno">{{data.FIRNo}}</span></p>
+                </div>
+                <div class="col-sm-4">
+                    <p><strong>FIR/DDR : </strong> <span class="firddrtype">{{data.FIR_DDR}}</span></p>
+                </div>
+                <div class="col-sm-4">
+                    <p><strong>FIR Date : </strong> <span class="firdate">{{data.FIR_Date}}</span></p>
+                </div>
+               
+            </div>
+
+            <hr>
+            <div class="row mt-1">
+                <div class="col-sm-4">
+                    <p><strong>Arrival Date : </strong> <span class="arrivaldate">{{data.cdArrivalDate}}</span></p>
+                </div>
+                <div class="col-sm-4">
+                    <p><strong>Arrival Time : </strong> <span class="arrivaltime">{{data.cdArrivalTime}}</span></p>
+                </div>
+               
+               
+            </div>
+            <hr>
+            <div class="row mt-1">
+                <div class="col-sm-4">
+                    <p><strong>Examination Start Date : </strong> <span class="examinationstartdate">{{data.cdExaminationStartDate}}</span></p>
+                </div>
+                <div class="col-sm-4">
+                    <p><strong>Examination Start Time : </strong> <span class="examinationstarttime">{{data.cdExaminationStartTime}}</span></p>
+                </div>
+            </div>
+            <hr>
+            <div class="row mt-1">
+                 <div class="col-sm-4">
+                    <p><strong>Victim Relative Name : </strong> <span class="victimrelativename">{{data.VictimRelativeName}}</span></p>
+                </div>
+                <div class="col-sm-4">
+                    <p><strong>Victim Address : </strong> <span class="victimaddress">{{data.VictimAddress}}</span></p>
+                </div>
+                <div class="col-sm-4">
+                    <p><strong>Victim Age : </strong> <span class="victimage">{{data.VictimAge}}</span></p>
+                </div>
+
+            </div>
+             <hr>
+            <div class="row col-sm-12">
+                <div class="right-bn text-center">
+                    <a href="javascript:void(0)" class="btn btn-primary text-white reportdownload" (click)="downloadFile(data.pdf)">Download Report</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

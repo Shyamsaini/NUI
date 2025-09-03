@@ -1,0 +1,52 @@
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.9);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(2px);
+}
+
+.loading-container {
+  text-align: center;
+  max-width: 500px;
+  padding: 2rem;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.loading-animation {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.spinner-border {
+  border-width: 0.25em;
+  animation-duration: 1.2s;
+}
+
+.progress-bar {
+  background: linear-gradient(90deg, #4b6cb7, #182848);
+}
+
+.status-update {
+  transition: all 0.3s ease;
+}
+
+/* Pulse animation for attention */
+@keyframes pulse {
+  0% { opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { opacity: 0.8; }
+}
+
+.loading-message p.lead {
+  animation: pulse 2s infinite;
+}

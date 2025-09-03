@@ -1,0 +1,21 @@
+import { Injectable } from '@angular/core';
+import * as CryptoJS from 'crypto-js';
+@Injectable({
+  providedIn: 'root'
+})
+export class DecryptApiService {
+  keyString ="Eu2wPC7SSI1ZP5vX0OMZbh79gm6j1QK5";  
+  constructor() { }
+   decryptAesFromDotNet(base64CipherText: string): string {
+      // Key from UTF-8 string (same as C#'s Encoding.UTF8.GetBytes)
+      const key = CryptoJS.enc.Utf8.parse(this.keyString);  
+      // 16-byte IV filled with 0s (same as 'new byte[16]' in C#)
+      const iv = CryptoJS.enc.Hex.parse('00000000000000000000000000000000');  
+      const decrypted = CryptoJS.AES.decrypt(base64CipherText, key, {
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7
+      });
+      return decrypted.toString(CryptoJS.enc.Utf8);
+    }
+}

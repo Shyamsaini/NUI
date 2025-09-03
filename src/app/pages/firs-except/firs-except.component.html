@@ -1,0 +1,235 @@
+<div class="pc-container">
+    <div class="pcoded-content pb" style="padding-bottom:90px;">
+        <div class="page-header">
+            <div class="page-block">
+                <div class="row align-items-center">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <div class="page-header-title">
+                                <h5 class="m-b-10">New Criminal Laws Report</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-5">
+            <div class="card">
+                <div class="card-body">
+                    <form [formGroup]="form">
+                        <div id="searchByFilingNumber" class="row searchbypanel">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-10">
+                                        <div class="row">
+                                            <div class="col-md-3  col-12 mb-3">
+                                                <label class="form-label"> District Name</label>
+                                                <ng-multiselect-dropdown #multiSelect [settings]="settings"
+                                                    [data]="ListDistict" formControlName="districtCodes"
+                                                    [placeholder]="'Select District'"
+                                                    (onDropDownClose)="onDistrictDropdownChange($event)">
+                                                </ng-multiselect-dropdown>
+                                            </div>
+                                            <div class="col-md-3  col-12 mb-3">
+                                                <label class="form-label">Police Station</label>
+                                                <ng-multiselect-dropdown #multiSelect [settings]="settings"
+                                                    [data]="policestations" formControlName="PS_CD"
+                                                    [placeholder]="'Police Station'" (onSelect)="onPsSelect($event)"
+                                                    (onDeSelect)="onPsSelect($event)"
+                                                    (onSelectAll)="onPsSelectAll($event)"
+                                                    (onDeSelectAll)="onPsSelectAll([])">
+                                                </ng-multiselect-dropdown>
+                                            </div>
+                                            <div class="col-lg-2 col-md-3  col-12 mb-3">
+                                                <label class="form-label">FIR From Date</label>
+                                                <sup class="text-danger top-0">*</sup>
+                                                <p-calendar class="form-control mon" formControlName="FromDate"
+                                                    [minDate]="minDateValue" [maxDate]="maxDateValue"
+                                                    [readonlyInput]="true" placeholder="01-07-2024" [showIcon]="true"
+                                                    (onSelect)="onDateChange($event)" dateFormat="dd-mm-yy">
+                                                </p-calendar>
+                                            </div>
+
+                                            <div class="col-lg-2 col-md-2 col-12 mb-3">
+                                                <label class="form-label">FIR To Date</label>
+                                                <sup class="text-danger top-0">*</sup>
+                                                <p-calendar class="form-control mon" formControlName="ToDate"
+                                                    [minDate]="minToDate" [maxDate]="maxToDate" [readonlyInput]="true"
+                                                    [placeholder]="currentDatePlaceholder" dateFormat="dd-mm-yy"
+                                                    [showIcon]="true">
+                                                </p-calendar>
+                                            </div>
+                                            <div class="col-md-2 col-12">
+                                                <label class="form-label">Act Type</label>
+                                                <select class="form-control" formControlName="ACT_CD">
+                                                    <option value="" disabled selected>Select</option>
+                                                    <option *ngFor="let option of actTypeOptions"
+                                                        [value]="option.value">
+                                                        {{ option.label }}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 col-12 pt-4 mt-2 text-end">
+                                        <button type="button" class="btn btn-success text-white mr-2"
+                                            (click)="onSearch()">Search</button>
+                                        <button type="button" class="btn btn-secondary text-white"
+                                            (click)="onReset()">Reset</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <form [formGroup]="form">
+                        <div id="searchByFilingNumber" class="row searchbypanel">
+                            <div class="col-md-12 seprtaion">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class=" col-sm-12 mb-1">
+                                                <label class="form-label "> State :</label><span>{{ states || 'No State
+                                                    selected' }} </span>
+                                            </div>
+                                            <div class="col-sm-12 mb-1" *ngIf="selectedDistrictNames.length">
+                                                <label class="form-label"> Distict :</label>
+                                                <span class="spl-pd2">
+                                                    {{ trimmedDistrictNames }}
+                                                    <a href="#"
+                                                        (click)="toggleReadMoreDistricts(); $event.preventDefault()"
+                                                        *ngIf="selectedDistrictNames.join(', ').length > 100">
+                                                        {{ readMoreDistricts ? 'Read less' : 'Read more' }}
+                                                    </a>
+                                                </span>
+                                            </div>
+                                            <div class="col-sm-12 mb-1" *ngIf="selectedPoliceStations.length">
+                                                <label class="form-label"> Police Station :</label>
+                                                <span class="spl-pd">
+                                                    {{ trimmedPoliceStations }}
+                                                    <a href="#" (click)="toggleReadMore(); $event.preventDefault()"
+                                                        *ngIf="selectedPoliceStations.join(', ').length > 100">
+                                                        {{ readMore ? 'Read less' : 'Read more' }}
+                                                    </a>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="row new-design-fir">
+                <div class="col-sm-12" *ngIf="isActiveDiv">
+                    <div class="row">
+                        <div class="col-md-8 mt-3">
+                            <h5 _ngcontent-ng-c2247344463="" class="me-3 mb-0">Time Period From :
+                                {{fromDate}} to {{ toDate }}</h5>
+
+                        </div>
+                        <!-- <div class="col-md-4" *ngIf="isActiveDiv">
+                            <div class="d-flex justify-content-end mb-2 pt-2">
+                                <button type="button" class="btn btn-success text-white mr-2"
+                                    (click)="downloadPDF()">Download
+                                    PDF</button>
+                                <button type="button" class="btn btn-success text-white mr-2"
+                                    (click)="downloadExcel()">Download
+                                    Excel</button>
+                            </div>
+                        </div> -->
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row d-flex justify-content-center">
+                                <table class="table table-bordered text-center table-sm custom-fir-table">
+                                    <thead>
+                                        <tr>
+                                            <th rowspan="2" style="width: 46px;">S.No.</th>
+                                            <th rowspan="2">Police Station</th>
+                                            <th rowspan="2">FIR's REGISTERED <BR><BR>(A)</th>
+                                            <th rowspan="2">CHARGESHEET (CS) + FINAL REPORT (FR)</th>
+                                            <th rowspan="2">CHARGESHEET (CS) <BR><BR> (B)</th>
+                                            <th rowspan="2">CHARGESHEET % OF TOTAL FIR's <BR><BR> (B/A)×100</th>
+                                            <th colspan="2">Final Report (FR)</th>
+                                            <th rowspan="2">DISPOSAL %<br><BR>(B+C+D)/A *100</th>
+                                            <th colspan="3">CASES WITH PUNISHMENT IS LESS THAN 10 YEARS</th>
+                                            <th colspan="3">CASES WITH PUNISHMENT IS MORE THAN 10 YEARS</th>
+                                        </tr>
+                                        <tr>
+                                            <th>UNTRACED <BR><BR> (C)</th>
+                                            <th>CANCELED / QUASHED <BR><BR> (D)</th>
+                                            <th>TOTAL FIR's</th>
+                                            <th>CHARGESHEET WITHIN 60 DAYS</th>
+                                            <th>%AGE</th>
+                                            <th>TOTAL FIR's</th>
+                                            <th>CHARGESHEET WITHIN 90 DAYS</th>
+                                            <th>%AGE</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let report of ListFIRReport; let i = index">
+                                            <ng-container *ngIf="report.Police_Station === 'TOTAL'; else normalRow">
+                                                <td colspan="2" style="text-align: center; font-weight: bold;">{{
+                                                    report.Police_Station }}</td>
+                                                <td style="text-align: right;">{{ report.FIR_COUNT }}</td>
+                                                <td style="text-align: right;">{{ report.CHARGESHEET_Final_COUNT }}</td>
+                                                <td style="text-align: right;">{{ report.Chargesheeted_COUNT }}</td>
+                                                <td style="text-align: right;">{{ report.Chargesheet_Percentage |
+                                                    number:'1.2-2' }} %</td>
+                                                <td style="text-align: right;">{{ report.UNTRACE_COUNT }}</td>
+                                                <td style="text-align: right;">{{ report.CANCELLATION_COUNT }}</td>
+                                                <td style="text-align: right;">{{ report.Combined_Percentage |
+                                                    number:'1.2-2' }} %</td>
+                                                <td style="text-align: right;">{{ report.FIR_Less_Than_12000 }}</td>
+                                                <td style="text-align: right;">{{
+                                                    report.Chargesheet_Within_60_Days_LT_12000 }}</td>
+                                                <td style="text-align: right;">{{
+                                                    report.Percentage_LT_12000_Within_60_Days | number:'1.2-2' }} %</td>
+                                                <td style="text-align: right;">{{ report.FIR_Greater_Equal_12000 }}</td>
+                                                <td style="text-align: right;">{{
+                                                    report.Chargesheet_Within_90_Days_GE_12000 }}</td>
+                                                <td style="text-align: right;">{{
+                                                    report.Percentage_GE_12000_Within_90_Days | number:'1.2-2' }} %</td>
+                                            </ng-container>
+                                            <ng-template #normalRow>
+                                                <td>{{ i + 1 }}</td>
+                                                <td style="text-align: left;">{{ report.Police_Station }}</td>
+                                                <td style="text-align: right;">{{ report.FIR_COUNT }}</td>
+                                                <td style="text-align: right;">{{ report.CHARGESHEET_Final_COUNT }}</td>
+                                                <td style="text-align: right;">{{ report.Chargesheeted_COUNT }}</td>
+                                                <td style="text-align: right;">{{ report.Chargesheet_Percentage |
+                                                    number:'1.2-2' }} %</td>
+                                                <td style="text-align: right;">{{ report.UNTRACE_COUNT }}</td>
+                                                <td style="text-align: right;">{{ report.CANCELLATION_COUNT }}</td>
+                                                <td style="text-align: right;">{{ report.Combined_Percentage |
+                                                    number:'1.2-2' }} %</td>
+                                                <td style="text-align: right;">{{ report.FIR_Less_Than_12000 }}</td>
+                                                <td style="text-align: right;">{{
+                                                    report.Chargesheet_Within_60_Days_LT_12000 }}</td>
+                                                <td style="text-align: right;">{{
+                                                    report.Percentage_LT_12000_Within_60_Days | number:'1.2-2' }} %</td>
+                                                <td style="text-align: right;">{{ report.FIR_Greater_Equal_12000 }}</td>
+                                                <td style="text-align: right;">{{
+                                                    report.Chargesheet_Within_90_Days_GE_12000 }}</td>
+                                                <td style="text-align: right;">{{
+                                                    report.Percentage_GE_12000_Within_90_Days | number:'1.2-2' }} %</td>
+                                            </ng-template>
+                                        </tr>
+                                        <tr *ngIf="ListFIRReport.length === 0">
+                                            <td colspan="15" class="text-center">No record found</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>

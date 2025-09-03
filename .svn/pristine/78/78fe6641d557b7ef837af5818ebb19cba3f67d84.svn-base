@@ -1,0 +1,87 @@
+<!-- Sidebar -->
+<nav id="pc-sidebar_nav" class="pc-sidebar">
+  <div class="navbar-wrapper">
+    <div class="m-header bg-white">
+      <a href="index.html" class="b-brand">
+        <img src="assets/images/nyaay-setu-logo.png" alt="Nyay Setu" width="65px"
+          style="float:left;margin-right:10px;margin-top:5px;">
+        <span style="font-size:24px;line-height:24px;">Nyay Setu न्याय सेतु </span>
+        <br><img src="assets/images/icjs-lg.png" width="85px" style="position:relative; top:-2px;">
+      </a>
+    </div>
+    <div class="navbar-content">
+      <ul class="pc-navbar">
+
+
+        <li *ngFor="let menuItem of menuItems" class="pc-item"
+          [ngClass]="{ 'pc-hasmenu': menuItem.subMenu.length > 0,  'active': expandedMenu === menuItem.menuName }">
+
+          <a href="javascript:void(0)" (click)="toggleMenu(menuItem.menuName, menuItem.subMenu)" class="pc-link"
+            [routerLink]="menuItem.subMenu.length === 0 && menuItem.accessUrl ? [menuItem.accessUrl] : []"
+            routerLinkActive="active">
+
+            <span class="pc-micon">
+              <i [ngClass]="menuItem.menuIcon"></i>
+            </span>
+            <span class="pc-mtext">{{ menuItem.menuName }}</span>
+
+            <span *ngIf="menuItem.subMenu.length > 0" class="pc-arrow"
+              [ngClass]="{'rotate': expandedMenu === menuItem.menuName}">
+              <i class="fa fa-chevron-right" style="font-size:13px;"></i>
+            </span>
+
+          </a>
+
+
+          <ul *ngIf="menuItem.subMenu.length > 0 && expandedMenu === menuItem.menuName"
+            class="pc-submenu animated-submenu">
+
+            <li *ngFor="let subMenuItem of menuItem.subMenu" class="pc-item"
+              [ngClass]="{ 'active': this.currentRoute.includes(subMenuItem.accessUrl) }">
+              <a [routerLink]="subMenuItem.accessUrl" routerLinkActive="active" class="pc-link">
+                {{ subMenuItem.menuName }}
+              </a>
+            </li>
+
+          </ul>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Header 11  -->
+<header class="pc-header">
+  <div class="header-wrapper pr-2">
+    <div class="mr-auto mt-3 swipe-btn">
+      <button (click)="toggleSidebar()">
+        <i class="fa fa-bars tog-bn" aria-hidden="true" style="font-size:30px; color:#fff;"></i>
+      </button>
+    </div>
+    <div class="pc-mob-drp">
+      <h1>Monitoring Platform for Criminal Justice System <span>(An Initiative under ICJS Project)
+          <span style="color:#ffad37;display:inline-block">
+            <span style="color:#fff;display:inline-block"></span> {{statename}}</span> </span></h1>
+    </div>
+    <div class="ml-auto">
+      <ul class="list-unstyled">
+        <li class="dropdown pc-h-item">
+          <!-- <a class="pc-head-link dropdown-toggle arrow-none" data-toggle="dropdown" href="javascript:void(0)" role="button" aria-haspopup="false" aria-expanded="false"> -->
+          <a class="pc-head-link dropdown-toggle arrow-none" data-bs-toggle="dropdown" href="#" role="button"
+            aria-haspopup="false" aria-expanded="false">
+            <i class="fa fa-user-circle mr-2" aria-hidden="true"></i>
+            <span>
+              <span class="user-name text-white">{{ userName }}<br /> <small>{{roleName}}</small></span>
+            </span>
+          </a>
+          <div class="dropdown-menu dropdown-menu-right pc-h-dropdown">
+            <a href="javascript:void(0)" class="dropdown-item" (click)="logout($event)">
+              <i class="fa fa-sign-out" aria-hidden="true"></i> Logout
+            </a>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</header>

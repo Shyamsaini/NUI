@@ -1,0 +1,218 @@
+<div class="pc-container">
+  <div class="pcoded-content pb" style="padding-bottom: 90px;">
+    <div class="page-header">
+      <div class="page-block">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <div class="page-header-title">
+              <h5 class="m-b-10">Data Analytics</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-5">
+      <div class="card">
+        <div class="card-body">
+          <form [formGroup]="form" (ngSubmit)="onSearch()">
+            <div id="searchByFilingNumber" class="row searchbypanel">
+              <div class="col-md-3 col-12 mb-3">
+                <label class="form-label">District Name</label>
+                <ng-multiselect-dropdown #multiSelect [settings]="settings" [data]="ListDistict"
+                  formControlName="districtCodes" [placeholder]="'Select District'"
+                  (onDropDownClose)="onDistrictDropdownChange($event)">
+                </ng-multiselect-dropdown>
+              </div>
+
+              <div class="col-md-3 col-12 mb-3">
+                <label class="form-label">Police Station</label>
+                <!-- <sup class="text-danger top-0">*</sup> -->
+                <ng-multiselect-dropdown #multiSelect [settings]="settings" [data]="policestations"
+                  formControlName="psCode" [placeholder]="'Police Station'">
+                </ng-multiselect-dropdown>
+              </div>
+
+              <div class="col-md-3 col-12 mb-3">
+                <label class="form-label">From Date</label>
+                <!-- <sup class="text-danger top-0">*</sup> -->
+                <p-calendar formControlName="FromDate" [minDate]="minDateValue" class="form-control"
+                  [maxDate]="maxDateValue" readonlyInput="true" placeholder="Select a date" dateFormat="dd/mm/yy">
+                </p-calendar>
+              </div>
+
+              <div class="col-md-3 col-12 mb-3">
+                <label class="form-label">To Date</label>
+                <!-- <sup class="text-danger top-0">*</sup> -->
+                <p-calendar class="form-control" formControlName="ToDate" [minDate]="minDateValue2"
+                  [maxDate]="maxDateValue2" placeholder="Select a date" dateFormat="dd/mm/yy">
+                </p-calendar>
+              </div>
+
+              <div class="col-md-3 col-12 mb-3">
+                <label class="form-label">Major Heads</label>
+                <!-- <sup class="text-danger top-0">*</sup> -->
+                <ng-multiselect-dropdown #multiSelect [settings]="settings" [data]="majorheads"
+                  formControlName="MajorHead" [placeholder]="'Select Major Heads'"
+                  (onDropDownClose)="onMajorHeadDropdownChange($event)">
+                </ng-multiselect-dropdown>
+              </div>
+
+              <div class="col-md-3 col-12 mb-3">
+                <label class="form-label">Minor Heads</label>
+                <!-- <sup class="text-danger top-0">*</sup> -->
+                <ng-multiselect-dropdown #multiSelect [settings]="settings" [data]="minorheads"
+                  formControlName="MinorHead" [placeholder]="'Select Minor Heads'">
+                </ng-multiselect-dropdown>
+              </div>
+
+              <div class="col-md-3 col-12 mb-3">
+                <label class="form-label">Groups</label>
+                <!-- <sup class="text-danger top-0">*</sup> -->
+                <ng-multiselect-dropdown #multiSelectGroupby
+                                          [settings]="settings"
+                                          [data]="groupby"
+                                          formControlName="groupby"
+                                          [placeholder]="'Select Groups'">
+                </ng-multiselect-dropdown>
+              </div>
+              
+            </div> 
+              <!-- <div class="col-md-3 col-12 mb-3">
+                <label class="form-label">Groups</label>
+                <sup class="text-danger top-0">*</sup>
+                <select class="form-control" [(ngModel)]="selectedGroup" formControlName="groupby">
+                  <option *ngFor="let group of groupby" [value]="group.id">
+                    {{ group.itemName }}
+                  </option>
+                </select>
+              </div>
+            </div> -->
+
+            <div class="col-md-12 col-12 mb-3 pt-4 mt-1" style="text-align: right;">
+              
+
+              <button (click)="Reset()" class="btn btn-primary text-white py-1">Reset</button>
+
+              <button type="submit" class="btn btn-success text-white py-1">Search</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="col-md-12">
+        <div class="card" style="font-size: 1.75rem;">
+          <div class="card-body">
+            <div style="height: 100%; width: 100%;">
+              <div class="row mb-1">
+                <!-- Additional content if needed -->
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <p-table [value]="AnalyticsData" *ngIf="ListTable" [paginator]="true" [rows]="20" [rowsPerPageOptions]="[10, 20, 50]" responsiveLayout="scroll"  >
+
+                    <!-- Table Header -->
+                    <ng-template pTemplate="header">
+                      <tr>
+                        <th *ngFor="let col of columns" [pSortableColumn]="col.field">
+                          {{ col.header }}
+                          <p-sortIcon [field]="col.field"></p-sortIcon>
+                        </th>
+                      </tr>
+                    </ng-template>
+                  
+                    <!-- Table Body -->
+                    <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex" >
+                      <tr>
+                        <ng-container *ngFor="let col of columns">
+                          <td *ngIf="col.field !== 'Count'"> {{ rowData[col.field] }}</td>
+                        </ng-container>
+                  
+                        <!-- Display Count column as a clickable link -->
+                        <td (click)="onCountClick([rowData.MAJOR_HEAD_CODE], [rowData.MINOR_HEAD_CD], [rowData.PS_CD], rowData.ASSIGN_IO_CD,rowData.REG_YEAR)" class="text-primary cursor-pointer">
+                          {{ rowData.Count }}
+                        </td>
+                      </tr>
+                    </ng-template>
+                  
+                    <!-- Paginator Footer -->
+                    <ng-template pTemplate="paginatorleft">
+                      <!-- <div>Showing {{ AnalyticsData?.length }} records</div> -->
+                    </ng-template>
+                  </p-table>
+                  
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="errorMessage" class="alert alert-danger mt-3">
+        {{ errorMessage }}
+      </div>
+      
+
+      <div *ngIf="showTable">
+        <p-table [value]="AnalyticsCountData"
+                 [paginator]="true"
+                 [rows]="20"
+                 [totalRecords]="FilteredRecordsCountfir"
+                 [rowsPerPageOptions]="[10, 20, 50]"
+                 responsiveLayout="scroll">
+    
+            <!-- Table Header -->
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>S.No</th>
+                    <th>FIR Registration Number</th>
+                    <th>FIR Date</th>
+                    <th>Police Station Code</th>
+                    <th>Police Station</th>
+                    <th>Major Head</th>
+                    <th>Minor Head</th>
+                </tr>
+            </ng-template>
+    
+            <!-- Table Body -->
+            <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex">
+                <tr>
+                  <td>{{ rowIndex + 1 }}</td>
+                    <td>{{ rowData.FIR_REG_NUM }}</td>
+                    <td>{{ rowData.FIRDATE }}</td>
+                    <td>{{ rowData.PS_CD }}</td>
+                    <td>{{ rowData.PS }}</td>
+                    <td>{{ rowData.MAJOR_HEAD }}</td>
+                    <td>{{ rowData.MINOR_HEAD }}</td>
+                </tr>
+            </ng-template>
+    
+            <!-- Paginator Left Template -->
+            <ng-template pTemplate="paginatorleft">
+                <div>Showing {{ FilteredRecordsCountfir }} records</div>
+            </ng-template>
+        </p-table>
+    </div>
+    
+
+      <!-- No Data Message -->
+      <div *ngIf="!showTable && errorMessage" class="text-center">
+        {{ errorMessage }}
+      </div>
+
+    </div>
+
+    <!-- Modal Template -->
+    <ng-template #template>
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">Modal</h4>
+        <button type="button" class="close pull-right" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        This is a modal.
+      </div>
+    </ng-template>
+  </div>
+</div>

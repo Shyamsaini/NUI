@@ -1,0 +1,114 @@
+import { ChangeDetectorRef, Component, ElementRef, Input, Renderer2 } from '@angular/core';
+import { UtilityService } from '../../services/utility.service';
+import { DomSanitizer } from '@angular/platform-browser';
+import { ReportAuthorizationService } from '../../services/report-authorization.service';
+import Swal from 'sweetalert2';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
+
+@Component({
+  selector: 'app-prosecution',
+  templateUrl: './prosecution.component.html',
+  styleUrl: './prosecution.component.css'
+})
+export class ProsecutionComponent {
+  data: any = undefined;
+  opinionAdviceInHtml: any = "";
+  Ps_Code :any;
+  @Input() psCode: string | undefined;  
+  
+  
+  constructor(private ref: ChangeDetectorRef,  private utilityService: UtilityService, private sanitizer: DomSanitizer,private renderer: Renderer2, private el: ElementRef,
+    private ReportAuthorizationService: ReportAuthorizationService
+  ){
+    this.renderer.listen(this.el.nativeElement, 'click', (event: any) => {
+      if (event.target && event.target.matches('[data-view-doc]')) {
+        const eprocid = event.target.getAttribute('data-eprocid');
+        const docid = event.target.getAttribute('data-docid');
+        this.viewdocument(eprocid, docid);
+      }
+    });
+  }
+
+  loadProsecutionInfo(data: any,psCode:any) {  
+    this.data = data;
+    this.ref.detectChanges();
+   this.Ps_Code=psCode;
+  }
+  
+  loadProsecutionHtml(eProcId: string) {   
+    const body = { eProcId };
+    this.utilityService.OpinionAdviceInHtml(body).subscribe((response) => {
+      if (response.isSuccess) {
+        const data = JSON.parse(response.data);
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(data.data.htmlstring, 'text/html');
+  
+        doc.querySelectorAll('style, head').forEach((el) => el.remove());
+  
+        doc.querySelectorAll('[onclick]').forEach((el) => {
+          const onclickValue = el.getAttribute('onclick');
+          if (onclickValue) {
+            const match = onclickValue.match(/viewdocument\('(.+?)',(\d+)\)/);
+            if (match) {
+              const [_, eprocid, docid] = match;
+              el.setAttribute('data-eprocid', eprocid);
+              el.setAttribute('data-docid', docid);
+              el.classList.add('trigger-view-doc'); 
+            }
+            el.removeAttribute('onclick');
+          }
+        });
+  
+        doc.querySelectorAll('.collapse').forEach((el) => el.classList.remove('collapse'));
+        doc.querySelectorAll('.menu-content').forEach((el) => {
+          el.classList.remove('menu-content');
+          el.classList.add('p-10');
+        });
+        doc.querySelectorAll('table').forEach((el) => {
+          el.classList.add('table', 'table-bordered');
+        });
+  
+        this.opinionAdviceInHtml = this.sanitizer.bypassSecurityTrustHtml(doc.body.innerHTML);
+        this.ref.detectChanges();
+      } else {
+        this.utilityService.ShowErrorPopup(response.message);
+      }
+    });
+  }
+  
+  viewdocument(eprocid: any, docid: any) {      
+        const psCode=this.Ps_Code;
+        const body = { eprocid, docid,psCode };
+        this.utilityService.viewdocument_proc(body).subscribe(response => {
+          if (response.isSuccess) {
+            this.utilityService.DownloadPdfFileFromBase64(response.fileData, eprocid+".pdf");
+          } else {
+            this.utilityService.ShowErrorPopup(response.message);
+          }
+        });
+  } 
+  
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (target && target.classList.contains('trigger-view-doc')) {
+      const eprocid = target.getAttribute('data-eprocid');
+      const docid = target.getAttribute('data-docid');  
+      if (eprocid && docid) {
+        this.viewdocument(eprocid, docid);
+      }
+    }
+  }  
+
+  
+  printProsecution(eProcId: string) {
+      const body = { eProcId };
+    this.utilityService.OpinionAdviceInPDF(body).subscribe((response) => {
+      if (response.isSuccess) {
+        this.utilityService.DownloadPdfFileFromBase64(response.data, eProcId+".pdf");  
+      } else {
+        this.utilityService.ShowErrorPopup(response.message);
+      }
+    });
+  }
+}

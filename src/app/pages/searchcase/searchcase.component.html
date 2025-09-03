@@ -1,0 +1,444 @@
+<div class="pc-container">
+    <div class="pcoded-content pb">
+    <div class="page-header">
+            <div class="page-block">
+                <div class="row align-items-center">
+                    <div class="col-md-6"  style="margin-top: 20px;">
+                        <div class="page-header-title">
+                            <h5 class="m-b-10">Search Case</h5>
+                        </div>                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="card mt-5">
+                <div class="card-body">
+                    <form [formGroup]="form" (ngSubmit)="onSearchClick()">
+                        <div class="row searchbypanel">
+                        <div class="row inner-page mt-4">                           
+                            <div class="col-md-3 col-6 mb-3">
+                                <input class="form-check-input rbserchby" type="radio" value="CaseNumber" name="rbserchby"  formControlName="selectedSearchBy" (change)="onSearchByChange($event)" >
+                                <label for="rbSearchByCaseNumber">  Search by Case Number</label>
+                              </div>                              
+                              <div class="col-md-3 col-6 mb-3">
+                                <input class="form-check-input rbserchby" type="radio" value="FilingNumber" name="rbserchby" id="rbSearchByFilingNumber" formControlName="selectedSearchBy" (change)="onSearchByChange($event)">
+                                <label class="form-check-label" for="rbSearchByFilingNumber">  Search By Filing Number</label>
+                              </div>
+                              <div class="col-md-3 col-6 mb-3">
+                                <input class="form-check-input rbserchby" type="radio" value="PartyName" name="rbserchby" id="rbSearchByPartyName"formControlName="selectedSearchBy" (change)="onSearchByChange($event)">
+                                <label class="form-check-label" for="rbSearchByPartyName">  Search By Party Name</label>
+                              </div>
+                              <div class="col-md-3 col-6 mb-3">
+                                <input class="form-check-input rbserchby" type="radio" value="Act" name="rbserchby" id="rbSearchByAct" formControlName="selectedSearchBy" (change)="onSearchByChange($event)"> 
+                                <label class="form-check-label" for="rbSearchByAct">  Search By Act</label>
+                            </div>
+                        </div>
+
+                        <div id="searchByCaseNumber" class="row searchbypanel" *ngIf="isSearchByCaseNumber()">
+                            <div class="col-md-3  col-12 mb-3">
+                                <label for="courtComplexSearchByCaseNumber" class="form-label">
+                                    Court Complex
+                                </label>
+                                <sup class="text-danger top-0">*</sup>
+                                <select formControlName="CourtComplex" class="form-control form-select"  
+                                    [ngClass]="{ 'is-invalid': isSubmitted && form.get('CourtComplex')?.errors }">
+                                    <option [value]="null">Select</option>
+                                    <option *ngFor="let item of CourtComplex" [value]="item.value">
+                                    {{ item.text }}
+                                    </option>
+                                </select>
+                                    @if (f['CourtComplex'].errors && isSubmitted) {
+                                    <div class="invalid-feedback">
+                                      @if (f['CourtComplex'].errors['required']) {
+                                        <div>Court Complex is required</div>
+                                      }
+                                    </div>
+                                    }                            
+                            </div>
+                            <div class="col-md-3 col-12 mb-3">
+                                <label for="txtFirNumber" class="form-label">
+                                    Case Type
+                                </label>
+                                <sup class="text-danger top-0">*</sup>
+                                <select formControlName="CaseType" data-errormessage-custom-error="" class="form-control form-select"  [ngClass]="{ 'is-invalid': isSubmitted && f['CaseType'].errors }">
+                                    <option [value]="null">Select</option>
+                                    <option *ngFor="let subItem of CaseType" [value]="subItem.value">
+                                      {{ subItem.text }}
+                                    </option>
+                                  </select>       
+                                  @if (f['CaseType'].errors && isSubmitted) {
+                                    <div class="invalid-feedback">
+                                      @if (f['CaseType'].errors['required']) {
+                                        <div>Case Type is required</div>
+                                      }
+                                    </div>
+                                    }                    
+                            </div>
+                            <div class="col-md-3 col-12 mb-3">
+                                <div class="lab-sp">
+                                    <label for="txtFirNumber" class="form-label">
+                                        Case Number
+                                    </label>
+                                    <sup class="text-danger top-0">*</sup>
+                                </div>
+                                <input formControlName="caseNumber"  maxlength="7" tabindex="2"  class="form-control " [ngClass]="{ 'is-invalid': isSubmitted && f['caseNumber'].errors }" />
+                                @if (f['caseNumber'].errors && isSubmitted) {
+                                  <div class="invalid-feedback">
+                                    @if (f['caseNumber'].errors['required'] && isSubmitted) {
+                                      <div>Case Number is required</div>
+                                    }
+                                    @if (f['caseNumber'].errors['pattern']) {
+                                      <div>Invalid Case Number</div>
+                                    }
+                                  </div>
+                              }
+                              </div>
+                            <div class="col-md-3 col-12 mb-3">
+                                <div class="lab-sp">
+                                    <label for="txtFirNumber" class="form-label">
+                                        Year
+                                    </label>
+                                    <sup class="text-danger top-0">*</sup>
+                                </div>
+                                <input type="text" id="txtSearchByCaseNoYear" formControlName="year"  maxlength="7" tabindex="2"  class="form-control " [ngClass]="{ 'is-invalid': isSubmitted && f['year'].errors }"  />
+                                @if (f['year'].errors && isSubmitted) {
+                                  <div class="invalid-feedback">
+                                    @if (f['year'].errors['required'] && isSubmitted) {
+                                      <div>Year is required</div>
+                                    }
+                                    @if (f['year'].errors['pattern']) {
+                                      <div>Invalid Year</div>
+                                    }
+                                  </div>
+                              }
+                              </div>
+                        </div>
+
+                        <div id="searchByFilingNumber" class="row searchbypanel" *ngIf="isSearchFilingNumber()">
+                            <div class="col-md-3 mb-3">
+                                <div class="lab-sp">
+                                    <label for="courtComplexSearchByFilingNumber" class="form-label">
+                                        Court Complex
+                                    </label>
+                                    <sup class="text-danger top-0">*</sup>
+                                </div>
+                                <select formControlName="CourtComplex" data-errormessage-custom-error="" class="form-control form-select"  [ngClass]="{ 'is-invalid': isSubmitted && f['CourtComplex'].errors }" >
+                                    <option [value]="null">Select</option>
+                                    <option *ngFor="let item of CourtComplex" [value]="item.value">
+                                      {{ item.text }}
+                                    </option>
+                                  </select>
+
+                                  @if (f['CourtComplex'].errors && isSubmitted) {
+                                    <div class="invalid-feedback">
+                                      @if (f['CourtComplex'].errors['required']) {
+                                        <div>Court Complex is required</div>
+                                      }
+                                    </div>
+                                    }   
+                            </div>
+    
+                            <div class="col-md-3 mb-3">
+                                <div class="lab-sp">
+                                    <label for="caseTypeFilingNumber" class="form-label">
+                                        Case Type
+                                    </label>
+                                    <sup class="text-danger top-0">*</sup>
+                                </div>
+                                  <select formControlName="CaseType" data-errormessage-custom-error="" class="form-control form-select"  [ngClass]="{ 'is-invalid': isSubmitted && f['CaseType'].errors }">
+                                    <option [value]="null">Select</option>
+                                    <option *ngFor="let subItem of CaseType" [value]="subItem.value">
+                                      {{ subItem.text }}
+                                    </option>
+                                  </select> 
+                                  @if (f['CaseType'].errors && isSubmitted) {
+                                    <div class="invalid-feedback">
+                                      @if (f['CaseType'].errors['required']) {
+                                        <div>Case Type is required</div>
+                                      }
+                                    </div>
+                                    }       
+                            </div>
+    
+                            <div class="col-md-3 mb-3">
+                                <div class="lab-sp">
+                                    <label for="txtFirNumber" class="form-label">
+                                        Filing Number
+                                    </label>
+                                    <sup class="text-danger top-0">*</sup>
+                                </div>
+                                <input type="text" formControlName="caseNumber"  maxlength="7" tabindex="2"  class="form-control " [ngClass]="{ 'is-invalid': isSubmitted && f['caseNumber'].errors }" />
+                                @if (f['caseNumber'].errors && isSubmitted) {
+                                  <div class="invalid-feedback">
+                                    @if (f['caseNumber'].errors['required']) {
+                                      <div>Filing Number is required</div>
+                                    }
+                                  </div>
+                                  }
+                              </div>
+    
+                            <div class="col-md-3 mb-3">
+                                <div class="lab-sp">
+                                    <label for="txtFilingNumberYear" class="form-label">
+                                        Year
+                                    </label>
+                                    <sup class="text-danger top-0">*</sup>
+                                </div>
+                                <input type="text" formControlName="year"  maxlength="7" tabindex="2"  class="form-control " [ngClass]="{ 'is-invalid': isSubmitted && f['year'].errors }"/>
+                                @if (f['year'].errors && isSubmitted) {
+                                  <div class="invalid-feedback">
+                                    @if (f['year'].errors['required']) {
+                                      <div>Year is required</div>
+                                    }
+                                  </div>
+                                  }
+                              </div>
+                        </div>
+
+                        <div id="searchByAct" class="row searchbypanel" *ngIf="isSearchByAct()">
+                            <div class="col-md-3 mb-3">
+                                <div class="lab-sp">
+                                    <label for="courtComplexSearchByAct" class="form-label">
+                                        Court Complex
+                                    </label>
+                                    <sup class="text-danger top-0">*</sup>
+                                </div>
+                                <select formControlName="CourtComplex" data-errormessage-custom-error="" class="form-control form-select"  [ngClass]="{ 'is-invalid': isSubmitted && f['CourtComplex'].errors }" >
+                                    <option [value]="null">Select</option>
+                                    <option *ngFor="let item of CourtComplex" [value]="item.value">
+                                      {{ item.text }}
+                                    </option>
+                                  </select>
+                                  @if (f['CourtComplex'].errors && isSubmitted) {
+                                    <div class="invalid-feedback">
+                                      @if (f['CourtComplex'].errors['required']) {
+                                        <div>Court Complex is required</div>
+                                      }
+                                    </div>
+                                    }   
+                            </div>
+    
+                            <div class="col-md-3 mb-3">
+                                <div class="lab-sp">
+                                    <label for="caseTypeFilingNumber" class="form-label">
+                                        Case Status
+                                    </label>
+                                    <sup class="text-danger top-0">*</sup>
+                                </div>
+                                <select formControlName="CaseStatus" data-errormessage-custom-error="" class="form-control form-select" [ngClass]="{ 'is-invalid': isSubmitted && f['CaseStatus'].errors }">
+                                    <option [value]="null">Select</option>
+                                    <option *ngFor="let item of CaseStatus" [value]="item.value">
+                                      {{ item.text }}
+                                    </option>
+                                  </select>
+                                  @if (f['CaseStatus'].errors && isSubmitted) {
+                                    <div class="invalid-feedback">
+                                      @if (f['CaseStatus'].errors['required']) {
+                                        <div>Act is required</div>
+                                      }
+                                    </div>
+                                    }
+                                     
+                            </div>
+    
+                            <div class="col-md-3 mb-3">
+                                <div class="lab-sp">
+                                    <label for="caseTypeFilingNumber" class="form-label">
+                                        Act
+                                    </label>
+                                    <sup class="text-danger top-0">*</sup>
+                                </div>
+                                <select formControlName="Act" data-errormessage-custom-error="" class="form-control form-select" [ngClass]="{ 'is-invalid': isSubmitted && f['Act'].errors }">
+                                    <option [value]="null">Select</option>
+                                    <option *ngFor="let item of Act" [value]="item.value" class="wrap-option" [title]="item.text">
+                                        {{ item.text }}
+                                      </option>
+                                  </select>
+                                  @if (f['Act'].errors && isSubmitted) {
+                                    <div class="invalid-feedback">
+                                      @if (f['Act'].errors['required']) {
+                                        <div>Act is required</div>
+                                      }
+                                    </div>
+                                    } 
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="lab-sp">
+                                    <label for="txtFilingNumberYear" class="form-label">
+                                        Year
+                                    </label>
+                                    <sup class="text-danger top-0">*</sup>
+                                </div>
+                                <input [(ngModel)]="year" type="text" id="txtActYear" class="form-control validate[required, funcCall[InvalidYear[]]]" />
+                            </div>
+                        </div>
+
+                        <div id="searchByPartyName" class="row searchbypanel" *ngIf="isSearchByPartyName()">
+                            <div class="col-md-3 mb-3">
+                                <div class="lab-sp">
+                                    <label for="courtComplexSearchByParty" class="form-label">
+                                        Court Complex
+                                    </label>
+                                    <sup class="text-danger top-0">*</sup>
+                                </div>
+                                <select formControlName="CourtComplex" data-errormessage-custom-error="" class="form-control form-select"  [ngClass]="{ 'is-invalid': isSubmitted && f['CourtComplex'].errors }" >
+                                    <option [value]="null">Select</option>
+                                    <option *ngFor="let item of CourtComplex" [value]="item.value">
+                                      {{ item.text }}
+                                    </option>
+                                  </select>
+                                  @if (f['CourtComplex'].errors && isSubmitted) {
+                                    <div class="invalid-feedback">
+                                      @if (f['CourtComplex'].errors['required']) {
+                                        <div>Court Complex is required</div>
+                                      }
+                                    </div>
+                                    }   
+                            </div>
+    
+                            <div class="col-md-3 mb-3">
+                                <div class="lab-sp">
+                                    <label for="caseStatusParty" class="form-label">
+                                        Case Status
+                                    </label>
+                                    <sup class="text-danger top-0">*</sup>
+                                </div>
+                                <select formControlName="CaseStatus" data-errormessage-custom-error="" class="form-control form-select"  [ngClass]="{ 'is-invalid': isSubmitted && f['CaseStatus'].errors }">
+                                    <option [value]="null">Select</option>
+                                    <option *ngFor="let item of CaseStatus" [value]="item.value">
+                                      {{ item.text }}
+                                    </option>
+                                </select>    
+                                @if (f['CaseStatus'].errors && isSubmitted) {
+                                  <div class="invalid-feedback">
+                                    @if (f['CaseStatus'].errors['required']) {
+                                      <div>Case Status is required</div>
+                                    }
+                                  </div>
+                                  }   
+                            </div>
+    
+                            <div class="col-md-3 mb-3">
+                                <div class="lab-sp">
+                                    <label for="txtFilingNumberYear" class="form-label">
+                                        Petitioner/Respondent
+                                    </label>
+                                    <sup class="text-danger top-0">*</sup>
+                                </div>
+                                <input type="text" [(ngModel)]="caseNumber" class="form-control validate[required, minSize[3], maxSize[99]]]" />
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="lab-sp">
+                                    <label for="txtFilingNumberYear" class="form-label">
+                                        Year
+                                    </label>
+                                    <sup class="text-danger top-0">*</sup>
+                                </div>
+                                <input [(ngModel)]="year" type="text" id="txtPartyYear" class="form-control validate[required, funcCall[InvalidYear[]]]" />
+                            </div>
+                        </div>
+    
+
+                        </div>
+                        <div class="row">
+                        <div class="col-md-12 text-right">
+                            <button type="button" id="btnSearchCases" (click)="onSearchClick();" class="btn btn-success">
+                               Search
+                            </button>
+                        </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            </div>
+
+            <div class="row"  [ngClass]="{'hidden-div': !isDivVisible}">
+                <div class="row mt-4">
+                    <div class="col-sm-12 p-0" >                       
+                                <div class="card">                                    
+                                    <div class="card-body pb-0 pt-3">
+                                        <div class="row mb-3 align-items-center">
+                                          <!-- Text Column -->
+                                          <div class="col-md-10">                                           
+                                            <span class="d-inline-block form-check-label" *ngIf="selectedSearchBy === 'CaseNumber'">Search Result for Case Number : {{ caseNumber }}/{{ year }}</span>
+                                            <span class="d-inline-block form-check-label" *ngIf="selectedSearchBy === 'FilingNumber'">Search Result for Filing Number : {{ caseNumber }}/{{ year }}</span>
+                                            <span class="d-inline-block form-check-label" *ngIf="selectedSearchBy === 'Act'">Search Result for Act : {{ selectedActItem }}</span>
+                                            <span class="d-inline-block form-check-label" *ngIf="selectedSearchBy === 'PartyName'">Search Result for Party Name : {{ caseNumber }}</span>                                          
+                                          </div>
+                                          <!-- Input Field -->
+                                          <div class="col-md-2">
+                                            <input 
+                                              type="text" 
+                                              class="form-control" 
+                                              placeholder="Search..." 
+                                              (input)="onQuickFilter($event)" 
+                                              style="max-width: 300px;"
+                                            />
+                                          </div>
+                                        </div>
+                                        <div class="row">
+                                          <div class="col-sm-12 p-0">
+                                            <ag-grid-angular
+                                              style="width: 100%; height: 550px;"
+                                              class="ag-theme-alpine"
+                                              [rowData]="SearchCasesData"
+                                              [columnDefs]="columnDefs"
+                                              [gridOptions]="gridOptions"
+                                              (gridReady)="onGridReady($event)">
+                                            </ag-grid-angular>
+                                          </div>
+                                        </div>
+                                      </div>
+                                </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- your-component.component.html -->
+<!-- <div class="modal" id="cnrModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Case Details</h5>
+          <button type="button" class="close" aria-label="Close" (click)="closeModal()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Case details for CNR: {{ selectedCNR }}</p>
+          
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+    </div>
+</div> -->
+<style>
+.wrap-option {
+  white-space: normal;
+  word-wrap: break-word;
+  display: block; 
+  max-width: 100%;
+}
+
+.select-container {
+  max-width: 300px;
+}
+
+select {
+  width: 100%;
+}
+select option {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hidden-div {
+  display: none;
+}
+</style>
+

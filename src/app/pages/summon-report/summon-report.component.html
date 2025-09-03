@@ -1,0 +1,520 @@
+<div class="pc-container"> 
+  <div class="pcoded-content pb" style="padding-bottom:80px;">
+    <div class="page-header">
+      <div class="page-block">
+        <div class="row align-items-center">
+          <div class="col-md-6" style="margin-top: 20px;">
+            <div class="page-header-title">
+              <h5 class="m-b-10">Summon Report</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Criteria Form -->
+    <div class="row">
+      <div class="col-sm-12 px-0">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Search Criteria</h5>
+            <form [formGroup]="form" (ngSubmit)="onSubmit()">
+              <div class="row">
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label for="fromDate">From Date</label>
+                    <input type="date" class="form-control" id="fromDate" formControlName="fromDate" />
+                    <div *ngIf="f['fromDate'].invalid && isSubmitted" class="text-danger">
+                      From Date is required.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label for="toDate">To Date</label>
+                    <input type="date" class="form-control" id="toDate" formControlName="toDate" />
+                    <div *ngIf="f['toDate'].invalid && isSubmitted" class="text-danger">
+                      To Date is required.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label for="summonType">Summon Type</label>
+                    <select id="summonType" formControlName="summonType" class="form-control form-select">
+                      <option value="2">Un-Assign</option>
+                      <option value="1">ALL</option>
+                      <option value="3">Re-Assign</option>
+                      <option value="4">Served</option>
+                      <option value="5">Not Related to PO/Summon Branch</option>
+                    </select>
+                    <div *ngIf="f['summonType'].invalid && isSubmitted" class="text-danger">
+                      Summon Type is required.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label for="process_id">Process ID</label>
+                    <input type="text" class="form-control" id="process_id" formControlName="process_id" placeholder="Enter Process ID" />
+                  </div>
+                </div>
+
+             
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label for="ci_no">CI No</label>
+                    <input type="text" class="form-control" id="ci_no" formControlName="ci_no" placeholder="Enter CI No" />
+                  </div>
+                </div>
+
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label for="fir_no">FIR No</label>
+                    <input type="text" class="form-control" id="fir_no" formControlName="fir_no" placeholder="Enter FIR No" />
+                  </div>
+                </div>
+
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label for="year_no">Year No</label>
+                    <input type="text" class="form-control" id="year_no" formControlName="year_no" placeholder="Enter Year No" />
+                  </div>
+                </div>
+
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label for="name_address">Name / Address</label>
+                    <input type="text" class="form-control" id="name_address" formControlName="name_address" placeholder="Enter Name or Address" />
+                  </div>
+                </div>
+
+                <div class="col-md-3 col-12 mb-3 pt-4 mt-1">
+                  <button type="submit" class="btn btn-success text-white py-1" [disabled]="!form.valid">Search</button>
+                  <button type="button" class="btn btn-secondary text-white py-1 ml-2" (click)="onReset()">Reset</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  <div class="card-view row justify-content-around">
+    <!-- Card for Total Record -->
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-body d-flex flex-column justify-content-center">
+          <h5 class="card-title text-center md-text text-primary" style="font-size: 24px;">Total Summons</h5>
+          <p class="card-text text-center md-text text-primary" style="font-size: 20px;">
+            {{ totalSummonsCount }}
+          </p>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Card for Pending Record -->
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-body d-flex flex-column justify-content-center">
+          <h5 class="card-title text-center md-text text-primary" style="font-size: 24px;">Unassigned</h5>
+          <p class="card-text text-center md-text text-primary" style="font-size: 20px;">
+            {{ unAssignedCount }}
+          </p>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Card for Served Record -->
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-body d-flex flex-column justify-content-center">
+          <h5 class="card-title text-center md-text text-primary" style="font-size: 24px;">Served</h5>
+          <p class="card-text text-center md-text text-primary" style="font-size: 20px;">
+            {{ servedCount }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+
+    <!-- Data Table -->
+    <div class="row mt-12" *ngIf="isGridVisible">
+      <div class="col-md-12">
+        <div class="card" style="font-size: 1.75rem;">
+          <div class="card-body">
+    
+            <!-- Keep the Search Panel Visible -->
+            <div class="row mb-1">
+              <div class="col-md-6 offset-md-6 d-flex justify-content-end mb-3">
+                <input #searchInput type="text" class="form-control" placeholder="Search..." (input)="onQuickFilter($event)" style="max-width: 300px;">
+              </div>
+            </div>
+    
+            <!-- Table Header (Always Visible) -->
+            <div class="row">
+              <div class="col-md-12">
+                <p-table [value]="SummonReports" 
+                         [paginator]="true" 
+                         [rows]="rowsPerPage" 
+                         [totalRecords]="totalRecords" 
+                         [loading]="loading" 
+                         [rowsPerPageOptions]="[10, 20, 50]" 
+                         [lazy]="true" 
+                         (onLazyLoad)="PaginationSummonReport($event)" 
+                         [responsive]="true">
+    
+                  <!-- Table Header -->
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th>S. No.</th>
+                      <th>Summon ID</th>
+                      <th>Issued Date</th>
+                      <th>Next Hearing Date</th>
+                      <th>Act Section / FIR No / FIR Year</th>
+                      <th>Name / Address</th>
+                      <th>Purpose / Case Type / Summons Name</th>
+                      <th>Police Station Name</th>
+                      <th>Assign Name</th>
+                      <th>Summon Status / Execution Date</th>
+                      <th>Actions</th>
+                    </tr>
+                  </ng-template>
+    
+                  <!-- Table Body (Conditional Rendering) -->
+                  <ng-template pTemplate="body" let-rowData let-i="rowIndex">
+                    <tr *ngIf="SummonReports.length > 0; else noRecordsTemplate">
+                      <td>{{ (currentPage - 1) * rowsPerPage + i + 1 }}</td>
+                      <td>{{ rowData.process_id }}</td>
+                      <td>{{ rowData.serve_date | date: 'dd MMM yyyy' }}</td>
+                      <td>{{ rowData.next_date | date: 'dd MMM yyyy' }}</td>
+                      <td>
+                        Act Section: {{ rowData.act_section }} <br>
+                        Fir No: {{ rowData.fir_no }} <br>
+                        Fir Year: {{ rowData.fir_year }}
+                      </td>
+                      <td>{{ rowData.addressee_name }} <br> {{ rowData.address }}</td>
+                      <td>{{ rowData.purpose }} / {{ rowData.case_type }} / {{ rowData.summons_name }}</td>
+                      <td>{{ rowData.police_station_name }}</td>
+                      <td>{{ rowData.assignName || 'N/A' }}</td>
+                      <td>{{ rowData.summonStatus }} <br> {{ rowData.assign_on | date: 'dd MMM yyyy' }}</td>
+
+                      <td>
+                        <div class="button-group">
+                          
+                          <!-- PDF Download button -->
+                          <button *ngIf="rowData.process_id" class="btn btn-danger btn-sm" (click)="DownloadPDF(rowData.process_id)" title="Download PDF">
+                            <i class="fa fa-file-pdf-o"></i>
+                          </button>
+                      
+                          <!-- Show More button -->
+                          <button *ngIf="rowData.cino" class="btn btn-warning btn-sm" (click)="ShowDetailsModal(rowData)" title="Show More">
+                            <i class="fa fa-info-circle"></i>
+                          </button>
+                      
+                          <!-- Action button for Unassigned Summon -->  
+                          <button *ngIf="rowData.summon_assign_id === null && rowData.summonStatus === 'Pending'" class="btn btn-info btn-sm" (click)="openCombinedModal(rowData.process_id, rowData)" title="Action">
+                            <i class="fa fa-user-plus"></i>
+                          </button>
+                      
+                          <!-- Re-Assign button for Pending Summon that is already assigned -->
+                          <button *ngIf="rowData.summon_assign_id !== null && rowData.summonStatus === 'Pending'" class="btn btn-info btn-sm" (click)="openCombinedModal(rowData.process_id, rowData)" title="Re-Assign">
+                            <i class="fa fa-pencil-square-o"></i>
+                          </button>
+                      
+                          <!-- Disabled Action button for Executed Summon -->
+                          <button *ngIf="rowData.summon_assign_id !== null && rowData.summonStatus !== 'Pending'" class="btn btn-info btn-sm" disabled title="Assigned">
+                            <i class="fa fa-user"></i>
+                          </button>
+                        </div>
+                      </td>
+                      
+
+                    </tr>
+                  </ng-template>
+    
+                  <!-- No Records Template -->
+                  <ng-template #noRecordsTemplate>
+                    <tr>
+                      <td colspan="11" class="text-center">
+                        No records found
+                      </td>
+                    </tr>
+                  </ng-template>
+    
+                  <!-- Paginator Info -->
+                  <ng-template pTemplate="paginatorleft">
+                    <div>
+                      Showing {{ (currentPage - 1) * rowsPerPage + 1 }} to {{ (currentPage * rowsPerPage) > totalRecords ? totalRecords : (currentPage * rowsPerPage) }} of {{ totalRecords }} records
+                    </div>
+                  </ng-template>
+                </p-table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- ng-template for the modal -->
+  <ng-template #detailModal let-modal>
+    <div class="modal fade" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Summon Details</h5>
+            <button type="button" class="btn-close" aria-label="Close" (click)="closeModal()"></button>
+          </div>
+          <div class="modal-body">
+            <div class="container">
+              <div class="row">
+                <div class="col-sm-4">
+                  <p><strong>Process ID:</strong> {{ selectedRowData?.process_id }}</p>
+                </div>
+                <div class="col-sm-4">
+                  <p><strong>CNR No:</strong> {{ selectedRowData?.cino }}</p>
+                </div>
+                <div class="col-sm-4">
+                  <p><strong>Fir/Year No:</strong> {{ selectedRowData?.fir_no }} / {{ selectedRowData?.fir_year }}</p>
+                </div>
+              </div>
+              <hr />
+              <div class="row">
+                <div class="col-sm-4">
+                  <p><strong>Summons Issued To:</strong> {{ selectedRowData?.addressee_name }}</p>
+                </div>
+                <div class="col-sm-4">
+                  <p><strong>Type:</strong> {{ selectedRowData?.addressee_type }}</p>
+                </div>
+                <div class="col-sm-4">
+                  <p><strong>Address:</strong> {{ selectedRowData?.address }}</p>
+                </div>
+              </div>
+              <hr />
+              <div class="row">
+                <div class="col-sm-4">
+                  <p><strong>Issued Date:</strong> {{ selectedRowData?.serve_date | date: 'dd MMM yyyy' }}</p>
+                </div>
+                <div class="col-sm-4">
+                  <p><strong>Next Hearing Date:</strong> {{ selectedRowData?.next_date | date: 'dd MMM yyyy' }}</p>
+                </div>
+                <div class="col-sm-4">
+                  <p><strong>Police Station:</strong> {{ selectedRowData?.police_station_name }}</p>
+                </div>
+              </div>
+              <hr />
+              <div class="row">
+                <div class="col-sm-4">
+                  <p><strong>Summon Name:</strong> {{ selectedRowData?.summons_name }}</p>
+                </div>
+                <div class="col-sm-4">
+                  <p><strong>Purpose:</strong> {{ selectedRowData?.purpose }}</p>
+                </div>
+                <div class="col-sm-4">
+                  <p><strong>Act/Section:</strong> {{ selectedRowData?.act_section }}</p>
+                </div>
+              </div>
+              <hr />
+              <div class="row" *ngIf="selectedRowData?.delivered_on">
+                <div class="col-sm-4">
+                  <p><strong>Execution Date:</strong> {{ selectedRowData?.delivered_on }}</p>
+                </div>
+                <div class="col-sm-4">
+                  <p><strong>Summon Status:</strong> {{ selectedRowData?.summonStatus }}</p>
+                </div>
+                <div class="col-sm-4">
+                  <p><strong>Category:</strong> {{ selectedRowData?.SummonCategory }}</p>
+                </div>
+              </div>
+              <hr />
+              <div class="row">
+                <div class="col-sm-12">
+                  <p><strong>Petitioner:</strong> {{ selectedRowData?.pet_name }} <br> <strong>Respondent:</strong> {{ selectedRowData?.res_name }}</p>
+                </div>
+              </div>
+              <!-- <div class="row mt-3" *ngIf="selectedRowData?.imageUrl">
+                <div class="col-sm-12 text-left">
+                  <strong>Image:</strong>
+                  <img [src]="selectedRowData?.imageUrl" alt="Summon Image" class="img-fluid" style="height: 100%; width: 100%; object-fit: contain;">
+                </div>
+              </div> -->
+              <div class="row mt-3" *ngIf="imageData">
+                <div class="col-sm-12 text-left">
+                  <strong>Image:</strong>
+                  <img [src]="'data:image/jpeg;base64,' + imageData" alt="Summon Image" class="img-fluid" style="height: 100%; width: 100%; object-fit: contain;">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeModal()">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template> 
+
+
+<!-- Combined Modal -->
+<ng-template #combinedModal let-modal>
+  <div class="modal-dialog modal-fullscreen w-75 mx-auto">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="combinedModalLabel">Combined Summon Action</h5>
+        <button type="button" class="btn-close" (click)="closeCombinedModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-8">
+           
+              <embed [src]="pdfViewerUrl" type="application/pdf" width="100%" height="1000px">
+
+          </div>
+          <div class="col-md-4">
+            <ul class="nav nav-tabs" id="combinedModalTab" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="assign-tab" (click)="selectTab('assign-tab-pane')" type="button" role="tab">Assign Summon</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <!-- <button class="nav-link" id="serve-tab" (click)="selectTab('serve-tab-pane')" type="button" role="tab">Serve</button> -->
+                <button class="nav-link" id="serve-tab" (click)="selectTab('serve-tab-pane')" type="button" role="tab" [disabled]="serveTabDisabled">Serve</button>
+              </li>
+            </ul>
+            <div class="tab-content" id="combinedModalTabContent">
+            
+              <div class="tab-pane fade show active" id="assign-tab-pane">
+                <h4 class="modal-title">{{ selectedRowData?.AssignName }}</h4>
+
+                <!-- Conditionally show "Present Summon User" text -->
+                <div *ngIf="showSummonUserTo" id="SummonUserTo">
+                  {{ presentSummonUserText }}
+                </div>
+
+                <div class="mb-3">
+                  <label for="assignUserList" class="form-label">Assign to User <sup class="text-danger">*</sup></label>
+                  <select class="form-select" [(ngModel)]="assignUser" id="assignUserList">
+                    <option *ngFor="let user of assignUserList" [value]="user.PIS_CODE">{{ user.PERSON_FULL_NAME }}</option>
+                  </select>
+                </div>
+
+                <!-- Conditionally show/hide the Locality div -->
+                <div *ngIf="showLocalityDiv" id="reasonForLocalityDiv">
+                  <label for="ddlLocalityList" class="form-label">Locality <sup class="text-danger">*</sup></label>
+                  <select class="form-select" [(ngModel)]="locality" id="ddlLocalityList">
+                    <option value="0">Select the Locality</option>
+                    <option value="Local">Local</option>
+                    <option value="TriCity">Tri City</option>
+                    <option value="OutSide">Out Side</option>
+                  </select>
+                </div>
+
+
+                <!-- Conditionally show/hide the Judge Name div -->
+                <div *ngIf="showJudgeDiv" id="reasonForJudgeDiv">
+                  <label for="ddlJudgeNameList" class="form-label">Judge Name <sup class="text-danger">*</sup></label>
+                  <select class="form-select" [(ngModel)]="judgeName" id="ddlJudgeNameList">
+                    <option *ngFor="let judge of judgeList" [value]="judge">{{ judge }}</option>
+                  </select>
+                </div>
+
+
+                <!-- Conditionally show/hide the Reassign Reason div -->
+                <div *ngIf="showReassignReasonDiv" id="reasonForReassignDiv">
+                  <label for="reasonForReassign" class="form-label">Reason for Re-assign <sup class="text-danger">*</sup></label>
+                  <select class="form-select" [(ngModel)]="reassignReason" id="reasonForReassign">
+                    <option *ngFor="let reason of reassignReasons" [value]="reason.Id">{{ reason.SummonServedType }}</option>
+                  </select>
+                </div>
+                
+                <input type="hidden" id="AssignDataId" [value]="assignDataId" />
+              </div>
+
+           
+              <div class="tab-pane fade" id="serve-tab-pane">
+
+                <div class="mb-3">
+                  <label for="actionDropdown" class="form-label">Action</label>
+                  <select class="form-select" [(ngModel)]="actionId" id="actionDropdown" (change)="loadSummonServeReasonsData(actionId)">
+                    <option [value]="0" selected>Choose...</option>
+                    <option *ngFor="let action of actions" [value]="action.id">{{ action.summonCategory }}</option>
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label for="reasonDropdown" class="form-label">Reason</label>
+                  <select class="form-select" [(ngModel)]="selectedReasonId" id="reasonDropdown" (change)="onReasonChange($event)">
+                    <option selected>Choose...</option>
+                    <option *ngFor="let reason of reasons" [value]="reason.id">{{ reason.summonServedType }}</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="remarksTextarea" class="form-label">Remarks</label>
+                  <textarea class="form-control" [(ngModel)]="remarks" id="remarksTextarea" rows="3"></textarea>
+                </div>
+       
+              
+                <div class="mb-3" *ngIf="isServePersonVisible && actionId !== 3">
+                  <label for="servePersonEmail" class="form-label">Email</label>
+                  <input type="email" class="form-control" [(ngModel)]="servePersonEmail" id="servePersonEmail">
+                </div>
+                
+                
+
+                <div class="mb-3" *ngIf="isServePersonVisible && actionId !== 3">
+                  <label for="servePersonName" class="form-label">Serve To</label>
+                  <input type="text" class="form-control" [(ngModel)]="servePersonName" id="servePersonName">
+                </div>
+                <div class="mb-3" *ngIf="isServePersonVisible && actionId !== 3">
+                  <label for="servePersonRelation" class="form-label">Relation</label>
+                  <input type="text" class="form-control" [(ngModel)]="servePersonRelation" id="servePersonRelation">
+                </div>
+                <div class="mb-3" *ngIf="isServePersonVisible && actionId !== 3">
+                  <label for="servePersonAddress" class="form-label">Address</label>
+                  <input type="text" class="form-control" [(ngModel)]="servePersonAddress" id="servePersonAddress">
+                </div>
+                <div class="mb-3" *ngIf="isServePersonVisible && actionId !== 3">
+                  <label for="servePersonMobile" class="form-label">Mobile Number</label>
+                  <input type="text" class="form-control" [(ngModel)]="servePersonMobile" id="servePersonMobile">
+                </div>
+                
+                
+
+                <div class="mb-3">
+                  <label for="dateInput" class="form-label">Date</label>
+                  <input type="date" class="form-control" [(ngModel)]="serveDate" id="dateInput" readonly>
+                </div>
+                <div class="mb-3">
+                  <label for="uploadImage" class="form-label">Upload Image</label>
+                  <input type="file" class="form-control" (change)="onFileSelect($event)" id="uploadImage">
+                </div>
+                <input type="hidden" id="processIdInput" [(ngModel)]="processId">
+                <input type="hidden" id="cinoInput" [(ngModel)]="cino">
+                <input type="hidden" id="case_status" [(ngModel)]="caseStatus">
+                <input type="hidden" id="police_station_cd" [(ngModel)]="policeStationCd">
+                <input type="hidden" id="police_station_name" [(ngModel)]="policeStationName">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeCombinedModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="handleSubmit()">Submit</button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+
+
+
+  </div>
+</div>

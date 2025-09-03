@@ -1,0 +1,258 @@
+import { Component } from '@angular/core';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AuthService } from '../services/auth.service';
+import { UtilityService } from '../services/utility.service';
+import { ActsearchService } from '../services/actsearch.service';
+import { ReportAuthorizationService } from '../services/report-authorization.service';
+import Swal from 'sweetalert2';
+export interface DropdownOption {
+  value: number;
+  text: string;
+}
+
+@Component({
+  selector: 'app-user-registrationfor-report-authencation',
+  templateUrl: './user-registrationfor-report-authencation.component.html',
+  styleUrls: ['./user-registrationfor-report-authencation.component.css']
+})
+export class UserRegistrationforReportAuthencationComponent {
+  isLoaded = false;
+  isSubmitted = false;
+  firdata: any = [];
+  form!: FormGroup;
+  nameQuery: string = '';
+  nameSuggestions: any[] = [];
+  policestations: any[] = [];
+  ListDistict: any[] = [];
+  errorMessage: string = '';
+  settings = {};
+  selectedPerson: any;
+  states: any[] = [];
+  isOtpButton: boolean = false;
+  selectedStateCode: number = 0;
+  selectedType: 'state' | 'district' | 'police' = 'state';
+  suggestions: string[] = []
+  moduleAssignList: any[] = [];
+  Name: string = '';
+  constructor(
+    private formBuilder: FormBuilder,
+    private authService: AuthService,
+    private utilityService: UtilityService,
+    private apiservice: ActsearchService,
+    private ReportAuthorizationService: ReportAuthorizationService
+  ) { }
+  ListReport: DropdownOption[] = [
+    { value: 1, text: 'FSL' },
+    { value: 2, text: 'Prosecution' },
+    { value: 3, text: 'eSakshaya' },
+    { value: 4, text: 'Medleapr' }
+  ];
+
+
+  UserType: DropdownOption[] = [
+    { value: 1, text: 'Admin' },
+    { value: 2, text: 'Normal' }   
+  ];
+
+  ngOnInit(): void {
+    this.form = this.formBuilder.group({
+      searchType: ['state'],
+      districtCodes: [null],
+      PsCodes: [null],
+      Name: ['', [Validators.required, Validators.minLength(2)]],
+      state: ['', Validators.required],
+      ReportName: [[], Validators.required],
+    });
+
+    this.BindDistricts();
+    this.settings = {
+      singleSelection: false,
+      idField: 'value',
+      textField: 'text',
+      allowSearchFilter: true,
+      maxHeight: 200
+    };
+
+    const stateCode = localStorage.getItem('stateCode') ?? '';
+
+    this.authService.getStates().subscribe((data: any[]) => {
+      this.states = data.filter(state => state.StateCode === stateCode);
+    });
+    this.form.get('Name')?.valueChanges.subscribe(val => {
+      if (!val) {
+        this.suggestions = [];
+      }
+    });
+
+    this.form.get('searchType')?.valueChanges.subscribe(type => {
+      this.updateValidators(type);
+    });
+
+    this.updateValidators(this.form.get('searchType')?.value);
+  }
+  updateValidators(searchType: string): void {
+    this.form.get('state')?.setValidators(Validators.required);
+    this.form.get('districtCodes')?.reset();
+    this.form.get('PsCodes')?.reset();
+    this.form.get('districtCodes')?.clearValidators();
+    this.form.get('PsCodes')?.clearValidators();
+    if (searchType === 'district') {
+      this.form.get('districtCodes')?.setValidators(Validators.required);
+    } else if (searchType === 'police') {
+      this.form.get('districtCodes')?.setValidators(Validators.required);
+      this.form.get('PsCodes')?.setValidators(Validators.required);
+    }
+    this.form.get('state')?.updateValueAndValidity();
+    this.form.get('districtCodes')?.updateValueAndValidity();
+    this.form.get('PsCodes')?.updateValueAndValidity();
+  }
+
+  get f(): { [key: string]: AbstractControl } {
+    return this.form.controls;
+  }
+
+  onMobileInput(event: any): void {
+    const input = event.target.value.replace(/[^0-9]/g, '');
+    this.form.get('MobileNumber')?.setValue(input, { emitEvent: false });
+  }
+
+  onSubmit(): void {
+    this.isSubmitted = true;
+
+    const formData = this.form.value;
+    const requestPayload = {
+      Mobile: String(formData.Name?.MOBILE_1 ?? ''),
+      State: formData.state,
+      DistrictCodes: (formData.districtCodes || []).map((d: any) => +d.value),
+      PsCodes: (formData.PsCodes || []).map((p: any) => +p.value),
+      ReportNames: [],
+    };
+    this.ReportAuthorizationService.ModuleAssign(requestPayload).subscribe({
+      next: (response) => {
+        if (response.isSuccess) {
+          Swal.fire({
+            position: 'top-end',
+            title: response.message,
+
+            showConfirmButton: false,
+            timer: 2000,
+            customClass: {
+              popup: 'custom-alert',
+              title: 'custom-title',
+            },
+            background: '#006400',
+
+          });
+        } else {
+          alert('Failed: ' + response.message);
+        }
+        this.loadModuleAssignData(String(formData.Name?.MOBILE_1));
+      },
+      error: (err) => {
+        const errorMessage =
+          err?.error?.message ||
+          err?.message ||
+          JSON.stringify(err);
+      }
+    });
+  }
+  BindDistricts(): void {
+    this.apiservice.LoadDistricts().subscribe({
+      next: (response) => {
+        if (response.isSuccess && response.data && response.data.length > 0) {
+          this.ListDistict = response.data;
+          this.errorMessage = '';
+        } else {
+          this.errorMessage = 'No data available .';
+          this.ListDistict = [];
+        }
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to load data from the server. Please try again later.';
+        this.ListDistict = [];
+      },
+    });
+  }
+  onDistrictDropdownChange(event: any): void {
+    const formValues = this.form.getRawValue();
+    if (Array.isArray(formValues.districtCodes)) {
+      const districtCodes = formValues.districtCodes.map((item: { value: any; }) => parseInt(item.value));
+      this.apiservice.LoadPoliceStations(districtCodes).subscribe((data: any) => {
+        if (data.isSuccess) {
+          this.policestations = data.data;
+        }
+      });
+    } else {
+      console.error('districtCodes is not an array');
+    }
+
+  }
+
+  onpolicestationsDropdownChange(event: any): void {
+    if (this.form) {
+      const formValues = this.form.getRawValue();
+      if (Array.isArray(formValues.PsCds)) {
+        const policestationsCodes = formValues.PsCds.map((item: { value: any; }) => parseInt(item.value));
+      } else {
+        console.error('PsCds is not an array');
+      }
+    } else {
+      console.error('Form is not initialized');
+    }
+  }
+
+  moduleAssignColumns: any[] = [];
+
+  loadModuleAssignData($event: any): void {
+    const formData = this.form.value;
+    const mobileNumber = String(formData.Name?.MOBILE_1);
+    this.Name = String(formData.Name?.FullName);
+
+    this.ReportAuthorizationService.getModuleAssignList(mobileNumber).subscribe({
+      next: (res) => {
+        if (res.isSuccess) {
+          this.moduleAssignList = res.data;
+          if (this.moduleAssignList.length > 0) {
+            this.moduleAssignColumns = Object.keys(this.moduleAssignList[0]).map(key => ({
+              field: key,
+              header: this.formatHeader(key)
+            }));
+          }
+        } else {
+          this.moduleAssignList = [];
+        }
+      },
+      error: (err) => {
+        const errorMessage =
+          err?.error?.message || err?.message || JSON.stringify(err);
+        alert('Failed: ' + errorMessage);
+        this.moduleAssignList = [];
+      }
+    });
+  }
+  formatHeader(key: string): string {
+    return key.replace(/_/g, ' ')
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .toUpperCase();
+  }
+
+
+  getBrands($event: any) {
+    this.authService.SearchByName($event.query).subscribe({
+      next: (response: any) => {
+        if (JSON.parse(response.data).length != 0) {
+          const data = JSON.parse(response.data);
+          const result = data.map((person: any) => ({
+            MOBILE_1: person.MOBILE_1,
+            FullName: person.FullName
+          }));
+          this.suggestions = Array.from(result);
+        }
+        else {
+          this.suggestions = [];
+          //this.loaderService.hide();
+        }
+      }
+    });
+  }
+}

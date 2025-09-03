@@ -1,0 +1,21 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class FslReportServiceService    {
+ private GetPoliceStationApiUrl: string = `${environment.apiUrl}/Public/GetPoliceStationList`;
+
+  constructor(private http: HttpClient) {}
+
+  getFslReports(requestPayload: any): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/FSLReport/get-fsl-reports`, requestPayload);
+  }
+  LoadPoliceStations(distcodes: number[]): Observable<any[]> {
+    return this.http.post<any[]>(`${this.GetPoliceStationApiUrl}`, {districts:distcodes});
+  }
+}
+   

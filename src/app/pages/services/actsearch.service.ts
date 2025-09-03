@@ -1,0 +1,49 @@
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
+import { Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ActsearchService {
+
+  constructor(private http: HttpClient) { }
+
+  private GetDistrictsApiUrl: string = `${environment.apiUrl}/Public/GetDistricts`;
+  private GetPoliceStationApiUrl: string = `${environment.apiUrl}/Public/GetPoliceStationList`;
+  private GetActListApiUrl: string = `${environment.apiUrl}/Act/GetActList`;
+  private GetActWiseCountApiUrl: string = `${environment.apiUrl}/Act/ActWiseCount`;
+  private GetActPSWiseListpiUrl: string = `${environment.apiUrl}/Act/ActPSWiseList`;
+  private GetMajorHeadListApiUrl: string = `${environment.apiUrl}/Act/GetMAJORHEAD`;
+
+  GetZeroFir(): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/ZeroFir/GetZeroFir`);
+  }
+
+  LoadDistricts(): Observable<any> {
+    return this.http.get<any>(this.GetDistrictsApiUrl);
+  }
+
+  LoadPoliceStations(distcodes: number[]): Observable<any[]> {
+    return this.http.post<any[]>(`${this.GetPoliceStationApiUrl}`, { districts: distcodes });
+  }
+ GetMajorHeadList(HeniousType: any): Observable<any> {  
+    const data = {
+      HeniousType: HeniousType,
+    };  
+    return this.http.post<any[]>(`${this.GetMajorHeadListApiUrl}`, data);
+  }
+  GetActList(): Observable<any> {
+    return this.http.get<any>(`${this.GetActListApiUrl}`);
+  }
+
+  LoadActWiseCount(data: any): Observable<any[]> {
+    return this.http.post<any[]>(`${this.GetActWiseCountApiUrl}`, data);
+  }
+
+  LoadActPSWiseList(data: any): Observable<any[]> {
+    return this.http.post<any[]>(`${this.GetActPSWiseListpiUrl}`, data);
+  }
+
+}

@@ -1,0 +1,14 @@
+.custom-fir-table th,
+.custom-fir-table td {
+  border: 1px solid #000 !important;
+  vertical-align: middle;
+}
+
+.custom-fir-table thead th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+
+.custom-fir-table tr th:first-child {width:180px;}
+.table.table-sm td, .table.table-sm th {padding:10px 5px;}

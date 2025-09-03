@@ -1,0 +1,559 @@
+<div class="pc-container">
+    <div class="pcoded-content pb" style="padding-bottom:90px;">
+         <div class="page-header">
+            <div class="page-block">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <div class="page-header-title">
+                            <h5 class="m-b-10" >Cases Submitted to ICJS Pillar's </h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         <div class="card mt-5">
+            <div class="card-body">
+                      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                    <div id="searchByFilingNumber" class="row searchbypanel">
+                          <div class="col-md-3  col-12 mb-3">
+                         <label class="form-label"> District  Name</label>
+                            <ng-multiselect-dropdown #multiSelect [settings]="settings" [data]="Districts" formControlName="district" [placeholder]="'Select District'"
+                         (onDropDownClose)="onDistrictChange($event)">
+                        </ng-multiselect-dropdown>
+                      </div>
+                      <div class="col-md-3  col-12 mb-3">
+                         <label class="form-label"> Police Station</label>
+                           <ng-multiselect-dropdown #multiSelect [settings]="settings" 
+                           [data]="policestations" 
+                           formControlName="psCode" 
+                           [placeholder]="'Police Station'">
+                           </ng-multiselect-dropdown>
+                      </div>
+                        <div class="col-lg-2 col-md-3  col-12 mb-3">
+                         <label class="form-label">From Date</label>
+                        <sup class="text-danger top-0">*</sup>
+                        <input type="date" id="bdpFromDate"  class="form-control" formControlName="FromDate" maxlength="7" tabindex="2" >    
+                        </div>
+                        <div class="col-lg-2 col-md-3  col-12 mb-3">
+                            <label class="form-label">To Date</label>
+                        <sup class="text-danger top-0">*</sup>
+                        <input type="date" id="bdpToDate"     class="form-control" formControlName="ToDate" maxlength="7" tabindex="2">
+                        </div>
+                        
+                        <div class="col-md-2 col-12 pt-4 mt-1" style="text-align: center;">
+                            <button type="submit" class="btn btn-success text-white py-1">Search</button>
+                        </div>
+                    </div>
+                   
+                 </form>
+                </div>
+         </div>
+         <div class="ag-theme-alpine" style="height: 100%; width: 100%;">
+                    <div>
+                      <div class="card mt-5">
+                                 <div class="card-body">
+                                    <div class="row" *ngIf="isPillersLoaded">
+                                        <div class="col-md-12">
+                                           <h3 class="comme-h3"> Cases Submitted to ICJS Pillar's</h3>
+                                            <p-table 
+                                            [value]="PillarData" 
+                                            [paginator]="true"
+                                             [rows]="100" 
+                                            responsiveLayout="scroll">
+                                                <ng-template pTemplate="header">
+                                                    <tr>
+                                                        <th style="text-align:center">Sr.No.</th>
+                                                        <th style="text-align:center">Police Station</th>
+                                                        <th style="text-align:center">Prosecution</th>
+                                                        <th style="text-align:center">FSL</th>
+                                                        <th style="text-align:center">MLC </th>
+                                                        <th style="text-align:center">PMR </th>
+                                                    </tr>
+                                                </ng-template>
+                                                <ng-template pTemplate="body" let-case let-rowIndex="rowIndex">
+                                                  <tr>
+                                                    <td style="text-align:center">{{ rowIndex + 1 }}</td>
+                                                    <td style="text-align:left">{{ case.PS }}</td>
+                                                    <td style="text-align:right">
+                                                        <a href="javascript:void(0)"  (click)="loadProsLinkedData(case.PS_CD)">
+                                                            {{ case.Prosecution_Count }}
+                                                          </a>
+                                                    </td>
+                                                    <td style="text-align:right"><a href="javascript:void(0)"  (click)="loadFslLinkedData(case.PS_CD)">
+                                                        {{ case.FSL_Count }}
+                                                      </a></td>
+                                                    <td style="text-align:right"><a href="javascript:void(0)"  (click)="loadMlrLinkedData(case.PS_CD)">
+                                                        {{ case.MLC_COUNT }}
+                                                      </a></td> 
+                                                    <td style="text-align:right"><a href="javascript:void(0)"  (click)="loadPmrLinkedData(case.PS_CD)">
+                                                        {{ case.PMR_COUNT }}
+                                                      </a></td>  
+                                                </tr>
+                                                </ng-template>
+                                                 <ng-template pTemplate="footer">
+                                                    <tr style="font-weight: bold; border-top: 2px solid #000;">
+                                                        <td colspan="2" style="border: 1px solid #000; padding: 8px; background-color: #f1f1f1; text-align: center">Total</td>
+                                                        <td style="border: 1px solid #000; padding: 8px; background-color: #f1f1f1; text-align: right">{{ getTotal('Prosecution_Count') }}</td>
+                                                        <td style="border: 1px solid #000; padding: 8px; background-color: #f1f1f1;text-align: right">{{ getTotal('FSL_Count') }}</td>
+                                                        <td style="border: 1px solid #000; padding: 8px; background-color: #f1f1f1;text-align: right">{{ getTotal('MLC_COUNT') }}</td>
+                                                        <td style="border: 1px solid #000; padding: 8px; background-color: #f1f1f1;text-align: right">{{ getTotal('PMR_COUNT') }}</td>
+                                                    </tr>
+                                                </ng-template>
+                                            </p-table>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                    <!-- <p-dialog [(visible)]="displayPopup" [modal]="true" [header]="''" [style]="{ width: '80vw', height: '70vh' }" [closable]="true" >  -->
+                                      <p-dialog [(visible)]="displayPopup" [modal]="true" header="" [style]="{ width: '70%' }" [closable]="true">                                     
+                                          <div class="row">
+                                          <div class="col-sm-12 p-0">
+                                            <div class="card">
+                                              <div class="card-body pb-0 pt-3">
+                                                <div *ngIf="ProsdataListVisible">
+                                                  <h5 class="m-b-10" >Details of legal opinion cases submitted between {{ fromDate }} to {{ toDate }}</h5>    
+                                                                                            
+                                                <p-table #table [value]="Prosdata"  
+                                                [paginator]="true" 
+                                                [rows]="10" 
+                                                [responsiveLayout]="'scroll'" 
+                                                [rowsPerPageOptions]="[10, 20, 50]">
+                                                  <ng-template pTemplate="header">
+                                                    <tr>
+                                                      <th>Sr.No.</th>
+                                                      <th>Fir Number</th>
+                                                      <th>Police Station Name</th>
+                                                      <th>Case submission date</th>
+                                                    </tr>
+                                                  </ng-template>
+                                                  <ng-template pTemplate="body"  let-rowData let-i="rowIndex">
+                                                    <tr>
+                                                      <td>{{ i + 1 }}</td>                                                      
+                                                      <td><a href="javascript:void(0)"  (click)="loadProsLinkedDataByRegNo(rowData.RegNumComplete)">
+                                                          {{ rowData.RegNum || '0' }}
+                                                        </a></td>
+                                                      
+                                                      <td>{{ rowData.PS|| 'N/A'  }}</td>
+                                                      <td>{{ rowData.SubmitedDate || 'N/A' }}</td>
+                                                    </tr>
+                                                  </ng-template>
+                                                  <ng-template pTemplate="emptymessage">
+                                                    <tr>
+                                                      <td colspan="4" class="text-center text-muted p-3">
+                                                        No records found
+                                                      </td>
+                                                    </tr>
+                                                  </ng-template>
+                                                </p-table>
+                                               
+                                                <div *ngIf="isParticularDetailsLoaded">
+                                                  <div class="col-sm-12">
+                                                    <div class="mt-3">
+                                                      <div class="card"  style="background:#f5f6fa">
+                                                      <div class="card-body">
+                                                  <h4 class="mb-3">Prosecutor Linked Data</h4>
+                                                
+                                                  <!-- List of Records -->
+                                                  <ul class="e-shaksheya list-unstyled mb-0 no-boder-last" *ngIf="Particulardata && Particulardata.length > 0">
+                                                    <li *ngFor="let data of Particulardata" class="mb-3 border-bottom-dark" style="flex:0 0 100%;">
+                                      
+                                              <ul class="e-shaksheya list-unstyled mb-0 lst-li-wdt">
+                                              <li><strong>LegalOpinion Date :</strong> <span> {{ data.LEGALOPINION_DT || 'N/A' }}</span></li>  
+                                              <li><strong>FIR Number :</strong> <span> {{ data.FIR_REG_NUM || 'N/A' }}</span></li>  
+                                              <li><strong>Eprocid :</strong> <span> {{ data.Eprocid || 'N/A' }}</span></li>  
+                                              <li><strong>Submitted To :</strong> <span> {{ data.submittedTo || 'N/A' }}</span></li>  
+                                              <li><strong>Intimation To Police Email :</strong> <span> {{ data.IntimationToPoliceEmailId || 'N/A' }}</span></li>  
+                                            <li><strong>Intimation To Police Mobile No :</strong> <span> {{ data.IntimationToPoliceMobileNo || 'N/A' }}</span></li>  
+                                            <li><strong>Entered On :</strong> <span> {{ data.RECORD_CREATED_ON || 'N/A' }}</span></li>  
+                                           <li><strong>Legal Opinion Subject :</strong> <span> {{ data.LO_Subject || 'N/A' }}</span></li> 
+                                            
+                                            <li>
+                                              <strong>Legal Opinion Brief Facts :</strong>
+                                              <span *ngIf="!data.isExpanded">{{ (data.LO_BriefFacts | slice:0:50) || 'N/A' }}...</span>
+                                              <span *ngIf="data.isExpanded">{{ data.LO_BriefFacts || 'N/A' }}</span>
+                                              <a href="javascript:void(0)" (click)="toggleMore(data)">
+                                                {{ data.isExpanded ? 'Less' : 'More' }}
+                                              </a>
+                                            </li>
+                                      
+                                                    </ul>
+                                                    </li>
+                                                  </ul>
+                                                
+                                                  <div *ngIf="Particulardata && Particulardata.length === 0">
+                                                    <p>No records found.</p>
+                                                  </div>
+                                                </div>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </div>    
+                                                </div>
+                                      
+                                                <div class="row" *ngIf="FsldataListVisible">
+                                                  <h5 class="m-b-10" >Details of FSL cases submitted between {{ fromDate }} to {{ toDate }}</h5>          
+                                                <p-table #table [value]="Fsldata"  [paginator]="true" [rows]="10" [responsiveLayout]="'scroll'" [rowsPerPageOptions]="[10, 20, 50]">
+                                                  <ng-template pTemplate="header">
+                                                    <tr>
+                                                      <th>Sr.No.</th>
+                                                      <th>Fir Number</th>
+                                                      <th>Police Station Name</th>
+                                                       <th>Case submission date</th> 
+                                                    </tr>
+                                                  </ng-template>
+                                                  <ng-template pTemplate="body"  let-rowData let-i="rowIndex">
+                                                    <tr>
+                                                      <td>{{ i + 1 }}</td>
+                                                      <td style="text-align:right"><a href="javascript:void(0)"  (click)="loadFslLinkedDataByRegNo(rowData.FirNum1,rowData.FirNum)">
+                                                          {{ rowData.FirNum || '0'  }}
+                                                        </a></td>
+                                                      
+                                                      <td>{{ rowData.PS || 'N/A' }}</td>
+                                                       <td>{{ rowData.SubmittedDate || 'N/A' }}</td> 
+                                                    </tr>
+                                                  </ng-template>
+                                                  <ng-template pTemplate="emptymessage">
+                                                    <tr>
+                                                      <td colspan="3" class="text-center text-muted p-3">
+                                                        No records found
+                                                      </td>
+                                                    </tr>
+                                                  </ng-template>
+                                                  <!-- <div *ngIf="Prosdata.length === 0" class="text-center p-5">
+                                                    <p>No prisoner data found</p>
+                                                  </div> -->
+                                                </p-table>
+                                                <div class="row" *ngIf="isParticularFSLDetailsLoaded">
+                                                  <div class="col-sm-12">
+                                                    <div class="mt-3">
+                                                     
+                                                    <div class="row">
+                                                      <h5 class="m-b-10">Docket Details For FirNumber: {{ FirFirNum || 'N/A' }}</h5>
+                                                      
+                                                        <p-table 
+                                                          [columns]="columns" 
+                                                          [value]="Particulardata" 
+                                                          [paginator]="true" 
+                                                          [rows]="20" 
+                                                          [lazy]="true" 
+                                                          
+                                                          [rowsPerPageOptions]="[10, 20, 50]"
+                                                          [paginatorTemplate]="true"
+                                                          [responsive]="true"
+                                                          [rowHover]="true"  
+                                                        >
+                                                          <ng-template pTemplate="header" let-columns>
+                                                            <tr>
+                                                              <th>Sr.No.</th>
+                                                              <th>Docket Id</th>
+                                                              <!-- <th>Fir Number</th> -->
+                                                              <th>Packet Details</th>
+                                                            </tr>
+                                                          </ng-template>
+                                                          <ng-template pTemplate="body" let-rowData let-i="rowIndex">
+                                                            <tr>
+                                                              <td>{{ i + 1 }}</td>
+                                                              <!-- <td style="text-align:right"><a href="javascript:void(0)"  (click)="loadFslLinkedDataByRegNo(rowData.Docket_Id)">
+                                                                  {{ rowData.Docket_Id || '0'  }}
+
+                                                                </a></td> -->
+                                                             <td>{{ rowData.Docket_Id || 'N/A' }}</td>
+
+                                                               
+                                                              <!-- <td>{{ rowData.fir_reg_num || 'N/A' }}</td> -->
+
+                                                              <td>{{ rowData.Packet_details || 'N/A' }}</td>
+                                                              
+                                                            </tr>
+                                                          </ng-template>
+                                                          <ng-template #noRecords>
+                                                            <tr>                                                          
+                                                              <td [attr.colspan]="columns.length" class="text-center text-muted p-3"> 
+                                                                No records found
+                                                              </td>
+                                                            </tr>
+                                                          </ng-template>
+                                                        </p-table>
+                                          
+                                                     
+                                                    </div>
+                                                    
+                                                  </div>
+                                                  </div>
+                                                  </div> 
+                                      
+                                              <!-- <div class="row" *ngIf="isParticularFSLDetailsLoaded">
+                                              <div class="col-sm-12">
+                                                <div class="mt-3">
+                                                 
+                                                <div class="row">
+                                                  <div class="col-md-12">
+                                                    <p-table 
+                                                      [columns]="columns" 
+                                                      [value]="Particulardata" 
+                                                      [paginator]="true" 
+                                                      [rows]="20" 
+                                                      [lazy]="true" 
+                                                      
+                                                      [rowsPerPageOptions]="[10, 20, 50]"
+                                                      [paginatorTemplate]="true"
+                                                      [responsive]="true"
+                                                      [rowHover]="true"  
+                                                    >
+                                                      <ng-template pTemplate="header" let-columns>
+                                                        <tr>
+                                                          <th *ngFor="let col of columns" class="header-style"> 
+                                                            {{ col.header }}
+                                                          </th>
+                                                        </tr>
+                                                      </ng-template>
+                                                      <ng-template pTemplate="body" let-rowData let-columns="columns">
+                                                        <tr *ngIf="Particulardata.length > 0; else noRecords">
+                                                          <td *ngFor="let col of columns" class="body-cell-style">                                                            
+                                                            <ng-container [ngSwitch]="col.field">                                                              
+                                                              <span *ngSwitchCase="'EnteredOn'">
+                                                                {{ dateFormatingService.formatISODateTime(rowData[col.field]) }}
+                                                              </span>
+                                                              <span *ngSwitchCase="'FullDispNo'">
+                                                                <a href="javascript:void(0)" (click)="openModalWithDispNo(rowData[col.field])">
+                                                                  View Details
+                                                                </a>
+                                                              </span>
+                                                              <span *ngSwitchDefault>
+                                                                {{ rowData[col.field] }}
+                                                              </span>
+                                                            </ng-container>
+                                                          </td>
+                                                        </tr>
+                                                      </ng-template>
+                                                      <ng-template #noRecords>
+                                                        <tr>                                                          
+                                                          <td [attr.colspan]="columns.length" class="text-center text-muted p-3"> 
+                                                            No records found
+                                                          </td>
+                                                        </tr>
+                                                      </ng-template>
+                                                    </p-table>
+                                      
+                                                  </div>
+                                                </div>
+                                                
+                                              </div>
+                                              </div>
+                                              </div>         -->
+                                                </div> 
+                                                
+                                                
+                                                <div  class="row" *ngIf="MlrdataListVisible" >
+                                                  <h5 class="m-b-10" >Details of MLC cases submitted between {{ fromDate }} to {{ toDate }}</h5>                                                 
+                                                <p-table #table [value]="Mlrdata" [paginator]="true" [rows]="10" [responsiveLayout]="'scroll'" [rowsPerPageOptions]="[10, 20, 50]">
+                                                  <ng-template pTemplate="header">
+                                                    <tr>
+                                                      <th>Sr.No.</th>
+                                                      <th>MLC Registeration Number</th>
+                                                      <th>Police Station Name</th>
+                                                      <th>GD No. & Date</th>
+                                                      <!-- <th>FIR No & Date</th> -->
+                                                      <th>Case submission date</th>
+                                                    </tr>
+                                                  </ng-template>
+                                                  <ng-template pTemplate="body"  let-rowData let-i="rowIndex">
+                                                    <tr>
+                                                      <td>{{ i + 1 }}</td>
+                                                      <td><a href="javascript:void(0)"  (click)="loadMlrLinkedDataByRegNo(rowData)">
+                                                        {{ rowData.RegNum || 'N/A'  }}
+                                                      </a>                                                          
+                                                        </td>                                                      
+                                                      <td>{{ rowData.PS || 'N/A' }}</td>
+                                                      <td>
+                                                        {{ rowData.Gd_Num  }} <br /> {{ rowData.GD_DT  }}
+                                                      </td>
+                                                      <!-- <td>{{ rowData.Fir_No }}<br /> {{ rowData.REG_DT }}</td> -->
+                                      
+                                                      <td>{{ rowData.SubmittedDate }}</td>
+                                                    </tr>
+                                                  </ng-template>
+                                                </p-table>
+                                                <div *ngIf="isParticularMLRDetailsLoaded">   
+                                              
+                                                  <div class="row"> 
+                                                    <div class="col-md-12 mt-2">
+                                                      <p-table [value]="Particulardata" [paginator]="true" [rows]="20" [responsiveLayout]="'scroll'" [rowsPerPageOptions]="[10, 20, 50]">
+                                                        <ng-template pTemplate="header">
+                                                          <tr>
+                                                            <th>Sr.No.</th>
+                                                            <th>Police Station</th>
+                                                            <th>Type</th>
+                                                            
+                                                            <th>No & Date</th>
+                                                             <th>Hospital</th>
+                                                              <th>Doctor</th>
+                                                                <th>Victim Name</th>
+                                                            <th>Report Date</th>
+                                                            <th>Download Report</th>
+                                                          </tr>
+                                                        </ng-template>
+                                                        <ng-template pTemplate="body" let-rowData let-i="rowIndex">
+                                                          <tr>
+                                                            <td>{{i + 1}}</td>
+                                                            <td>{{rowData.Police_Station_name}}</td>
+                                                            <td>{{rowData.FIR_DDR}}</td>
+                                                            <td>{{rowData.FIRNo}}/{{dateFormatingService.getYearFromDate(rowData.FIR_Date)}}<br/>{{rowData.FIR_Date}}</td>
+                                                             <td>{{rowData.HealthInstituteName}}</td>
+                                                            <td>{{rowData.MLR_PMR_Prepared_By_Doctor}}</td>
+                                                            <td>{{rowData.victim_name}}</td>
+                                                            <td>{{dateFormatingService.formatISODateTime(rowData.cdTranactionDate)}}</td>
+                                                            <td>
+                                                              <a href="javascript:void(0)" (click)="openDyanmicModel(rowData.MLR_PMR_No)">                                                              
+                                                                View Details
+                                                              </a>
+                                                            </td>
+                                                          </tr>
+                                                        </ng-template>
+                                                      </p-table>
+                                                    </div>
+                                                  </div>                                                 
+                                      <p-dialog   [(visible)]="isMlrPmrInfoDetailsVisible"  [style]="{ width: '80vw' }"  [modal]="true"      
+                                        [closable]="true" 
+                                        header="Data Table">
+                                        <div class="row">
+                                          <div class="col-md-12">                                            
+                                              <p-table>
+                                              <ng-template pTemplate="header">
+                                                <tr>
+                                                  <th>S.No.</th>
+                                                  <th>Police Station</th>
+                                                  <th>Type</th>
+                                                  <th>No & Date</th>
+                                                  <th>Hospital</th>
+                                                  <th>Doctor</th>
+                                                  <th>Victim Name</th>
+                                                  <th>Report Date</th>
+                                                  <th>Download Report</th>
+                                                </tr>
+                                              </ng-template>
+                                              <ng-template pTemplate="body" let-rowData let-i="rowIndex">
+                                                <tr>
+                                                  <td>{{ i + 1 }}</td>
+                                                  <td>{{ rowData.Police_Station_name }}</td>
+                                                  <td>{{ rowData.FIR_DDR }}</td>
+                                                  <td>
+                                                    {{ rowData.FIRNo }}/{{ dateFormatingService.getYearFromDate(rowData.FIR_Date) }}
+                                                    <br />
+                                                    {{ rowData.FIR_Date }}
+                                                  </td>
+                                                  <td>{{ rowData.HealthInstituteName }}</td>
+                                                  <td>{{ rowData.MLR_PMR_Prepared_By_Doctor }}</td>
+                                                  <td>{{ rowData.victim_name }}</td>
+                                                  <td>{{ dateFormatingService.formatISODateTime(rowData.cdTranactionDate) }}</td>
+                                                  <td>
+                                                    <a href="javascript:void(0)" (click)="openDyanmicModel(rowData.MLR_PMR_No)">
+                                                      {{ rowData.MLR_PMR_No }}
+                                                    </a>
+                                                  </td>
+                                                </tr>
+                                              </ng-template>
+                                            </p-table>
+                                          </div>
+                                        </div>
+                                      </p-dialog>
+                                      
+                                                
+                                              </div>
+                                                </div>
+                                      
+                                                <div  class="row"*ngIf="PmrdataListVisible">
+                                                  <h5 class="m-b-10" >Details of PMR cases submitted between {{ fromDate }} to {{ toDate }}</h5>
+                                                 
+                                                <p-table #table [value]="Pmrdata"  [paginator]="true" [rows]="10" [responsiveLayout]="'scroll'" [rowsPerPageOptions]="[10, 20, 50]">
+                                                  <ng-template pTemplate="header">
+                                                    <tr>
+                                                      <th>Sr.No.</th>
+                                                      <th>Inquest Number</th>
+                                                      <th>Police Station Name</th>
+                                                      <th>GD No. & Date</th>
+                                                      <!-- <th>FIR No. & Date</th>                -->
+                                                      <th>Case submission date</th>
+                                                    </tr>
+                                                  </ng-template>
+                                                  <ng-template pTemplate="body"  let-rowData let-i="rowIndex">
+                                                    <tr>
+                                                      <td>{{ i + 1 }}</td>
+                                                      <td><a href="javascript:void(0)"  (click)="loadPmrLinkedDataByRegNo(rowData)">
+                                                          {{ rowData.InquestNum }}
+                                                        </a></td>
+                                                     
+                                                      <td>{{ rowData.PS  }}</td>
+                                                      <td>
+                                                        {{ rowData.GD_NUM  }} <br /> {{ rowData.GD_DT }}
+                                                      </td>
+                                                      <!-- <td>{{ rowData.Fir_NUM }}<br /> {{ rowData.REG_DT  }}</td> -->
+                                      
+                                                      <td>{{ rowData.SubmittedDate }}</td>
+                                                    </tr>
+                                                  </ng-template>
+                                                </p-table>
+                                      
+                                                <div *ngIf="isParticularPMRDetailsLoaded">
+                                                  <div class="row"> 
+                                                    <div class="col-md-12 mt-2">
+                                                      <p-table [value]="Particulardata" [paginator]="true" [rows]="20" [responsiveLayout]="'scroll'" [rowsPerPageOptions]="[10, 20, 50]">
+                                                        <ng-template pTemplate="header">
+                                                          <tr>
+                                                            <th>S.No.</th>
+                                                            <th>Police Station</th>
+                                                            <th>Type</th>
+                                                            
+                                                            <th>No & Date</th>
+                                                             <th>Hospital</th>
+                                                              <th>Doctor</th>
+                                                                <th>Victim Name</th>
+                                                            <th>Report Date</th>
+                                                            <th>Download Report</th>
+                                                          </tr>
+                                                        </ng-template>
+                                                        <ng-template pTemplate="body" let-rowData let-i="rowIndex">
+                                                          <tr>
+                                                            <td>{{i + 1}}</td>
+                                                            <td>{{rowData.Police_Station_name}}</td>
+                                                            <td>{{rowData.FIR_DDR}}</td>
+                                                            <td>{{rowData.FIRNo}}/{{dateFormatingService.getYearFromDate(rowData.FIR_Date)}}<br/>{{rowData.FIR_Date}}</td>
+                                                             <td>{{rowData.HealthInstituteName}}</td>
+                                                            <td>{{rowData.MLR_PMR_Prepared_By_Doctor}}</td>
+                                                            <td>{{rowData.victim_name}}</td>
+                                                            <td>{{dateFormatingService.formatISODateTime(rowData.cdTranactionDate)}}</td>
+                                                            <td>
+                                                              <a href="javascript:void(0)" (click)="openDyanmicModel(rowData.MLR_PMR_No)">
+                                                                <!-- {{rowData.MLR_PMR_No}} -->
+                                                                View Details
+                                                              </a>
+                                                            </td>
+                                                          </tr>
+                                                        </ng-template>
+                                                      </p-table>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                               </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div>
+                                          
+                                        </div>
+                                      
+                                       <!-- pillardashboard.component.html -->
+                                      
+                                        
+                                     </p-dialog>
+                                        </div>
+                                    </div>
+                                 </div>
+                     </div>
+                   </div>
+         </div>
+   </div>
+</div>
+
+<div #dynamicContainer></div>

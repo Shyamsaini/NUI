@@ -1,0 +1,371 @@
+<div class="pc-container">
+  <div class="pcoded-content pb" style="padding-bottom:90px;">
+    <div class="page-header">
+      <div class="page-block">
+        <div class="row align-items-center">
+          <div class="row align-items-center">
+            <div class="col-md-6">
+              <div class="page-header-title">
+                <h5 class="m-b-10">
+                  {{ deshboardHeaderText }} - {{ userName }}
+                  <ng-container *ngIf="roleName">
+                    {{ ' ' + roleName }}
+                  </ng-container>
+                </h5>
+
+              </div>
+            </div>
+            <div class="col-md-6 text-right">
+           
+
+              <div class="toggle-container">
+
+
+                <label class="radio-option">
+                  <input type="radio" name="dashboard" value="ConsolidatedDashboard" [(ngModel)]="DashboardType"
+                    (change)="toggleState()">
+                  <span class="toggle-label" [class.active]="DashboardType == 'ConsolidatedDashboard'">Consolidated
+                    Dashboard</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="dashboard" value="MyDashboard" [(ngModel)]="DashboardType"
+                    (change)="toggleState()">
+                  <span class="toggle-label" [class.active]="DashboardType == 'MyDashboard'">MY Dashboard</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-5">
+      <div class="card">
+        <div class="card-body">
+          <form [formGroup]="form">
+            <div id="searchByFilingNumber" class="row searchbypanel">
+              <div class="col-md-12">
+                <div class="row">
+                  <div class="col-md-10">
+                    <div class="row">
+                      <div class="col-md-3  col-12 mb-3">
+                        <label class="form-label"> District Name</label>
+                        <ng-multiselect-dropdown #multiSelect [settings]="settings" [data]="ListDistict"
+                          formControlName="districtCodes" [placeholder]="'Select District'"
+                          (onDropDownClose)="onDistrictDropdownChange($event)">
+                        </ng-multiselect-dropdown>
+                      </div>
+                      <div class="col-md-3  col-12 mb-3">
+                        <label class="form-label"> Police Station</label>
+                        <sup class="text-danger top-0">*</sup>
+                        <ng-multiselect-dropdown #multiSelect [settings]="settings" [data]="policestations"
+                          formControlName="psCode" [placeholder]="'Police Station'" (onSelect)="onPsSelect($event)"
+                          (onDeSelect)="onPsSelect($event)" (onSelectAll)="onPsSelectAll($event)"
+                          (onDeSelectAll)="onPsSelectAll([])">
+                        </ng-multiselect-dropdown>
+                      </div>
+                      <div class="col-lg-2 col-md-3  col-12 mb-3">
+                        <label class="form-label">FIR From Date</label>
+                        <sup class="text-danger top-0">*</sup>
+                      
+                        <p-calendar class="form-control mon" formControlName="FromDate" [minDate]="minDateValue"
+                          [maxDate]="maxDateValue" [readonlyInput]="true" placeholder="01-07-2024" [showIcon]="true"
+                          (onSelect)="onDateChange($event)" dateFormat="dd/mm/yy">
+                        </p-calendar>
+
+                      </div>
+
+                      <div class="col-lg-2 col-md-3 col-12 mb-3">
+                        <label class="form-label">FIR To Date</label>
+                        <sup class="text-danger top-0">*</sup>
+                        <p-calendar class="form-control mon" formControlName="ToDate" [minDate]="minToDate"
+                          [maxDate]="maxToDate" [readonlyInput]="true" [placeholder]="currentDatePlaceholder"
+                          dateFormat="dd/mm/yy" [showIcon]="true">
+                        </p-calendar>
+                      </div>
+                      <!-- NCL Filter -->
+                      <div class="col-md-2 col-12">
+                        <label class="form-label">Act Type</label>
+                        <select class="form-control" formControlName="actType">
+                          <option value="" disabled selected>Select</option>
+                          <option *ngFor="let option of actTypeOptions" [value]="option.value">
+                            {{ option.label }}
+                          </option>
+                        </select>
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                  <div class="col-md-2 col-12 pt-4 mt-2 text-end">
+                    <button type="button" class="btn btn-success text-white mr-2" (click)="onSearch()">Search</button>
+                    <button type="button" class="btn btn-secondary text-white" (click)="onReset()">Reset</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+
+
+
+      <div class="card">
+        <div class="card-body">
+          <form [formGroup]="form">
+            <div id="searchByFilingNumber" class="row searchbypanel">
+              <div class="col-md-12 seprtaion">
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="row">
+                      <div class=" col-sm-12 mb-1">
+                        <label class="form-label "> State :</label><span>{{ states || 'No State selected' }} </span>
+                      </div>
+                      <div class="col-sm-12 mb-1" *ngIf="selectedDistrictNames.length">
+                        <label class="form-label"> Distict :</label>
+                        <span class="spl-pd2">
+                          {{ trimmedDistrictNames }}
+                          <a href="#" (click)="toggleReadMoreDistricts(); $event.preventDefault()"
+                            *ngIf="selectedDistrictNames.join(', ').length > 100">
+                            {{ readMoreDistricts ? 'Read less' : 'Read more' }}
+                          </a>
+                        </span>
+                      </div>
+                      <div class="col-sm-12 mb-1" *ngIf="selectedPoliceStations.length">
+                        <label class="form-label"> Police Station :</label>
+                        <span class="spl-pd">
+                          {{ trimmedPoliceStations }}
+                          <a href="#" (click)="toggleReadMore(); $event.preventDefault()"
+                            *ngIf="selectedPoliceStations.join(', ').length > 100">
+                            {{ readMore ? 'Read less' : 'Read more' }}
+                          </a>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+
+      <div class="row new-design-fir">
+        <div class="col-sm-12" *ngIf="isTotalFirstCountlbl">
+          <div class="card">
+            <div class="card-header p-0">
+              <h4 class="text-center"> FIR registered from {{ CountFromDate}} to {{ CountToDate}} <span *ngIf="DashboardType == 'MyDashboard'">
+                , ({{this.userName}})
+              </span> <span *ngIf="actType">({{ actType }})</span></h4>
+            </div>
+            <div class="card-body">
+              <div class="row d-flex justify-content-center">
+                <div class="col-sm-12 mb-1 fir-det-sec" *ngIf="isTotalFirstCount">
+                  <div class="row">
+                    <div class="col-sm-4" *ngFor="let rowData of CountListRowData">
+                      <div class="card text-center px-4 py-5 com-border-shadow no-bgg">
+                        <div class="tot-cnt border-bottomm pb-2 mb-2 tot-fr">
+                          <h4>{{ rowData.TotalFirCountLabel }}</h4>
+                          <a href="javascript:void(0)" id="TotalCount"
+                            (click)="LoadTimePendency(rowData.TotalFirCountType, rowData.MainType, rowData.MainHeader)"
+                            class="h2 fw-bold text-decoration-none">
+                            {{ rowData.TotalFirCount }}
+                          </a>
+                        </div>
+                        <div class="row sub-pnt">
+                          <div class="col-sm-6">
+                            <div class="tot-cnt tot-fr">
+                              <h4 class="text-danger">{{ rowData.TotalFirHeniousLabel }}</h4>
+                              <a href="javascript:void(0)" id="HeinousYes"
+                                (click)="LoadTimePendency(rowData.TotalFirHeniousType, rowData.MainType, rowData.MainHeader + ' - ' + rowData.TotalFirHeniousLabel)"
+                                class="h4 fw-bold text-danger text-decoration-none">
+                                {{ rowData.TotalFirHeniousCount }}
+                              </a>
+                            </div>
+                          </div>
+                          <div class="col-sm-6 border-leftt">
+                            <div class="tot-cnt tot-fr">
+                              <h4>{{ rowData.TotalFirNonHeniousLabel }}</h4>
+                              <a href="javascript:void(0)" id="HeinousNo"
+                                (click)="LoadTimePendency(rowData.TotalFirNonHeniousType, rowData.MainType, rowData.MainHeader + ' - ' + rowData.TotalFirNonHeniousLabel)"
+                                class="h4 fw-bold  text-decoration-none">
+                                {{ rowData.TotalFirNonHeniousCount }}
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+      <div class="row new-design-fir" *ngIf="isTotalSecondCount" #firTotContainer>
+        <div class="col-sm-12">
+          <div class="card">
+            <div class="card-header p-0">
+              <h4 class="text-center">{{timePendencyHeaderLabel}}</h4>
+            </div>
+            <div class="card-body">
+              <div class="row d-flex justify-content-center">
+                <div class="col-lg-3" *ngFor="let timependency of timependencies">
+                  <a href="javascript:void(0)"
+                    (click)="LoadFirList(timependency.Label, mainType, timependency.FromDate, timependency.ToDate, { first: 0, rows: pageSize })"
+                    class="card">
+                    <h4>{{timependency.Label}}</h4><span>{{timependency.Cnt}}</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div *ngIf="ListTable">
+        <div #gridContainer class="ag-theme-alpine" style="height: 100%; width: 100%;">
+
+          <div class="card mt-2">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="row">
+                    <div class="col-md-7">
+                      <h4>{{ headerText}} </h4>
+                      <h3 class="comme-h3">
+                        (State: {{ ListRowData.length > 0 ? ListRowData[0].STATE : 'N/A' }}
+                        <!-- ,District: {{ ListRowData.length > 0 ? ListRowData[0].DISTRICT : 'N/A' }} -->
+                        )
+                        - FIR registered from {{ CountFromDate }} to {{ CountToDate }}
+                      </h3>
+
+                    </div>
+                    <div class="col-md-3">
+                      <button *ngIf="isTotalSecondCount" (click)="onFirCountClick()"
+                        class="btn btn-primary text-white d-flex justify-content-end my-2 pt-0  ms-auto">Police station
+                        wise summary</button>
+                    </div>
+                    <div class="col-md-2">
+                      <div class="d-flex justify-content-end mb-2 pt-2">
+                        <input type="text" class="form-control w-100" placeholder="Search..."
+                          (input)="onQuickFilter($event)">
+                      </div>
+                    </div>
+                  </div>
+                  <p-table [value]="DataFilter" [paginator]="true" [rows]="10" [lazy]="true"
+                    (onLazyLoad)="LoadFirListPagination($event)" [totalRecords]="FilteredRecordsCount"
+                    [rowsPerPageOptions]="[10, 20, 50]" [paginatorTemplate]="true" [responsive]="true" [rowHover]="true"
+                    [sortField]="'REG_DT'">
+                    <ng-template pTemplate="header">
+                      <tr>
+                        <th>Sr.No1.</th>
+                        <th>Fir No.</th>
+                        <th>District</th>
+                        <th>Police Station</th>
+                        <th>IO Name</th>
+
+                        <th [pSortableColumn]="'REG_DT'">Registration Date <p-sortIcon field="REG_DT"></p-sortIcon></th>
+                        <th *ngIf="typeOfFir == 'Pending'">Days Passed</th>
+                        <th>Status</th>
+                      </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-case let-rowIndex="rowIndex">
+                      <tr>
+                        <td>{{ rowIndex + 1 }}</td>
+                        <td>
+                          <!-- <a   href="javascript:void(0)" (click)="loadPillarData(case.FIR_REG_NUM,case.REG_DT,case.FIR_SRNO,case.PS_CD)">
+                            {{ case.FIR_SRNO }}/{{ case.REG_YEAR }}
+                          </a> -->
+                          <a href="javascript:void(0)"
+                            (click)="loadPillarData(case.FIR_REG_NUM,case.REG_DT,case.FIR_SRNO,case.PS_CD)">
+                            {{ case.FIR_SRNO }}/{{ case.REG_YEAR }}
+                          </a>
+                        </td>
+                        <!-- <td>{{ case.STATE }}</td> -->
+                        <td>{{ case.DISTRICT }}</td>
+                        <td>{{ case.PS }}</td>
+                        <td>{{ case.IO_NAME }}</td>
+
+                        <td>{{ case.REG_DT }}</td>
+                        <td *ngIf="typeOfFir == 'Pending'">{{ case.TimeLapse }}</td>
+                        <td>{{ case.FIR_STATUS_TYPE }}</td>
+                      </tr>
+                    </ng-template>
+                    <!-- <ng-template pTemplate="paginatorleft">
+                      <div>
+                        Showing {{ currentFirst }} to {{ currentLast }} of {{ FilteredRecordsCount }} records
+                      </div>
+                    </ng-template> -->
+                    <ng-template pTemplate="paginatorleft" let-state>
+                      <div>
+                        Showing {{ state.first + 1 }} to {{ state.first + state.rows > FilteredRecordsCount ?
+                        FilteredRecordsCount : state.first + state.rows }}
+                        of {{ FilteredRecordsCount }} records
+                      </div>
+                    </ng-template>
+                  </p-table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p-dialog [(visible)]="showPopup" [modal]="true" [responsive]="true" [style]="{width: '80%'}" [closable]="true"
+          (onHide)="closePopup()">
+          <p-header>
+            <div class="col-md-12">
+              <h4>{{ headerText}} </h4>
+              <h3 class="comme-h3">
+                (State: {{ ListRowData.length > 0 ? ListRowData[0].STATE : 'N/A' }})
+                <!-- District: {{ ListRowData.length > 0 ? ListRowData[0].DISTRICT : 'N/A' }}) -->
+                - FIR registered from {{ CountFromDate }} to {{ CountToDate }}
+              </h3>
+
+            </div>
+
+          </p-header>
+          <div class="modal-body">
+            <p-table #popupTable [columns]="popupColumns" [value]="popupData" [paginator]="true" [rows]="10"
+              [first]="firstRowIndex" [totalRecords]="popupDataCount" [rowsPerPageOptions]="[10, 20, 50]"
+              [responsive]="true" [rowHover]="true" (onShow)="resetPaginator()">
+              <ng-template pTemplate="header" let-columns>
+                <tr>
+                  <th class="header-style">Sr. No</th>
+                  <th *ngFor="let col of columns" class="header-style" [hidden]="col.field === 'Sno'">
+                    {{ col.header }}
+                  </th>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="body" let-rowData let-columns="columns" let-rowIndex="rowIndex">
+                <tr>
+                  <td class="body-cell-style">{{ rowIndex + 1 }}</td>
+                  <td *ngFor="let col of columns" class="body-cell-style" [hidden]="col.field === 'Sno'">
+                    {{ rowData[col.field] }}
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+
+          </div>
+        </p-dialog>
+      </div>
+    </div>
+
+    <modal id="modal-othterpillerdata">
+      <div class="modal-header">
+        <button type="button" class="btn-close" (click)="modalService.close();"></button>
+      </div>
+      <div class="modal-body">
+        <app-tab-container></app-tab-container>
+      </div>
+    </modal>

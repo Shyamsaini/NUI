@@ -1,0 +1,12 @@
+canvas#crimePieChart {
+    height: 470px !important;
+}
+
+canvas#crimeComparisonChart {
+    height: 470px !important;
+}
+
+canvas#crimeLineChart {
+    height: 500px !important;
+    width: 100% !important;
+}

@@ -1,0 +1,63 @@
+<div class="prosectution-sec pb-5">
+    <div class="timeline-sec">
+        <h2 class="d-inline-flex text-white clrr1 entrydate">{{data.entrydate}}</h2>
+        <div class="listing-sec">
+            <h3 class="cllr1">Registration in FSL </h3>
+            <ul class="list-unstyled">
+                <li>FSL Id:
+                    <label class="fslid">{{ data.fslid }}</label>
+                </li>
+                <li>State / District / Police Station:
+                    <label class="statedistrictpolicestation">{{data.statename}}/{{data.districtname}}/{{data.policestation}}</label>
+                </li>
+                <li>FIR No / FIR Year:
+                    <label class="firnumberandyear">{{data.firno}}</label>
+                </li>
+                <li>Entry Date:
+                    <label class="entrydate">{{data.entrydate}}</label>
+                </li>
+                <li>Messenger Name:
+                    <label class="messengername">{{data.messengername}}</label>
+                </li>
+                <li>Messenger Detail:
+                    <label class="messengerdetail">{{data.messengerdetail}}</label>
+                </li>
+                <li>FSL Office Address:
+                    <label class="fslofficeaddress">{{data.fsladdress}}</label>
+                </li>
+            </ul>
+        </div>
+        <h2 class="d-inline-flex text-white clrr2 reportdate">{{data.reportdate}}</h2>
+        <div class="listing-sec">
+            <h3 class="cllr1 cllr2">Report </h3>
+            <ul class="list-unstyled">
+                <li>Report Date:
+                    <label class="reportdate">{{data.reportdate}}</label>
+                </li>
+            </ul>
+        </div>
+
+
+        <h2 class="d-inline-flex text-white clrr3 dispatchdate">{{data.despdate}}</h2>
+        <div class="listing-sec">
+            <h3 class="cllr1 cllr3">Dispatch Detail </h3>
+            <ul class="list-unstyled">
+                <li>Dispatch Date:
+                    <label class="dispatchdate">{{data.despdate}}</label>
+                </li>
+                <li>Dispatch Messenger Name:
+                    <label class="dispatchmessengername">{{data.despmessengername}}</label>
+                </li>
+                <li>Dispatch Messenger Detail:
+                    <label class="dispatchmessengerdetail">{{data.despmessengerdetail}}</label>
+                </li>
+            </ul>
+        </div>
+
+        <div class="col-sm-12">
+            <div class="right-bn text-right">
+                <a href="javascript:void(0)" class="checkfslreport btn btn-primary text-white" (click)="downloadFSlReport(data.fslid)" data-fslid="CFSL(CHD)/153/Chem/53/20">Check Report in FSL</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,199 @@
+
+<div class="pc-container">
+  <div class="pcoded-content pb" style="padding-bottom:90px;">
+    <div class="page-header">
+      <div class="page-block">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <div class="page-header-title">
+              <h5 class="m-b-10">FSL Reports Received</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Form -->
+    <div class="row">
+      <div class="col-sm-12 px-0">
+        <div class="card">
+          <div class="card-body">
+            <form [formGroup]="form" #dateForm="ngForm">
+              <div class="row searchbypanel">
+                <div class="col-md-3  col-12 mb-3">
+                         <label class="form-label"> District  Name</label>
+                            <ng-multiselect-dropdown #multiSelect [settings]="settings" [data]="Districts" formControlName="district" [placeholder]="'Select District'"
+                        (onDropDownClose)="onDistrictChange($event)">
+                        </ng-multiselect-dropdown>
+                      </div>
+                        <div class="col-md-3  col-12 mb-3">
+                         <label class="form-label"> Police Station</label>
+                           <ng-multiselect-dropdown #multiSelect [settings]="settings" [data]="policestations" formControlName="psCode" [placeholder]="'Police Station'">
+                           </ng-multiselect-dropdown>
+                      </div>
+                <div class="col-lg-2 col-md-3  col-12 mb-3">
+                  <div class="form-group">
+                    <label for="fromDate" class="form-label">Case Submitted From Date <sup class="text-danger top-0">*</sup> </label>
+                      <p-calendar formControlName="FromDate"  class="form-control mon"
+                             readonlyInput="true" placeholder="Select a date" dateFormat="dd-mm-yy" [showIcon]="true">
+                            </p-calendar>
+                  </div>
+                </div>
+                <div class="col-lg-2 col-md-3  col-12 mb-3">
+                  <div class="form-group">
+                    <label for="toDate" class="form-label">Case Submitted To Date <sup class="text-danger top-0">*</sup> </label>
+                   
+                      <p-calendar formControlName="toDate"  class="form-control mon"
+                             readonlyInput="true" placeholder="Select a date" dateFormat="dd-mm-yy" [showIcon]="true">
+                            </p-calendar>
+                  </div>
+                </div>
+                
+                <div class="col-md-2 col-12 pt-4 mt-1" style="text-align: center;">
+                  <button type="button" class="btn btn-success text-white mr-2" (click)="onSearch()" [disabled]="!dateForm.valid">Search</button>
+                  <button type="button" class="btn btn-secondary text-white" (click)="onReset()">Reset</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results: Cards and Table -->
+
+          <div class="col-sm-12 mb-1 fir-det-sec d-none" *ngIf="showResults">
+      <div class="row">
+       
+        <div class="col-sm-4">
+          <div class="card text-center p-4 com-border-shadow" >
+            <h4>Total </h4>
+            <span >{{Total}} </span>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="card text-center p-4 com-border-shadow" >
+
+            <h4>Reports Generated</h4>
+            <span > {{ReportsGenerated}}</span>
+         </div>
+
+        </div>
+        <div class="col-sm-4">
+           <div class="card text-center p-4 com-border-shadow" >
+            <h4>Reports Not Generated</h4>
+            <span >{{ReportsNotGenerated}}</span>
+        </div>
+
+        </div>
+
+      </div>
+    </div>
+  
+      <!-- Cards -->
+      
+
+      <div class="row mt-12 px-0">
+        <div class="col-md-12 px-0">
+          <div class="card" style="font-size: 1.75rem;">
+            <div class="card-body">
+
+            <!-- Table -->
+                <div style="height: 100%; width: 100%;">
+                  
+                   <!-- <div class="col-md-8 mt-3">
+                  <h5 _ngcontent-ng-c2247344463="" class="me-3 mb-0">Medleapr w.e.f. from : {{ fromDate | date:'dd-MM-yyyy' }} to {{ toDate | date:'dd-MM-yyyy' }}</h5>
+                </div>
+                  <div class="row mb-1">
+                    <div class="col-md-6 offset-md-6 d-flex justify-content-end mb-3">
+                      <input type="text" class="form-control" placeholder="Search..." (input)="onQuickFilter($event)" style="max-width: 300px;" />
+                    </div>
+                  </div> -->
+                   <div class="col-md-12">
+              <div class="row">
+                   <div class="col-md-10 mt-4">
+                  <h5 _ngcontent-ng-c2247344463="" class="me-3 mb-0">FSL Reports  w.e.f. from :{{ fromDate | date:'dd-MM-yyyy' }} to {{ toDate | date:'dd-MM-yyyy' }} </h5>
+                </div>
+                  <div class="col-md-2">
+                    <div class="d-flex justify-content-end mb-2 pt-2">
+                   <input type="text" class="form-control" placeholder="Search..." (input)="onQuickFilter($event)" style="max-width: 300px;" />
+                    </div>
+                  </div>
+              </div>
+                   </div>
+                  
+                  <div class="row">
+                    <div class="col-md-12">
+                      <p-table 
+                        [columns]="columns" 
+                        [value]="FSLData" 
+                        [paginator]="true" 
+                        [rows]="10" 
+                        [lazy]="true" 
+                        (onLazyLoad)="loadFslReports($event)" 
+                        [totalRecords]="FilteredRecordsCount" 
+                        [loading]="loading" 
+                        [rowsPerPageOptions]="[10, 20, 50]"
+                        [paginatorTemplate]="true"
+                        [responsive]="true"
+                        [rowHover]="true"  
+                      >
+                        <ng-template pTemplate="header" let-columns>
+                          <tr>
+                            <th *ngFor="let col of columns" class="header-style"> <!-- Sortable Header -->
+                              {{ col.header }}
+                            </th>
+                          </tr>
+                        </ng-template>
+
+                        <!-- Table Body -->
+                        <ng-template pTemplate="body" let-rowData let-columns="columns">
+                          <tr>
+                            <td *ngFor="let col of columns" class="body-cell-style"> <!-- Improved Cell Style -->
+                              <!-- Add click event to 'fulldispno' column -->
+                              <span *ngIf="col.field === 'fulldispno'; else defaultColumn">
+                                <a href="javascript:void(0)" (click)="openModalWithDispNo(content, rowData)">
+                                  {{ rowData[col.field] }}
+                                </a>
+                              </span>
+                              <ng-template #defaultColumn>
+                                {{ rowData[col.field] }}
+                              </ng-template>
+                            </td>
+                          </tr>
+                        </ng-template>
+
+                        <!-- No Records Template -->
+                       <ng-template pTemplate="emptymessage">
+                        <tr>
+                          <td [attr.colspan]="columns.length" class="text-center text-muted p-3">
+                            No records found
+                          </td>
+                        </tr>
+                      </ng-template>
+
+                        <!-- Paginator Left Template -->
+                        <ng-template pTemplate="paginatorleft">
+                          <div>
+                            Showing {{ currentFirst }} to {{ currentLast }} of {{ FilteredRecordsCount }} records
+                          </div>
+                        </ng-template>
+                      </p-table>
+
+                    </div>
+                  </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+  </div>
+</div>
+
+
+
+
+<div #dynamicContainer></div>
+
+

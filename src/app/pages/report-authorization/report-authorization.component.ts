@@ -1,0 +1,187 @@
+import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { IodashboardService } from '../services/iodashboard.service';
+import { ReportAuthorizationService } from '../services/report-authorization.service'
+import { UtilityService } from '../services/utility.service';
+import Swal from 'sweetalert2';
+
+export interface DropdownOption {
+  value: number;
+  text: string;
+}
+
+@Component({
+  selector: 'app-report-authorization',
+  templateUrl: './report-authorization.component.html',
+  styleUrls: ['./report-authorization.component.css']
+})
+export class ReportAuthorizationComponent implements OnInit {
+  settings = {};
+  minDateValue: any;
+  maxDateValue: any;
+  minDateValue2: any;
+  maxDateValue2: any;
+  CountListRowData: any;
+  policestations: any[] = [];
+  ListDistict: any[] = [];
+  Districts: any[] = [];
+  errorMessage: string = '';
+  form: FormGroup;
+  reportForm: FormGroup;
+
+  @ViewChild('multiSelect') gridContainer!: ElementRef;
+
+  constructor(
+    private IodashboardService: IodashboardService,
+    private formBuilder: FormBuilder,
+    private ReportAuthorizationService: ReportAuthorizationService,
+    private Loadutility: UtilityService
+  ) {
+
+    this.form = this.formBuilder.group({
+
+      Mobile: [''],
+      districtCodes: [null, Validators.required],
+      PsCds: [null, Validators.required],
+      ReportName: [null, Validators.required],
+    });
+
+
+    this.reportForm = this.formBuilder.group({
+      reportType: new FormControl([])
+    });
+  }
+  ListReport: DropdownOption[] = [
+    { value: 1, text: 'FSL' },
+    { value: 2, text: 'Prosecution' },
+    { value: 3, text: 'eSakshaya' },
+    { value: 4, text: 'Medleapr' }
+  ];
+
+  ngOnInit(): void {
+    this.BindDistricts();
+    this.settings = {
+      singleSelection: false,
+      idField: 'value',
+      textField: 'text',
+      enableCheckAll: true,
+      allowSearchFilter: true,
+      limitSelection: -1,
+      clearSearchFilter: true,
+      maxHeight: 197,
+      itemsShowLimit: 3,
+      searchPlaceholderText: 'Search',
+      closeDropDownOnSelection: false,
+      showSelectedItemsAtTop: false,
+      defaultOpen: false,
+    };
+  }
+
+
+
+  BindDistricts(): void {
+    this.Loadutility.LoadDistricts().subscribe({
+   // this.IodashboardService.LoadDistricts().subscribe({
+      next: (response) => {
+        if (response.isSuccess && response.data && response.data.length > 0) {
+          this.ListDistict = response.data;
+          this.errorMessage = '';
+        } else {
+          this.errorMessage = 'No data available for Nyaay Shuruti.';
+          this.ListDistict = [];
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching Nyaay Shuruti data:', err);
+        this.errorMessage = 'Failed to load data from the server. Please try again later.';
+        this.ListDistict = [];
+      },
+    });
+  }
+
+
+  onDistrictChange(event: any): void {
+    if (this.form) {
+      const formValues = this.form.getRawValue();
+      if (Array.isArray(formValues.districtCodes)) {
+        const districtCodes = formValues.districtCodes.map((item: { value: any; }) => parseInt(item.value));
+        this.Loadutility.LoadPoliceStationsList(districtCodes).subscribe((data: any) => {
+        //this.IodashboardService.LoadPoliceStations(districtCodes).subscribe((data: any) => {
+          if (data.isSuccess) {
+            this.policestations = data.data;
+          }
+        });
+      } else {
+        console.error('districtCodes is not an array');
+      }
+    } else {
+      console.error('Form is not initialized');
+    }
+  }
+
+  onSubmit(): void {
+    const formData = this.form.value;
+    const officeCodes = localStorage.getItem('mobileNumber');
+    const userData = localStorage.getItem('userData');
+
+    let userDataJson: any = null;
+    if (userData) {
+      userDataJson = JSON.parse(userData);
+    }
+
+    const officeCodesFinal = userDataJson?.mobileNumber || officeCodes;
+    const UserLogin = officeCodesFinal?.startsWith('91') ? officeCodesFinal.substring(2) : officeCodesFinal;
+
+    const requestPayload = {
+      UserLogin: UserLogin,
+      Mobile: formData.Mobile,
+      ReportName: formData.ReportName,
+      PsCds: formData.PsCds
+    };
+
+    this.ReportAuthorizationService.InsertReportAuthority(requestPayload).subscribe({
+      next: (response) => {
+        if (response.isSuccess) {
+          Swal.fire({
+             position: 'top-end',
+              // icon: 'success',
+              // title: 'Success',
+            title: response.message || 'Report Authorization data saved successfully!',
+            showConfirmButton: false,
+            timer: 2000,           
+            customClass: {
+              popup: 'custom-alert',
+              title: 'custom-title'
+            },
+            background: '#006400'
+
+          });
+        } else {
+          Swal.fire({           
+            position: 'top-end',
+            title: response.message,
+            showConfirmButton: false,
+            timer: 3000,
+            customClass: {
+              popup: 'custom-warning-popup',
+              title: 'custom-warning-title',
+            },
+            background: '#fff3cd',
+          });
+        }
+      },
+      error: (err) => {
+        const errorMessage = err?.error?.message || 'An unexpected error occurred.';
+        console.error('Error:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: errorMessage,
+          showConfirmButton: true
+        });
+      }
+    });
+  }
+
+
+}

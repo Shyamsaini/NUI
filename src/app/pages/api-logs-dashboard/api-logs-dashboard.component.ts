@@ -1,0 +1,300 @@
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { ApiLogsDashboardService } from '../services/api-logs-dashboard.service';
+import { ViewChild } from '@angular/core';
+import { Table } from 'primeng/table';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { AuthService } from '../services/auth.service';
+import { LoaderService } from '../services/loader.service';
+
+
+@Component({
+  selector: 'app-api-logs-dashboard',
+  templateUrl: './api-logs-dashboard.component.html',
+  styleUrls: ['./api-logs-dashboard.component.css']
+})
+export class ApiLogsDashboardComponent implements OnInit {
+  logSearchForm!: FormGroup;
+  apiLogs: any[] = [];
+  filteredLogs: any[] = [];
+  showTable: boolean = false;
+  modalRef: NgbModalRef | undefined; 
+  selectedStateCode: number = 0; 
+  apiEndpoints: string[] = [];
+  isLoading: boolean = false;
+  popupData: any = null;
+  showPopup: boolean = false;
+  isEncrypted: boolean = false;
+  
+
+
+  requestDialogVisible = false;
+  responseDialogVisible = false;
+  exceptionDialogVisible = false;
+
+  requestDialogData: string = '';
+  responseDialogData: string = '';
+  exceptionDialogData: string = '';
+
+  errorDialogVisible = false;
+  errorDialogMessage = 'An unexpected error occurred';
+  responseDialogHeader: string = 'Response Data';
+  requestDialogHeader: string = 'Request Data';
+
+
+
+  recordCount: number = 0;
+  searchTerm: string = '';
+
+  
+  constructor(private fb: FormBuilder, private apiLogsService: ApiLogsDashboardService, private modalService: NgbModal,private authService: AuthService,     private loaderService: LoaderService) {}
+
+  @ViewChild('logTable') logTable!: Table;
+
+  ngOnInit(): void {
+    this.logSearchForm = this.fb.group({
+      fromDate: [''],
+      toDate: [''],
+      particularDate: [this.getCurrentDate()],
+      apiEndpoint: [''],
+      milliseconds: [0],
+      processStatus: ['0']
+    }); 
+    this.authService.getStates().subscribe((data: any[]) => {
+      this.states = data;
+
+
+      
+      const storedData = localStorage.getItem('userData');
+    if (storedData) {
+      const parsedData = JSON.parse(storedData);
+      this.selectedStateCode = parsedData.stateCode;
+      this.onStateChange();
+    }
+    });
+
+
+   
+    this.logSearchForm.get('fromDate')?.valueChanges.subscribe(() => this.handleDateLogic());
+    this.logSearchForm.get('toDate')?.valueChanges.subscribe(() => this.handleDateLogic());
+
+    this.logSearchForm.get('particularDate')?.valueChanges.subscribe(() => this.handleDateLogic());
+  }
+
+  
+  states: any[] = [];
+  openLoginModal(content: any) {
+
+    this.modalRef = this.modalService.open(content, { centered: true });
+  }
+
+  viewDetail(log: any): void {
+    this.popupData = log;
+    this.showPopup = true;
+  }
+
+  getCurrentDate(): string {
+  const today = new Date();
+  return today.toISOString().split('T')[0]; // Converts to 'yyyy-MM-dd' format
+}
+
+
+  copyToClipboard(text: string): void {
+    navigator.clipboard.writeText(text).then(() => {
+
+      console.log('Copied to clipboard');
+    }).catch(err => {
+      console.error('Failed to copy!', err);
+    });
+  }
+
+  
+
+filterLogs(): void {
+  if (this.searchTerm.trim() === '') {
+    this.filteredLogs = this.apiLogs;
+  } else {
+    const lowerCaseTerm = this.searchTerm.toLowerCase();
+    this.filteredLogs = this.apiLogs.filter(log =>
+      Object.values(log).some(value =>
+        String(value).toLowerCase().includes(lowerCaseTerm)
+      )
+    );
+  }
+  this.recordCount = this.filteredLogs.length;
+}
+
+  
+  onStateChange(): void {
+    if (this.selectedStateCode > 0) {
+      this.apiLogsService.getDistinctApiEndpoints(this.selectedStateCode).subscribe({
+        next: (res: any) => {
+          if (res.isSuccess) {
+            this.apiEndpoints = res.data;
+          } else {
+            this.apiEndpoints = [];
+          }
+        },
+        error: () => {
+          this.apiEndpoints = [];
+        }
+      });
+    } else {
+      this.apiEndpoints = [];
+    }
+  }
+
+  get isSearchDisabled(): boolean {
+  return (
+    this.selectedStateCode === 0 ||                         
+    !this.logSearchForm.get('particularDate')?.value ||     
+    this.logSearchForm.get('processStatus')?.value === '' ||
+    this.logSearchForm.get('apiEndpoint')?.value === 'select' 
+  );
+}
+
+  handleDateLogic(): void {
+    const fromDate = this.logSearchForm.get('fromDate')?.value;
+    const toDate = this.logSearchForm.get('toDate')?.value;
+    const particularDate = this.logSearchForm.get('particularDate')?.value;
+  
+    const particularControl = this.logSearchForm.get('particularDate');
+    const fromControl = this.logSearchForm.get('fromDate');
+    const toControl = this.logSearchForm.get('toDate');
+  
+    if (fromDate || toDate) {
+      particularControl?.disable({ emitEvent: false });
+    } else {
+      particularControl?.enable({ emitEvent: false });
+    }
+  
+    if (particularDate) {
+      fromControl?.disable({ emitEvent: false });
+      toControl?.disable({ emitEvent: false });
+    } else {
+      fromControl?.enable({ emitEvent: false });
+      toControl?.enable({ emitEvent: false });
+    }
+  }
+  
+
+  searchLogs(): void {
+     this.loaderService.show();
+    this.isLoading = true;
+    const formValues = this.logSearchForm.value;
+    let particularDate: string | null = null;
+
+    if (formValues.particularDateTime) {
+    const datePart = new Date(formValues.particularDateTime);
+    const ms = formValues.milliseconds || 0;
+
+    datePart.setMilliseconds(ms);
+
+    particularDate = datePart.toISOString();
+    }
+    const requestPayload = {
+
+      fromDate: formValues.fromDate || null,
+      toDate: formValues.toDate || null,
+      particularDate: formValues.particularDate || null,
+      apiEndpoint: formValues.apiEndpoint || '',
+      processStatus: formValues.processStatus !== '' ? parseInt(formValues.processStatus) : null
+    };
+    this.apiLogsService.searchLogs(requestPayload).subscribe({
+
+      next: (res: any) => {
+        this.isLoading = false;
+         this.loaderService.hide();
+        if (res.isSuccess) {
+          this.apiLogs = [...res.data];
+          this.filteredLogs = [...this.apiLogs];
+          this.recordCount = this.apiLogs.length;
+          this.showTable = true;
+
+          setTimeout(() => {
+            this.logTable.reset();
+          });
+
+        } else {
+          this.errorDialogMessage = res.message || 'Failed to fetch logs';
+          this.errorDialogVisible = true;
+        }
+        
+      },
+      error: () => {
+        this.isLoading = false;
+        this.errorDialogMessage = 'An unexpected error occurred';
+        this.errorDialogVisible = true;
+      }
+    });
+  }
+
+  resetForm(): void {
+    this.logSearchForm.reset();
+    this.apiLogs = [];
+    this.showTable = false;
+
+    this.logSearchForm.get('fromDate')?.enable({ emitEvent: false });
+    this.logSearchForm.get('toDate')?.enable({ emitEvent: false });
+    this.logSearchForm.get('particularDate')?.enable({ emitEvent: false })
+
+    this.selectedStateCode = 0;
+    this.apiEndpoints = [];
+    // Force the value of API Endpoint to "Select"
+  this.logSearchForm.get('apiEndpoint')?.setValue('select'); 
+
+  
+  this.onStateChange();  
+
+  //Set Process Status back to "Select"
+  this.logSearchForm.get('processStatus')?.setValue(''); 
+    // this.logSearchForm.get('apiEndpoint')?.setValue('1');
+    // this.logSearchForm.get('processStatus')?.setValue(''); 
+  }
+
+
+  showRequestData(requestParam: string, isEncrypted: boolean = false): void {
+  this.requestDialogData = requestParam;
+  this.requestDialogHeader = isEncrypted ? 'Encrypted Request Data' : 'Request Data';
+  this.requestDialogVisible = true;
+}
+
+
+  showResponseData(responseParam: string, isEncrypted: boolean = false): void {
+  this.responseDialogData = responseParam;
+  this.isEncrypted = isEncrypted;
+  this.responseDialogHeader = isEncrypted ? 'Encrypted Response Data' : 'Response Data';
+  this.responseDialogVisible = true;
+}
+
+  
+  showApiException(apiException: string): void {
+    this.exceptionDialogData = apiException;
+    this.exceptionDialogVisible = true;
+  }
+
+  formatPopupData(data: any): string {
+    return `Endpoint: ${data.ApiEndpoint}
+  Method: ${data.ApiMethodName}
+  Status: ${data.ApiStatusDescription}
+  Created On: ${data.CreatedOn}
+  Execution Time: ${data.ExecutionDurationMs} ms
+  
+  Request:
+  ${data.UserRequestParam || 'No request data'}
+  
+  Encrypted Request:
+  ${data.EncryptRequestParam || 'N/A'}
+
+  Response:
+  ${data.UserResponseParam || 'No response data'}
+
+  Encrypted Response:
+  ${data.EncryptResponseParam || 'N/A'}
+  
+  Exception:
+  ${data.ApiException || 'N/A'}
+  `;
+  }
+  
+}

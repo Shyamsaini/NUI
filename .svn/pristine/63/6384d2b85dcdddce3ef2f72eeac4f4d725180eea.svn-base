@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>NyaySetu</title>
+  <base href="/">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!-- ✅ Content Security Policy - allow Google Fonts only -->
+  <meta http-equiv="Content-Security-Policy" 
+        content="
+          default-src 'self';
+          script-src 'self' 'unsafe-inline';
+          style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+          font-src 'self' https://fonts.gstatic.com;
+          img-src 'self' data:;
+          connect-src 'self' http://10.194.163.69 http://localhost:5296;
+          frame-ancestors 'none';
+          object-src 'none';
+          base-uri 'self';
+        ">
+
+  <!-- ✅ Cache Control Security -->
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
+  <!-- ✅ Security Headers -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta name="referrer" content="strict-origin">
+
+  <!-- ✅ SEO and Branding -->
+  <meta name="description" content="NyaaySetu – Your Justice Access Platform for quick and efficient legal access in India.">
+  <meta name="author" content="NyaaySetu Team">
+  <meta name="robots" content="index, follow">
+
+  <!-- ✅ Favicon -->
+  <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+
+  <!-- ✅ Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- ✅ Preconnect for fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- ✅ Preconnect for internal APIs only -->
+  <link rel="preconnect" href="http://10.194.163.69">
+  <link rel="preconnect" href="http://localhost:5296">
+
+  <!-- ✅ Optional: Theme color -->
+  <meta name="theme-color" content="#ffffff">
+
+  <!-- ✅ Content Security Policy - allow Google Fonts only -->
+  <meta http-equiv="Content-Security-Policy" 
+        content="
+          default-src 'self';
+          script-src 'self' 'unsafe-inline';
+          style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+          font-src 'self' https://fonts.gstatic.com;
+          img-src 'self' data:;
+          connect-src 'self' http://10.194.163.69 http://localhost:5296;
+          frame-ancestors 'none';
+          object-src 'none';
+          base-uri 'self';
+        ">
+
+  <!-- ✅ Cache Control Security -->
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
+  <!-- ✅ Security Headers -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta name="referrer" content="strict-origin">
+
+  <!-- ✅ SEO and Branding -->
+  <meta name="description" content="NyaySetu – Your Justice Access Platform for quick and efficient legal access in India.">
+  <meta name="author" content="NyaySetu Team">
+  <meta name="robots" content="index, follow">
+
+  <!-- ✅ Favicon -->
+  <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+
+  <!-- ✅ Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- ✅ Preconnect for fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- ✅ Preconnect for internal APIs only -->
+  <link rel="preconnect" href="http://10.194.163.69">
+  <link rel="preconnect" href="http://localhost:5296">
+
+  <!-- ✅ Optional: Theme color -->
+  <meta name="theme-color" content="#ffffff">
+
+</head>
+<body id="main-body" class="bg-white" role="main">
+  <app-root></app-root>
+</body>
+</html>

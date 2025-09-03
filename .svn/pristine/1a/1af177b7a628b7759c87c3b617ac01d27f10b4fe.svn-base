@@ -1,0 +1,59 @@
+        <div class="linked-docs pt-2">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="text-right" *ngIf="otherPillarData !== undefined">
+                                    <a href="javascript:void(0)" (click)="loadMiniStatement(otherPillarData.firregnum)" class="ministatement btn btn-primary mb-3 px-2 py-1" >View Mini Statement</a>
+                                </div>
+                                <ul class="d-flex flex-row justify-content-between list-unstyled">
+                                    <li>
+                                        <div class="ic-nam">
+                                            <i class="fa fa-balance-scale" aria-hidden="true"></i>
+                                            <span>Medleapr</span>
+                                        </div>
+                                        <div class="medleaprids" *ngIf="otherPillarData !== undefined">
+                                            <a  *ngFor="let medleprid of otherPillarData.medleprids" href="javascript:void(0)" class="fslid" (click)="loadMedleprInfo(medleprid)" ><strong>{{medleprid}}</strong></a>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="ic-nam">
+                                            <i class="fa fa-file" aria-hidden="true"></i>
+                                            <span>Forensic</span>
+                                        </div>
+                                            <div class="fslnumbers" *ngIf="otherPillarData !== undefined">
+                                                <a  *ngFor="let forensicId of otherPillarData.forensicsids" href="javascript:void(0)" class="fslid" (click)="loadFslInformation(forensicId)" ><strong>{{forensicId}}</strong></a>
+                                            </div>
+                                    </li>
+                                    <li>
+                                        <div class="ic-nam">
+                                            <i class="fa fa-file-text" aria-hidden="true"></i>
+                                            <span>Prosecution</span>
+                                        </div>
+                                        <div class="prosecutionids" *ngIf="otherPillarData !== undefined">
+                                            <a href="javascript:void(0)" *ngFor="let prosecutionId of otherPillarData.prosecutionids"  class="prosecutionid"  (click)="loadProsecutionInformation(prosecutionId)"  ><strong>{{ prosecutionId }}</strong></a>
+                                        </div>
+
+                                    </li>
+                                    <li>
+                                        <div class="ic-nam">
+                                            <i class="fa fa-balance-scale" aria-hidden="true"></i>
+                                            <span>Court</span>
+                                        </div>
+                                        <div class="cnrnumbers" *ngIf="otherPillarData !== undefined"><a href="javascript:void(0)" class="cnrnumber" (click)="loadCaseInformation(cnr)"  *ngFor="let cnr of otherPillarData.cnrs" ><strong>{{cnr}}</strong></a></div>
+                                    </li>
+                                    <li>
+                                        <div class="ic-nam">
+                                            <i class="fa fa-id-card-o" aria-hidden="true"></i>
+                                            <span>Prison</span>
+                                        </div>
+                                        <div class="prisonerids"  *ngIf="otherPillarData !== undefined">
+                                            <a class="prisoner" href="javascript:void(0)"  *ngFor="let prisonerid of otherPillarData.prisoners" (click)="loadPrisonerInfo(prisonerid.prisonerid, prisonerid.prisoner_statecode)" ><strong>{{ prisonerid.prisonerid }}</strong></a>
+                                        </div>
+
+                                    </li>
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>

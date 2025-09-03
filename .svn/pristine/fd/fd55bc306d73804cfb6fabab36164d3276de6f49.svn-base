@@ -1,0 +1,308 @@
+<div class="pc-container">
+  <div class="pcoded-content pb" style="padding-bottom:90px;">
+    <div class="page-header">
+      <div class="page-block">
+          <div class="row align-items-center">
+              <div class="col-md-6">
+                  <div class="page-header-title">
+                      <h5 class="m-b-10" >Scheduler Panel</h5>
+                  </div>
+              </div>
+          </div>
+      </div>
+    </div>
+
+    <div class="card mt-5" id="schedulerForm">
+      <div class="card-body">
+
+        <h5 class="form-header">
+          {{ isEditMode ? 'Edit Scheduler' : 'Add Scheduler' }}
+        </h5>
+
+            <form [formGroup]="schedulerForm" (ngSubmit)="onSubmit()">
+          <div id="searchByFilingNumber" class="row searchbypanel">
+            
+              <!-- <div class="col-md-3  col-12 mb-3" *ngIf="isEditMode">
+                 <label class="form-label"> Schedular State Code</label>
+                  <sup class="text-danger top-0">*</sup>    
+                    <input id="SchedularStateCode" formControlName="SchedularStateCode" class="form-control" type="text" placeholder="Enter State Code" [readonly]="isEditMode"/>
+              </div> -->
+
+              <div class="col-md-3 col-12 mb-3">
+            <label class="form-label">State Name</label>
+            <sup class="text-danger top-0">*</sup>
+            <input id="StateName" formControlName="StateName" class="form-control" 
+                    type="text" [value]="selectedState" readonly>
+            </div>
+
+              <div class="col-md-3 col-12 mb-3">
+          <label class="form-label">Process API URL</label>
+          <sup class="text-danger top-0">*</sup>
+        <select id="ProcessApiUrl" formControlName="ProcessApiUrl" class="form-control">
+          <option value="" disabled selected>Select API URL</option>  
+          <option *ngFor="let apiUrl of apiUrls" [value]="apiUrl.value">
+          {{apiUrl.display}}
+        </option>        
+        </select>  
+        </div>
+
+             <div class="col-md-3  col-12 mb-3">
+              <label class="form-label"> Process Schedule Type</label>
+               <sup class="text-danger top-0">*</sup>
+                <input id="ProcessScheduleType" formControlName="ProcessScheduleType" class="form-control" type="text" placeholder="Enter Schedule Type" [readonly]="isEditMode" />
+                <div *ngIf="isFieldInvalid('ProcessScheduleType')" class="text-danger">
+                  ProcessScheduleType is required.
+                </div>
+            </div>
+
+            <div class="col-md-3 col-12 mb-3">
+              <label class="form-label"> Frequency Type</label>
+              <sup class="text-danger top-0">*</sup>
+              <select id="ScheduleFrequencyType" formControlName="ScheduleFrequencyType" class="form-control">
+                <option value="">Select</option>
+                <option value="HOURLY">Hourly</option>
+                <option value="DAILY">Daily</option>
+                <!-- <option value="RANGE">Range</option> -->
+              </select>
+              <div *ngIf="isFieldInvalid('ScheduleFrequencyType')" class="text-danger">
+                Frequency Type is required.
+              </div>
+            </div>
+
+            <div class="col-md-3 col-12 mb-3">
+              <label class="form-label">Frequency Interval</label>
+              <sup class="text-danger top-0">*</sup>
+              
+              <select
+                *ngIf="schedulerForm.get('ScheduleFrequencyType')?.value !== 'HOURLY'"
+                id="ScheduleFrequencyInterval"
+                formControlName="ScheduleFrequencyInterval"
+                class="form-control"
+              >
+                <option value="">Select</option>
+                <option *ngFor="let interval of intervals" [value]="interval">{{ interval }}</option>
+              </select>
+             
+              <input
+                *ngIf="schedulerForm.get('ScheduleFrequencyType')?.value === 'HOURLY'"
+                id="ScheduleFrequencyInterval"
+                formControlName="ScheduleFrequencyInterval"
+                class="form-control"
+                type="number"
+                placeholder="Enter Interval"
+              />
+              <div *ngIf="isFieldInvalid('ScheduleFrequencyInterval')" class="text-danger">
+                Frequency Interval is required.
+              </div>
+            </div>
+
+
+            <div *ngIf="schedulerForm.get('ScheduleFrequencyType')?.value !== 'HOURLY'" class="col-md-3 col-12 mb-3">
+              <label class="form-label">AM/PM</label>
+              <sup class="text-danger top-0">*</sup>
+              <select id="ScheduleAMPM" formControlName="ScheduleAMPM" class="form-control">
+                <option value="">Select</option>
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+              </select>
+              <div *ngIf="isFieldInvalid('ScheduleAMPM')" class="text-danger">
+                AM/PM is required.
+              </div>
+            </div>
+            
+            <!-- <div class="col-md-3  col-12 mb-3">
+              <label class="form-label"> From Date</label>
+               <sup class="text-danger top-0">*</sup>
+               <input id="FromDate" formControlName="FromDate" class="form-control" type="date" [min]="getTodayDate()" />
+               <div *ngIf="schedulerForm.hasError('toDateInvalid') && schedulerForm.get('ToDate')?.touched" class="text-danger">
+                From Date must be less than To Date.
+              </div>
+              <div *ngIf="isFieldInvalid('FromDate')" class="text-danger">
+                FromDate is required.
+              </div>
+            </div>
+
+
+            <div class="col-md-3  col-12 mb-3">
+              <label class="form-label"> To Date</label>
+               <sup class="text-danger top-0">*</sup>
+               <input id="ToDate" formControlName="ToDate" class="form-control" type="date" [min]="getTodayDate()" />
+               <div *ngIf="schedulerForm.hasError('toDateInvalid') && schedulerForm.get('ToDate')?.touched" class="text-danger">
+                From Date must be less than To Date.
+              </div>
+              <div *ngIf="isFieldInvalid('ToDate')" class="text-danger">
+               Invalid ToDate.
+              </div>
+            </div> -->
+
+            <div class="col-md-3  col-12 mb-3">
+              <label class="form-label"> Start Date</label>
+               <sup class="text-danger top-0">*</sup>
+               <input id="StartDate" formControlName="StartDate" class="form-control" type="date" [min]="getTodayDate()" />
+               <!-- <div *ngIf="schedulerForm.hasError('startDateInvalid') && schedulerForm.get('StartDate')?.touched" class="text-danger">
+                Start Date must be greater than or equal to To Date.
+              </div> -->
+              <div *ngIf="isFieldInvalid('StartDate')" class="text-danger">
+                StartDate is required.
+              </div>
+            </div>
+
+            <div class="col-md-3  col-12 mb-3">
+              <label class="form-label"> Is Process Active</label>
+               <sup class="text-danger top-0">*</sup>
+               <div class="form-check">
+                <input id="IsActive" formControlName="IsActive" class="form-check-input" type="checkbox" />
+                <label for="IsActive" class="form-check-label">Enable Active Process</label>
+               </div>
+            </div>
+
+            <div class="col-md-3 col-12 mb-3">
+              <label class="form-label">Is Scheduler Process</label>
+              <sup class="text-danger top-0">*</sup>
+              <div class="form-check">
+                <input id="IsProcessSchedule" formControlName="IsProcessSchedule" class="form-check-input" type="checkbox" />
+                <label for="IsProcessSchedule" class="form-check-label">Enable Schedule Process</label>
+              </div>
+            </div>
+             
+          </div>
+          <div class="col-md-12 col-12 mb-3 pt-4 mt-1" style="text-align: right;">
+           
+                <button type="submit" class="btn btn-success text-white py-1">
+                  {{ isEditMode ? 'Update' : 'Create' }}
+                </button>
+                
+                <button
+                  type="reset"
+                  class="btn btn-secondary text-white py-1 ml-2"
+                  (click)="resetForm()"
+                >
+                  Reset
+                </button>
+
+
+          </div>
+       </form>
+      </div>
+    </div>
+
+
+
+    <div class="ag-theme-alpine" style="height: 100%; width: 100%;">
+      <div>
+        <div class="card mt-5">
+              <div class="card-body">
+
+                <form [formGroup]="schedulerForm">
+                  
+                  <div class="d-flex justify-content-between align-items-center mb-4">
+                  <input
+                      type="text"
+                      class="form-control w-25"
+                      placeholder="Search..."
+                      (input)="onQuickFilter($event)"
+                  />
+                  
+                  <div style="padding-left: 750px;">
+                  <span class="badge"
+                        [ngClass]="{
+                          'bg-success': serviceStatus === 'Running',
+                          'bg-danger': serviceStatus === 'Stopped',
+                          'bg-secondary': serviceStatus !== 'Running' && serviceStatus !== 'Stopped'
+                        }">
+                    Service Status: {{ serviceStatus }}
+                  </span>
+                  </div>
+
+                  <button 
+                      class="btn btn-warning ml-3" 
+                      (click)="restartScheduler()"
+                      title="Restart all schedulers">
+                      Start/Stop Windows Service
+                  </button>
+
+                  </div>
+              </form>
+
+
+                      <div class="row">
+                          <div class="col-md-12">
+                             <h3 class="comme-h3"> Schedulers</h3>
+
+                              <p-table
+                                  [value]="filteredSchedulerRecords"
+                                  [paginator]="true"
+                                  [rows]="10"
+                                  [resizableColumns]="true"
+                                  class="p-datatable-gridlines"
+                              >
+                       
+                                  <ng-template pTemplate="header">
+                                  <tr>
+                                      <th>S.No</th>
+                                      <!-- <th>Schedular State Code</th> -->
+                                      <th>Method Name & API URL</th>
+                                      <!-- <th>ProcessApiUrl</th> -->
+                                      <th>Process Schedule Type</th>
+                                      <th>Frequency Details</th>
+                                      <!-- <th>Frequency Type</th>
+                                      <th>Frequency Interval</th> -->
+                                      <th>Start Date</th>
+                                      <th>Is Active</th>
+                                      <th>Actions</th>
+                                  </tr>
+                                  </ng-template>
+                      
+                               
+                                  <ng-template pTemplate="body" let-record let-rowIndex="rowIndex">
+                                    <tr>
+                                        <td>{{ rowIndex + 1 }}</td>
+                                        <!-- <td>{{ record.SchedularStateCode }}</td> -->
+                                        <td>
+                                          METHOD: {{ record.MethodName }} <br>
+                                          API URL: <a href="{{ record.ProcessApiUrl }}" target="_blank">{{ record.ProcessApiUrl }}</a>
+                                      </td>
+                                        <!-- <td>{{ record.MethodName }}</td>
+                                        <td>{{ record.ProcessApiUrl }}</td> -->
+                                        <td>{{ record.ProcessScheduleType }}</td>
+                                        <td>
+                                          Type: {{ record.ScheduleFrequencyType }} <br>
+                                          Interval: {{ record.ScheduleFrequencyInterval }}
+                                      </td>
+                                        <!-- <td>{{ record.ScheduleFrequencyType }}</td>
+                                        <td>{{ record.ScheduleFrequencyInterval }}</td> -->
+                                        <td>{{ record.StartDate | date: 'dd-MM-yyyy' }}</td>
+                                        <td>
+                                            <button
+                                                class="btn w-100"
+                                                [ngClass]="record.IsActive ? 'btn-success' : 'btn-secondary'"
+                                                (click)="toggleActiveStatus(record.Id, record.IsActive)"
+                                            >
+                                                {{ record.IsActive ? 'Active' : 'Inactive' }}
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-primary w-100" (click)="editRecord(record)">
+                                                Edit
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </ng-template>
+                                
+                                
+                                  <ng-template pTemplate="footer">
+                                  <tr *ngIf="schedulerRecords.length === 0">
+                                      <td colspan="8" class="text-center">No Records available.</td>
+                                  </tr>
+                                  </ng-template>
+                              </p-table>
+
+                          </div>
+                      </div>
+              </div>
+        </div>
+      </div>
+  </div>
+    
+  </div>
+</div>

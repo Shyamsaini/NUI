@@ -1,0 +1,7 @@
+export const environment = {
+    production: true,
+
+    apiUrl:'http://localhost:5296/api',
+   //apiUrl: 'https://nyaysetu.nic.in/NyaaySetuWrapperApi/api',    
+    //allowedHosts: ['localhost', '10.194.163.69', 'nyaysetu.nic.in', 'www.nyaysetu.nic.in'] 
+}

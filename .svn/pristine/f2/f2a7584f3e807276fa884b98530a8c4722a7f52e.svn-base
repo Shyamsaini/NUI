@@ -1,0 +1,487 @@
+import { Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActsearchService } from '../services/actsearch.service';
+import { ModalService } from '../services/modal.service';
+import { DynamicModalService } from '../services/dynamic-modal.service';
+import { UtilityService } from '../services/utility.service';
+import { TableLazyLoadEvent } from 'primeng/table';
+import { LoaderService } from '../services/loader.service';
+interface PsCodeOption {
+  text: string;
+  value: string;
+}
+@Component({
+  selector: 'app-actsearch',
+  templateUrl: './actsearch.component.html',
+  styleUrl: './actsearch.component.css'
+})
+export class ActsearchComponent {  
+
+  currentFirst: number = 1;
+  currentLast: number = 10;
+
+  SecondListFirst: number = 1;
+  SecondListLast: number = 10;
+
+  isActDetailTable: boolean = false;
+  isActSecondTable: boolean = false;
+  isActThirdTable: boolean = false;
+  totalRecords: number = 0;
+  totalCountRecords: number = 0;
+  pageNumber: number = 0;
+  pageSize: number = 0;
+  ActWiseCountList: any;
+  ActWiseList: any;
+  policestations: any[] = [];
+  actList: any[] = [];
+  ListDistict: any[] = [];
+  isSubmitted = false;
+  BackPage: boolean = false;
+  loading: boolean = false;
+  headerText: string = '';
+  columns: string[] = [];
+
+  errorMessage: string = '';
+  settings = {};
+  form!: FormGroup;
+  ActWiseCountForm!: FormGroup;
+  ActPSWiseListForm!: FormGroup;
+
+  isDropdownChanged: boolean = false;
+  
+  constructor(private renderer: Renderer2,private apiservice: ActsearchService, private el: ElementRef,
+    protected modalService: ModalService, private utilityService: UtilityService, private formBuilder: FormBuilder,
+    private dynamicModelService: DynamicModalService,private loaderService: LoaderService
+
+  ) {
+    
+  }
+  ngOnInit(): void {
+    this.form = this.formBuilder.group({
+      Mobile: [''],
+      districtCodes: [null, Validators.required],
+      PsCds: [null, Validators.required],
+      actName: [null, Validators.required],
+    });
+    this.BindDistricts();
+    this.BindAct();
+    this.settings = {
+      singleSelection: false,
+      idField: 'value',
+      textField: 'text',
+      allowSearchFilter: true,
+      maxHeight: 200
+    };
+    this.ActWiseCountForm = this.formBuilder.group({
+      PageNumber: [null, Validators.required],
+      PageSize: [null, Validators.required],
+      Acts: [null, Validators.required],
+      PSCodes: [null, Validators.required],
+      DISTRICT_Code: [null, Validators.required],
+      State_CD:localStorage.getItem('stateCode')
+    });
+    this.ActPSWiseListForm = this.formBuilder.group({
+      PageNumber: [null, Validators.required],
+      PageSize: [null, Validators.required],
+      ACT_CD: [null, Validators.required],
+      PS_CD: [null, Validators.required],
+      ACTTYPE: [null, Validators.required],
+      State_CD:localStorage.getItem('stateCode')
+    });
+    console.log(localStorage.getItem('userData'));
+  }
+  @ViewChild('dropdownRef', { static: false }) dropdownRef: ElementRef | undefined;
+
+ get actNameControl() {
+    return this.form.get('actName');
+  }
+  BindAct(): void {
+    this.apiservice.GetActList().subscribe({
+      next: (response) => {
+        if (response.isSuccess && response.data && response.data.length > 0) {
+          this.actList = response.data;
+          this.errorMessage = '';
+        }
+        else {
+          this.errorMessage = 'No data availaible.';
+          this.actList = [];
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching Nyaay Shuruti data:', err);
+        this.errorMessage = 'Failed to load data from the server. Please try again later.';
+        this.actList = [];
+      },
+    });
+  }
+  BindDistricts(): void {
+    this.apiservice.LoadDistricts().subscribe({
+      next: (response) => {
+        if (response.isSuccess && response.data && response.data.length > 0) {
+          this.ListDistict = response.data;
+          this.errorMessage = '';
+        } else {
+          this.errorMessage = 'No data available for Nyaay Shuruti.';
+          this.ListDistict = [];
+        }
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to load data from the server. Please try again later.';
+        this.ListDistict = [];
+      },
+    });
+  }
+  onDistrictDropdownChange(event: any): void {
+    if (this.form) {
+      const formValues = this.form.getRawValue();
+      if (Array.isArray(formValues.districtCodes)) {
+        const districtCodes = formValues.districtCodes.map((item: { value: any; }) => parseInt(item.value));
+        this.apiservice.LoadPoliceStations(districtCodes).subscribe((data: any) => {
+          if (data.isSuccess) {
+            this.policestations = data.data;
+          }
+        });
+      } else {
+        console.error('districtCodes is not an array');
+      }
+    } else {
+      console.error('Form is not initialized');
+    }
+  }
+  onpolicestationsDropdownChange(event: any): void {
+    if (this.form) {
+      const formValues = this.form.getRawValue();
+      if (Array.isArray(formValues.PsCds)) {
+        const policestationsCodes = formValues.PsCds.map((item: { value: any; }) => parseInt(item.value));
+      } else {
+        console.error('PsCds is not an array');
+      }
+    } else {
+      console.error('Form is not initialized');
+    }
+  }
+  isDropdownOpen = false;
+
+ 
+  onActDropdownChange(event: any): void {
+    
+    if (this.form) {
+    
+      const formValues = this.form.getRawValue();
+      if (Array.isArray(formValues.actName)) {
+        const actNameCodes = formValues.actName.map((item: { value: any; }) => parseInt(item.value));
+        this.isDropdownChanged = true;
+      } else {
+        console.error('act is not an array');
+        this.isDropdownChanged = false;
+      }
+    } else {
+      console.error('Form is not initialized');
+      this.isDropdownChanged = false;
+    }
+  }
+  totalZeroFirDetails() {
+    this.isActDetailTable = true;
+    this.isActSecondTable = false;
+    this.isActThirdTable=false;
+  }
+  onSubmit() {
+    debugger
+    this.loaderService.show();
+    this.BackPage = false;
+    this.isActDetailTable = true;
+    this.isActSecondTable = false;
+    this.isActThirdTable=false;
+    const psCodeArray: PsCodeOption[] = this.form.controls["PsCds"].value || [];
+    const psCodeValues = psCodeArray.length > 0 ? psCodeArray.map((item: PsCodeOption) => Number(item.value)) : [];
+    const actNameCodes: PsCodeOption[] = this.form.controls["actName"].value || [];
+    const ActNameCodes = actNameCodes.length > 0 ? actNameCodes.map((item: PsCodeOption) => Number(item.value)) : [];
+    const DISTRICT_Code_Array: PsCodeOption[] = this.form.controls["districtCodes"].value || [];
+    const DISTRICT_Codes = DISTRICT_Code_Array.length > 0 ? DISTRICT_Code_Array.map((item: PsCodeOption) => Number(item.value)) : [];
+    this.ActWiseCountForm.patchValue({
+      PageNumber: 1,
+      PageSize: 10,
+      Acts: ActNameCodes,
+      PSCodes: psCodeValues,
+      DISTRICT_Code:DISTRICT_Codes
+    });
+    this.apiservice.LoadActWiseCount(this.ActWiseCountForm.value).subscribe({
+      
+      next: (response: any) => {
+        debugger
+        if (response.isSuccess && response.data && response.data.length > 0) {
+          try {
+            this.ActWiseCountList = JSON.parse(response.data); // ✅ Parse JSON string into an array  
+            this.totalCountRecords = JSON.parse(response.count);
+            this.currentLast = 10;
+            this.loaderService.hide();
+          } catch (error) {
+            console.error("Error parsing JSON:", error);
+             this.loaderService.hide();
+          }
+        }
+        else {
+          this.errorMessage = 'No data availaible.';
+          this.ActWiseCountList = [];
+           this.loaderService.hide();
+        }
+      }
+    });
+  }
+
+  loadFirstReports(event: TableLazyLoadEvent) {
+    const pagesize = event.rows ?? 10;
+    const first = event.first ?? 0;
+    const pageNumber = Math.floor(first / pagesize) + 1;
+    const pageSize = pagesize;
+    this.currentFirst = first + 1;
+    this.currentLast = first + pageSize > this.totalRecords ? this.totalRecords : first + pageSize;
+    this.loaderService.show();
+    this.ActWiseCountForm.patchValue({
+      PageNumber: pageNumber,
+      PageSize: pageSize
+    });
+    this.apiservice.LoadActWiseCount(this.ActWiseCountForm.value).subscribe({
+      next: (response: any) => {
+        if (response.isSuccess && response.data && response.data.length > 0) {
+          try {
+            this.ActWiseCountList = JSON.parse(response.data);
+            this.totalCountRecords = JSON.parse(response.count);
+            this.loaderService.hide();
+          } catch (error) {
+            console.error("Error parsing JSON:", error);
+            this.loaderService.hide();
+          }
+        }
+        else {
+          this.errorMessage = 'No data availaible.';
+          this.ActWiseCountList = [];
+          this.loaderService.hide();
+        }
+      }
+    });
+  }
+  openpsComponent(cino: string) {
+    const actNameCodes: PsCodeOption[] = this.form.controls["actName"].value || [];
+    const ActNameCodes = actNameCodes.length > 0 ? actNameCodes.map((item: PsCodeOption) => Number(item.value)) : [];
+    this.loaderService.show();
+    this.ActPSWiseListForm.patchValue({
+      PageNumber: 1,
+      PageSize: 10,
+      ACT_CD: ActNameCodes,
+      PS_CD: cino,
+      ACTTYPE: "FIR"
+    });
+
+    console.log(this.ActPSWiseListForm.value);
+    this.apiservice.LoadActPSWiseList(this.ActPSWiseListForm.value).subscribe({
+      next: (response: any) => {
+        if (response.isSuccess && response.data && response.data.length > 0) {
+          try {
+            if (JSON.parse(response.data).length != 0) {
+              this.ActWiseList = JSON.parse(response.data);
+              this.isActSecondTable = true;
+              this.isActDetailTable = false;
+              this.isActThirdTable=false;
+              this.BackPage = true;
+              this.totalRecords = JSON.parse(response.count);
+              this.headerText = "Total FIR";
+              if (this.ActWiseList.length > 0) {
+                this.columns = Object.keys(this.ActWiseList[0]); // Extract the keys (field names) from the first item
+              }
+              this.loaderService.hide();
+            }
+            else {
+              alert("No Record Found !!");
+              this.loaderService.hide();
+            }
+          } catch (error) {
+            console.error("Error parsing JSON:", error);
+            this.loaderService.hide();
+          }
+        }
+        else {
+          this.errorMessage = 'No data availaible.';
+          this.ActWiseList = [];
+          this.loaderService.hide();
+        }
+      }
+    });
+  }
+  openAccusedComponent(cino: string) {
+    const actNameCodes: PsCodeOption[] = this.form.controls["actName"].value || [];
+    const ActNameCodes = actNameCodes.length > 0 ? actNameCodes.map((item: PsCodeOption) => Number(item.value)) : [];
+     this.loaderService.show();
+    this.ActPSWiseListForm.patchValue({
+      PageNumber: 1,
+      PageSize: 10,
+      ACT_CD: ActNameCodes,
+      PS_CD: cino,
+      ACTTYPE: "ACC"
+    });
+    this.apiservice.LoadActPSWiseList(this.ActPSWiseListForm.value).subscribe({
+      next: (response: any) => {
+        if (response.isSuccess && response.data && response.data.length > 0) {
+          try {
+            if (JSON.parse(response.data).length != 0) {
+              this.ActWiseList = JSON.parse(response.data);
+              this.isActSecondTable = false;
+              this.isActDetailTable = false;
+              this.isActThirdTable=true;
+              this.BackPage = true;
+              this.totalRecords = JSON.parse(response.count);
+              this.headerText = "Total Accused ";
+              this.loaderService.hide();
+            }
+            else {
+              alert("No Record Found !!");
+              this.loaderService.hide();
+            }
+          } catch (error) {
+            console.error("Error parsing JSON:", error);
+            this.loaderService.hide();
+          }
+        }
+        else {
+          this.errorMessage = 'No data availaible.';
+          this.ActWiseList = [];
+          this.loaderService.hide();
+        }
+      }
+    });
+  }
+  openArrestComponent(cino: string) {
+    const actNameCodes: PsCodeOption[] = this.form.controls["actName"].value || [];
+    const ActNameCodes = actNameCodes.length > 0 ? actNameCodes.map((item: PsCodeOption) => Number(item.value)) : [];
+    this.loaderService.show();
+    this.ActPSWiseListForm.patchValue({
+      PageNumber: 1,
+      PageSize: 10,
+      ACT_CD: ActNameCodes,
+      PS_CD: cino,
+      ACTTYPE: "ARR"
+    });
+    this.apiservice.LoadActPSWiseList(this.ActPSWiseListForm.value).subscribe({
+      next: (response: any) => {
+        if (response.isSuccess && response.data && response.data.length > 0) {
+          try {
+            if (JSON.parse(response.data).length != 0) {
+              this.ActWiseList = JSON.parse(response.data);
+              this.isActSecondTable = false;
+              this.isActDetailTable = false;
+              this.isActThirdTable=true;
+              this.BackPage = true;
+              this.totalRecords = JSON.parse(response.count);
+              this.headerText = "Total Arrest ";
+this.loaderService.hide();
+            }
+            else {
+              alert("No Record Found !!");
+              this.loaderService.hide();
+            }
+          } catch (error) {
+            console.error("Error parsing JSON:", error);
+            this.loaderService.hide();
+          }
+        }
+        else {
+          this.errorMessage = 'No data availaible.';
+          this.ActWiseList = [];
+          this.loaderService.hide();
+        }
+      }
+    });
+  }
+  fnback() {
+    this.isActDetailTable = true;
+    this.isActSecondTable = false;
+    this.isActThirdTable=false;
+    this.BackPage = false;
+  }
+  loadReports(event: TableLazyLoadEvent) {
+    //;
+    const pagesize = event.rows ?? 10;
+    const first = event.first ?? 0;
+    const pageNumber = Math.floor(first / pagesize) + 1;
+    const pageSize = pagesize;
+    this.SecondListFirst = first + 1;
+    this.SecondListLast = first + pageSize > this.totalRecords ? this.totalRecords : first + pageSize;
+this.loaderService.show();
+    this.ActPSWiseListForm.patchValue({
+      PageNumber: pageNumber,
+      PageSize: pageSize
+    });
+    this.apiservice.LoadActPSWiseList(this.ActPSWiseListForm.value).subscribe({
+      next: (response: any) => {
+        if (response.isSuccess && response.data && response.data.length > 0) {
+          try {
+            if (JSON.parse(response.data).length != 0) {
+              this.ActWiseList = JSON.parse(response.data);
+              this.isActSecondTable = true;
+              this.isActDetailTable = false;
+              this.isActThirdTable=false;
+              this.BackPage = true;
+              this.totalRecords = JSON.parse(response.count);
+              this.loaderService.hide();
+            }
+            else {
+              alert("No Record Found !!");
+              this.loaderService.hide();
+            }
+          } catch (error) {
+            console.error("Error parsing JSON:", error);
+            this.loaderService.hide();
+          }
+        }
+        else {
+          this.errorMessage = 'No data availaible.';
+          this.ActWiseList = [];
+          this.loaderService.hide();
+        }
+      }
+    });
+  }
+  loadDataReports(event: TableLazyLoadEvent) {
+    //debugger;
+    const pagesize = event.rows ?? 10;
+    const first = event.first ?? 0;
+    const pageNumber = Math.floor(first / pagesize) + 1;
+    const pageSize = pagesize;
+    this.SecondListFirst = first + 1;
+    this.SecondListLast = first + pageSize > this.totalRecords ? this.totalRecords : first + pageSize;
+this.loaderService.show();
+    this.ActPSWiseListForm.patchValue({
+      PageNumber: pageNumber,
+      PageSize: pageSize
+    });
+    this.apiservice.LoadActPSWiseList(this.ActPSWiseListForm.value).subscribe({
+      next: (response: any) => {
+        if (response.isSuccess && response.data && response.data.length > 0) {
+          try {
+            if (JSON.parse(response.data).length != 0) {
+              this.ActWiseList = JSON.parse(response.data);
+              this.isActSecondTable = false;
+              this.isActDetailTable = false;
+              this.isActThirdTable=true;
+              this.BackPage = true;
+              this.totalRecords = JSON.parse(response.count);
+              this.loaderService.hide();
+            }
+            else {
+              alert("No Record Found !!");
+              this.loaderService.hide();
+            }
+          } catch (error) {
+            console.error("Error parsing JSON:", error);
+            this.loaderService.hide();
+          }
+        }
+        else {
+          this.errorMessage = 'No data availaible.';
+          this.ActWiseList = [];
+          this.loaderService.hide();
+        }
+      }
+    });
+  }
+}

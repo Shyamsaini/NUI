@@ -1,0 +1,23 @@
+{
+    "svn.delete.ignoredRulesForDeletedFiles": [
+        "dist\\nyaay-setu-ui\\3rdpartylicenses.txt",
+        "dist\\nyaay-setu-ui\\browser\\assets",
+        "dist\\nyaay-setu-ui\\browser\\index.html",
+        "dist\\nyaay-setu-ui\\browser\\media",
+        "dist\\nyaay-setu-ui\\browser\\polyfills-XZ3YE3Y2.js",
+        "dist\\nyaay-setu-ui\\browser\\scripts-2KUCHTTY.js",
+        "dist\\nyaay-setu-ui\\browser\\styles-BTMD2IFT.css",
+        "dist\\nyaay-setu-ui\\server\\chunk-MBMFIIHN.mjs",
+        "dist\\nyaay-setu-ui\\server\\chunk-SDCGKQVP.mjs",
+        "dist\\nyaay-setu-ui\\server\\index.server.html",
+        "dist\\nyaay-setu-ui\\server\\main.server.mjs",
+        "dist\\nyaay-setu-ui\\server\\polyfills.server.mjs",
+        "dist\\nyaay-setu-ui\\server\\render-utils.server.mjs",
+        "dist\\nyaay-setu-ui\\server\\server.mjs",
+        "dist\\nyaay-setu-ui\\browser\\main-NCONNNSK.js",
+        "dist\\nyaay-setu-ui\\browser\\main-TGT77JND.js",
+        "dist\\nyaay-setu-ui\\server\\chunk-34DCLHL7.mjs",
+        "dist\\nyaay-setu-ui\\server\\chunk-7BJP3DTK.mjs",
+        "dist\\nyaay-setu-ui\\server\\chunk-WNIXSB4F.mjs"
+    ]
+}

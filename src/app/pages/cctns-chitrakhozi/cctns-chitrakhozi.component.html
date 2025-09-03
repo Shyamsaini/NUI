@@ -1,0 +1,99 @@
+
+
+   <div class="pc-container">
+     <div class="pcoded-content pb" style="padding-bottom:90px;">
+       <div class="page-header">
+        <div class="page-block">
+              <div class="row align-items-center">
+                <div class="col-md-6">
+                  <div class="page-header-title">
+                    <h5 class="m-b-10">CCTNS Chitra Khozi</h5>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+  
+      <div class="row">
+        <div class="card mt-5">
+          <div class="card-body">
+            <div class="row searchbypanel">
+              <div class="col-md-9 d-flex flex-column">
+                <span class="dragBox">Drag and Drop image here
+                  <input type="file" id="file" (change)="onFileSelected($event)" />
+                </span>
+                <label for="file" class="btn btn-primary w-25 mx-auto mt-3">Upload Image</label>
+              </div>
+              <div class="col-md-3 col-12 mb-3">
+                <div id="defaultImg">
+                  <img *ngIf="!uploadedImage" [src]="'assets/images/UserImage.jpg'" style="text-align: center; object-fit: cover; height: 200px; width: 200px;" />
+                </div>
+                <div #preview></div>
+                <div class="crim-img">
+                  <img *ngIf="uploadedImage" [src]="uploadedImage" alt="Uploaded image" style="text-align: center; object-fit: cover; height: 200px; width: 200px;" />
+                </div>
+                <button *ngIf="uploadedImage" type="button" class="btn btn-success px-5 mt-3" (click)="getChitraKhoziWithImage()" id="btnSubmit">Submit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="row" *ngIf="courtCasesData.length > 0">
+        <div class="card" id="ChitraKhozi">
+          <div class="card-body pb-0 pt-3">
+            <!-- <div class="col-md-6 offset-md-6 d-flex justify-content-end mb-3">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Search..."
+                (input)="onQuickFilter($event)"
+                style="max-width: 300px;"
+              />
+            </div> -->
+            <div class="row">
+              <div class="col-sm-12 fld p-0">
+                <div class="col-md-12">
+                  <p-table
+                    [value]="courtCasesData"
+                    [paginator]="true"
+                    [rows]="10"
+                    [responsiveLayout]="'scroll'"
+                    [trackBy]="trackByIndex"
+                  >
+                    <ng-template pTemplate="header">
+                      <tr>
+                        <th>S.No</th>
+                        <th>Prisoner Name</th>
+                        <th>Fir Number</th>
+                        <th>Photo</th>
+                        <th>Matching%</th>
+                      </tr>
+                    </ng-template>
+  
+                    <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex">
+                      <tr>
+                        <td>{{ rowIndex + 1 }}</td>
+                        <td>{{ rowData.name }}</td>
+                        <td>{{ rowData.fir_number }}</td>
+                        <td>
+                          <img
+                            *ngIf="rowData.image"
+                            [src]="'data:image/jpeg;base64,' + rowData.image"
+                            alt="Photo"
+                            style="width: 50px; height: 50px;"
+                          />
+                        </td>
+                        <td>{{ (rowData.accuracy).toFixed(0) }}%</td>
+                      </tr>
+                    </ng-template>
+                  </p-table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

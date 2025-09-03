@@ -1,0 +1,424 @@
+<div class="pc-container">
+    <div class="pcoded-content pb" style="padding-bottom:90px;" >
+      <div class="page-header">
+        <div class="page-block">
+          <div class="row align-items-center">
+            <div class="col-md-6">
+              <div class="page-header-title">
+                <h5 class="m-b-10">Consolidated eSakshaya Dashboard</h5>
+              </div>
+            </div>
+            <div class="col-md-6 text-right">
+              <!-- <button [routerLink]="['/Esakshyadashboard']" class="btn btn-primary text-white py-1">eSakshaya Created By Me</button> -->
+
+  <div class="toggle-container">
+  <label class="radio-option">
+    <input 
+      type="radio" 
+      name="dashboard" 
+      value="MyDashboard" 
+      [(ngModel)]="DashboardType" 
+      (change)="toggleState()">
+    <span class="toggle-label" [class.active]="DashboardType === 'MyDashboard'">
+      MY Sakshaya
+    </span>
+  </label>
+
+  <label class="radio-option">
+    <input 
+      type="radio" 
+      name="dashboard" 
+      value="ConsolidatedDashboard" 
+      [(ngModel)]="DashboardType" 
+      (change)="toggleState()">
+    <span class="toggle-label" [class.active]="DashboardType === 'ConsolidatedDashboard'">
+      Consolidated Dashboard
+    </span>
+  </label>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+     <div class="mt-5">
+
+
+        <div class="card">
+        <div class="card-body">
+          <form [formGroup]="formEsakshya" class="form-horizontal">
+              <div class="col-md-12">
+                <div class="row">
+                  <div class="col-md-10">
+                    <div class="row">
+              <div class="col-md-3  col-12 mb-3">
+                <label class="form-label"> District  Name</label>
+                <ng-multiselect-dropdown #multiSelectEsakshya [settings]="settings" [data]="ListDistict" formControlName="districtCodes" [placeholder]="'Select District'"
+                  (onDropDownClose)="onDistrictDropdownChange($event)">
+                  </ng-multiselect-dropdown>
+
+              </div>
+
+
+              <div class="col-md-3  col-12 mb-3">
+                <label class="form-label"> Police Station</label>
+                <sup class="text-danger top-0">*</sup>
+                <ng-multiselect-dropdown #multiSelectEsakshya [settings]="settings" [data]="policestations" formControlName="psCode" [placeholder]="'Police Station'">
+                </ng-multiselect-dropdown>
+              </div>
+              <div class="col-lg-2 col-md-3  col-12 mb-3">
+                <label class="form-label">SID From Date</label>
+                <sup class="text-danger top-0">*</sup>
+                <!-- <p-calendar formControlName="FromDate" [minDate]="minDateValue" class="form-control" [maxDate]="maxDateValue" readonlyInput="true"
+                  placeholder="Select a date" (onSelect)="onDateChange($event)" dateFormat="dd/mm/yy"></p-calendar> -->
+                  <p-calendar 
+                  class="form-control mon" 
+                  formControlName="FromDate" 
+                  [minDate]="minDateValue" 
+                  [maxDate]="maxDateValue" 
+                  [readonlyInput]="true" 
+                  placeholder="01-07-2024" 
+                  [showIcon]="true" 
+                  (onSelect)="onDateChange($event)" 
+                  dateFormat="dd/mm/yy" >
+              </p-calendar>
+
+              </div>
+             
+              <div class="col-lg-2 col-md-3 col-12 mb-3">
+                <label class="form-label">SID To Date</label>
+                <sup class="text-danger top-0">*</sup>
+                <!-- <p-calendar class="form-control" formControlName="ToDate" [minDate]="minToDate" [maxDate]="maxFromDate" placeholder="Select a date"
+                  dateFormat="dd/mm/yy"></p-calendar> -->
+                  <p-calendar 
+                  class="form-control mon" 
+                  formControlName="ToDate" 
+                  [minDate]="minToDate" 
+                  [maxDate]="maxToDate" 
+                  [readonlyInput]="true"
+                  [placeholder]="currentDatePlaceholder"
+                  dateFormat="dd/mm/yy"
+                  [showIcon]="true">
+              </p-calendar>
+             </div>
+             <!-- NCL Filter -->
+             <!-- <div class="col-md-2 col-12">
+              <label class="form-label">Act Type</label>
+              <select class="form-control" 
+                      formControlName="actType">
+                <option value="" disabled selected>Select</option>
+                <option *ngFor="let option of actTypeOptions" 
+                        [value]="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            </div> -->
+           
+            </div>
+           </div>
+            
+              <div class="col-md-2 col-12 pt-4 mt-2 text-end" >
+                <button type="button" class="btn btn-success text-white mr-2" (click)="onSearch()">Search</button>
+                <button type="button" class="btn btn-secondary text-white" (click)="onReset()">Reset</button>
+              </div>
+            </div>
+          </div>      
+        </form>
+        </div>
+      </div>  
+  <div class="card">
+        <div class="card-body">
+        <div class="col-sm-12 mb-1 fir-det-sec" >
+        <div class="col-sm-12 mb-1 fir-det-sec">
+        <div class="row">
+          <div class="col-sm-3">
+             <div class="card text-center px-4 py-5 com-border-shadow">
+              <div class="tot-cnt border-bottomm pb-2 mb-2 tot-fr">
+                <h4>Total</h4>
+                 <a href="javascript:void(0)" (click)="loadLinkedStatusCountRecordsClick('')">{{ total }}</a>
+              </div>
+              <div class="row sub-pnt dis-flx">
+                <div class="col-sm-6">
+                  <div class="tot-cnt tot-fr">
+                  <h4 class="mb-0">Unique IO</h4>
+                  </div>
+                </div>
+                <div class="col-sm-6 border-lefttt">
+                  <div class="tot-cnt tot-fr">
+                   <a href="javascript:void(0)" (click)="loadLinkedStatusCountRecordsClick('IO')">{{ UniqueIOCount }}</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-3">
+             <div class="card text-center px-4 py-5 com-border-shadow">
+              <div class="tot-cnt border-bottomm pb-2 mb-2 tot-fr">
+                <h4>Linked</h4>
+                <a href="javascript:void(0)" (click)="loadLinkedStatusCountRecordsClick('Y')">{{ linked }}</a>
+              </div>
+              <div class="row sub-pnt dis-flx">
+                <div class="col-sm-6">
+                  <div class="tot-cnt tot-fr">
+                    <h4 style="color: #af0b39;" class="mb-0">Unique FIR</h4>
+                  </div>
+                </div>
+                <div class="col-sm-6 border-lefttt">
+                  <div class="tot-cnt tot-fr">
+                    <a href="javascript:void(0)" style="color: #af0b39;  pointer-events: none;">{{ UniqueFirCount }}</a>
+                      <!-- <a href="javascript:void(0)" (click)="loadLinkedStatusCountRecords('Y')" style="color: #af0b39;">{{ UniqueFirCount }}</a> -->
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-3">
+             <div class="card text-center px-4 py-5 com-border-shadow">
+              <div class="tot-cnt border-bottomm pb-2 mb-2 tot-fr">
+            <h4>Not Linked</h4>
+             <a href="javascript:void(0)" (click)="loadLinkedStatusCountRecordsClick('N')">{{ notLinked }}</a>
+              </div>
+              <div class="row sub-pnt dis-flx">
+                <div class="col-sm-6">
+                  <div class="tot-cnt tot-fr">
+                    <h4 style="color: #af0b39;" class="mb-0">Unique IO</h4>
+                  </div>
+                </div>
+                <div class="col-sm-6 border-lefttt">
+                  <div class="tot-cnt tot-fr">
+                  <a href="javascript:void(0)" style="color: #af0b39;  pointer-events: none;">{{ UniqueNotLinkedIOCount  }}</a>
+                    <!-- <a href="javascript:void(0)" style="color: #af0b39;" (click)="loadLinkedStatusCountRecords('N')">{{ UniqueNotLinkedIOCount }}</a> -->
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-3">
+            <div class="card text-center px-4 py-5 com-border-shadow">
+              <div class="tot-cnt border-bottomm pb-2 mb-2 tot-fr">
+              <h4>Deleted</h4>
+             <a href="javascript:void(0)" (click)="loadLinkedStatusCountRecordsClick('D')">{{ DeletedLinked }}</a>
+              </div>
+              <div class="row sub-pnt dis-flx">
+                <div class="col-sm-6">
+                  <div class="tot-cnt tot-fr">
+                    <h4 style="color: #af0b39;" class="mb-0">Unique IO</h4>
+                  </div>
+                </div>
+                <div class="col-sm-6 border-lefttt">
+                  <div class="tot-cnt tot-fr">
+                  <a href="javascript:void(0)" style="color: #af0b39;  pointer-events: none;">{{ UniqueDeletedLinkedIOCount }}</a>
+                    <!-- <a href="javascript:void(0)" style="color: #af0b39;" (click)="loadLinkedStatusCountRecords('D')">{{ UniqueDeletedLinkedIOCount }}</a> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+   </div>
+   </div>
+   </div>
+      </div>
+        <div class="row mt-12" *ngIf="showResults">
+          <div class="col-md-12">
+            <div class="card" style="font-size: 1.75rem;">
+              <div class="card-body pt-0">
+                <div style="height: 100%; width: 100%;">
+                  <div class="row mb-1">
+                    <div class="col-md-2 pt-3">
+                      <h5>{{ LinkedStatusName }}</h5>
+                    </div>
+                    <div class="col-md-4 text-center pt-3">
+                      <h5 class="me-3 mb-0">Last Updated On : {{ LastUpdated }}</h5> 
+                        <!-- <button  (click)="DownalodLinkedStatusData()" class="btn btn-primary text-white pt-0 ms-auto pb-0">Download</button> -->
+                    </div>
+                    <div class="col-md-3 text-end">
+                    <button *ngIf="CurrentStatus == null"  class="btn btn-success text-white"(click)="DownalodLinkedStatusData()">SID Details Download</button>
+                    </div>
+                    <!-- <div class="col-md-3 text-end">
+                      <span class="p-input-icon-left">
+                        <i class="pi pi-search pe-2"></i>
+                      <input type="text" class="form-control ps-4" placeholder="Search..." (input)="onQuickFilter($event)" style="width: 300px;" />
+                      </span>
+                   </div> -->
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12">
+            
+                      <p-table
+                        #esakshyaDataTable
+                        [columns]="columns"
+                        [value]="EsakshyaFilterData"
+                        [paginator]="true"
+                        [rows]="pageSize"
+                        [totalRecords]="FilteredRecordsCount"
+                        [lazy]="true" 
+                        [loading]="loading"
+                        [rowsPerPageOptions]="[10, 25, 50]"
+                        [responsive]="true"
+                        [first]="(pageNumber - 1) * pageSize"
+                        (onPage)="onPageChange($event)"
+                        [rowHover]="true"
+                         >
+                        <!-- Table Header -->
+                        <!-- <ng-template pTemplate="header" let-columns>
+                          <tr>
+                            <th *ngFor="let col of columns" class="header-style" [pSortableColumn]="col.field" >
+                              {{ col.header }}
+                              <p-sortIcon [field]="col.field"></p-sortIcon>
+                            </th>
+                          </tr>
+                        </ng-template> --
+
+                        <!-- Table Header (Sorting Disabled) -->
+                    <ng-template pTemplate="header" let-columns>
+                       <tr>
+                          <th *ngFor="let col of columns" class="header-style">
+                          {{ col.header }}
+                          </th>
+                        </tr>
+                    </ng-template>
+
+                        <!-- Table Body -->
+                        <ng-template pTemplate="body" let-rowData let-columns="columns">
+                          <tr *ngIf="EsakshyaFilterData.length > 0; else noRecords">
+                      <td *ngFor="let col of columns" class="body-cell-style">
+                       <a
+                       *ngIf="col.field === 'SIDCount' && rowData.PS_Code !== 'NA'"
+                        href="javascript:void(0)"
+                        (click)="onSidCountClick(rowData)"
+                       >
+                      {{ rowData[col.field] }}
+                      </a>
+                      <!-- <a *ngIf="col.field === 'LinkedFIRNumber'" href="javascript:void(0)" (click)="loadPillarData()">
+                      {{ rowData[col.field] }}
+                      </a> -->
+                      <!-- <span *ngIf="(col.field !== 'SIDCount' && col.field !== 'LinkedFIRNumber') || rowData.PS_Code === 'NA'">
+                      {{ rowData[col.field] }}
+                      </span> -->
+                      <span *ngIf="!(col.field === 'SIDCount' && rowData.PS_Code !== 'NA')">
+                      {{ rowData[col.field] }}
+                      </span>
+
+                      </td>
+                      </tr>
+                        </ng-template>
+                        <!-- No Records Template -->
+                        <ng-template #noRecords>
+                          <tr>
+                            <td [attr.colspan]="columns.length" class="text-center text-muted p-3">
+                              No records found
+                            </td>
+                          </tr>
+                        </ng-template>
+                        <!-- Paginator Info -->
+                        <ng-template pTemplate="paginatorleft" let-state>
+                        <div>
+                          Showing {{ state.first + 1 }} to {{ state.first + state.rows > FilteredRecordsCount ? FilteredRecordsCount : state.first + state.rows }}
+                          of {{ FilteredRecordsCount }} entries
+                        </div>
+                      </ng-template>
+                      </p-table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- <p-dialog 
+        [(visible)]="showPopup" 
+        [modal]="true" 
+        [responsive]="true" 
+        [style]="{width: '80%'}" 
+        [closable]="true" 
+        (onHide)="closePopup()">
+        <p-header>
+          Detailed SID Information
+        </p-header>
+        <div class="modal-body">
+          <p-table
+             #popupTable
+            [columns]="popupColumns"
+            [value]="popupData"
+            [paginator]="true"
+            [rows]="10"
+            [rowsPerPageOptions]="[10, 20, 50]"
+            [responsive]="true"
+            [rowHover]="true"
+          >
+            <ng-template pTemplate="header" let-columns>
+              <tr>
+                <th *ngFor="let col of columns" class="header-style">
+                  {{ col.header }}
+                </th>
+              </tr>
+            </ng-template>
+      
+            <ng-template pTemplate="body" let-rowData let-columns="columns">
+              <tr>
+                <td *ngFor="let col of columns" class="body-cell-style">
+                  {{ rowData[col.field] }}
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      
+      
+      </p-dialog>
+       -->
+       <p-dialog 
+       [(visible)]="showPopup" 
+       [modal]="true" 
+       [responsive]="true" 
+       [style]="{width: '80%'}" 
+       [closable]="true" 
+       (onShow)="resetPaginator()"
+       (onHide)="closePopup()">
+       <p-header>
+        <p-header> Detailed SID Information <small *ngIf="isShowDistrictPopup">(District: {{ districtName || 'N/A' }}, Police Station: {{ psName || 'N/A' }})
+       </small>
+       </p-header>
+       </p-header>
+       <div class="modal-body">
+         <p-table
+            #popupTable
+           [columns]="popupColumns"
+           [value]="popupData"
+           [paginator]="true"
+           [rows]="10"
+           [first]="firstRowIndex"
+           [rowsPerPageOptions]="[10, 20, 50]"
+           [responsive]="true"
+           [rowHover]="true"
+         >
+         <ng-template pTemplate="header" let-columns>
+          <tr>
+            <th class="header-style">Sr. No</th>
+            <th *ngFor="let col of columns" class="header-style" [hidden]="col.field === 'Sno'">
+              {{ col.header }}
+            </th>
+          </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="body" let-rowData let-columns="columns" let-rowIndex="rowIndex">
+          <tr>
+            <td class="body-cell-style">{{ rowIndex + 1 }}</td>
+            <td  *ngFor="let col of columns" class="body-cell-style" [hidden]="col.field === 'Sno'">
+              {{ rowData[col.field] }}
+            </td>
+          </tr>
+          
+        </ng-template>
+         </p-table>
+       </div>
+   </p-dialog>
+      
+</div>
+</div>

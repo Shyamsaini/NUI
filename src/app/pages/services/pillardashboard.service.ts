@@ -1,0 +1,102 @@
+import { Injectable } from '@angular/core';
+import { HttpClient , HttpHeaders} from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class PillardashboardService {
+   private ApipillardashboarUrl = `${environment.apiUrl}/CourtCases/GetpillardashboardData`;
+     private GetPoliceStationApiUrl: string = `${environment.apiUrl}/Public/GetPoliceStationList`;
+  constructor(private http: HttpClient) { }
+
+    GetPillarData(districtCodes : any[], PoliceStationCpdeCode: any[],fdate: any, tdate: any): Observable<any> {
+    const body = {
+       districtCodes: districtCodes,
+       PoliceStationCode: PoliceStationCpdeCode,
+       startDate: fdate,
+       endDate:tdate
+    };
+    return this.http.post<any>(this.ApipillardashboarUrl, body);
+  }
+  
+  SearchProsDetails(fdate: any, tdate: any,policeCode: any):Observable<any>{
+     const body={
+       startDate: fdate,
+       endDate:tdate,
+       psCode: policeCode.toString() 
+     };
+     return this.http.post<any>(`${environment.apiUrl}/Statistics/ProsecutionDetails`, body);
+   }
+    LoadPoliceStations(distcodes: number[]): Observable<any[]> {
+    return this.http.post<any[]>(`${this.GetPoliceStationApiUrl}`, {districts:distcodes});
+  }
+   SearchFslDetails(fromDate: string | null, toDate: string | null, policeCode: string): Observable<any> {
+     
+     const payload = { startDate: fromDate, endDate: toDate, psCode: policeCode };
+     return this.http.post(`${environment.apiUrl}/Statistics/FslDetails`, payload);
+   }
+   SearchFSL_Details(fdate: any, tdate: any,policeCode: any):Observable<any>{     
+     const body={
+       startDate: fdate,
+       endDate:tdate,
+       PsCode: policeCode.toString() 
+ 
+     };
+     return this.http.post<any>(`${environment.apiUrl}/Statistics/FslDetails`, body);
+   }
+   SearchMlrDetails(fdate: any, tdate: any,policeCode: any):Observable<any>{
+    
+     const body={
+       startDate: fdate,
+       endDate:tdate,
+       PsCode: policeCode.toString() 
+ 
+     };
+     return this.http.post<any>(`${environment.apiUrl}/Statistics/MlrDetails`, body);
+   }
+   SearchPmrrDetails(fdate: any, tdate: any,policeCode: any):Observable<any>{
+     
+     const body={
+       startDate: fdate,
+       endDate:tdate,
+       PsCode: policeCode.toString() 
+ 
+     };
+     return this.http.post<any>(`${environment.apiUrl}/Statistics/PmrDetails`, body);
+   }
+   SearchProsLinkedData(RegNum: string):Observable<any>{
+     const body={
+       regNum: RegNum.toString()       
+     };
+     return this.http.post<any>(`${environment.apiUrl}/Statistics/ProsecutionDetailsByRegNum`, body);
+   }
+   SearchFslLinkedData(RegNum: any):Observable<any>{
+     const body={
+       RegNum: RegNum.toString()      
+     };
+     return this.http.post<any>(`${environment.apiUrl}/Statistics/FslDetailsByFirNum`, body);
+   }
+   SearchMlrLinkedData(rowData: any):Observable<any>{
+    
+     const body={
+       DsCode: rowData.DISTRICT_CD,
+      PsCode:rowData.PS_CD,
+      FirNo:rowData.MLC_GD_NUM,
+      FirDate:rowData.GD_DT
+     };
+     return this.http.post<any>(`${environment.apiUrl}/Statistics/MedleprData`, body);
+   }
+   SearchPmrLinkedData(RegNum: any):Observable<any>{
+     const body={
+       RegNum: RegNum.toString()      
+     };
+     return this.http.post<any>(`${environment.apiUrl}/Statistics/PmrDetailsByRegNum`, body);
+   }
+ 
+   LoadOtherPillars(body: any){
+     return this.http.post<any>(`${environment.apiUrl}/Napix/OtherPillarInformation`, body);
+   }
+}
+
