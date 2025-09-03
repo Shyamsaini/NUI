@@ -10,6 +10,7 @@ import { LoaderService } from '../services/loader.service';
 import { TabContainerComponent } from '../_components/tabs/tab-container.component';
 import { OtherPillarsComponent } from '../_components/otherpillars/other-pillars.component';
 import { OtherPillarsServicesService } from '../services/other-pillars-services.service';
+
 @Component({
   selector: 'app-total-fir',
   templateUrl: './total-fir.component.html',
