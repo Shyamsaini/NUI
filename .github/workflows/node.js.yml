@@ -1,0 +1,38 @@
+name: Angular CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      # Step 1: Checkout the source code
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Step 2: Setup Node environment
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      # Step 3: Install dependencies
+      - name: Install Dependencies
+        run: npm install
+
+      # Step 4: Build Angular App
+        # If your Angular project is in a subfolder, add: cd your-folder
+      - name: Build Angular App
+        run: npm run build -- --configuration=production
+
+      # Step 5: Upload build artifacts (dist folder)
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: angular-dist
+          path: dist/
